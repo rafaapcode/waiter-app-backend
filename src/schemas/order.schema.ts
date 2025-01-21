@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const Order = new mongoose.Schema({
+export const OrderSchema = new mongoose.Schema({
   table: {
     type: String,
     required: true,
