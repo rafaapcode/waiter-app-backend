@@ -9,7 +9,7 @@ export const Product = new mongoose.Schema({
     type: String,
     required: true,
   },
-  imagePath: {
+  imageUrl: {
     type: String,
     required: true,
   },
