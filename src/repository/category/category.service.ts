@@ -9,4 +9,25 @@ export class CategoryRepository {
     @Inject(CONSTANTS.CATEGORY_PROVIDER)
     private categoryModel: Model<Category>,
   ) {}
+
+  async createCategory(icon: string, name: string): Promise<Category> {
+    try {
+      const categorie = await this.categoryModel.create({ icon, name });
+
+      return categorie;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async listCategory(): Promise<Category[]> {
+    try {
+      const categorie = await this.categoryModel.find();
+      return categorie;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }

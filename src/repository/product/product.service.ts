@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from 'src/constants';
-import { Product } from 'src/types/Product.type';
+import { Product, ProductType } from 'src/types/Product.type';
 
 @Injectable()
 export class ProductRepository {
@@ -9,4 +9,38 @@ export class ProductRepository {
     @Inject(CONSTANTS.PRODUCT_PROVIDER)
     private productModel: Model<Product>,
   ) {}
+
+  async crateProduct(productData: ProductType): Promise<Product> {
+    try {
+      const product = await this.productModel.create(productData);
+      return product;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async listProducts(): Promise<Product[]> {
+    try {
+      const products = await this.productModel.find();
+      return products;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async listProductsByCategorie(categoryId: string): Promise<Product[]> {
+    try {
+      const products = await this.productModel
+        .find()
+        .where('category')
+        .equals(categoryId);
+
+      return products;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }

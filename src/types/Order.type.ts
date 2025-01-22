@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 
-enum STATUS {
+export enum STATUS {
   WAITING = 'WAITING',
   IN_PRODUCTION = 'IN_PRODUCTION',
   DONE = 'DONE',
@@ -12,3 +12,8 @@ export interface Order extends Document {
   readonly createdAt: Date;
   readonly products: { product: Schema.Types.ObjectId; quantity: number }[];
 }
+
+export type ProductsOrder = {
+  product: Schema.Types.ObjectId;
+  quantity: number;
+};

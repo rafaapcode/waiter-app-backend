@@ -8,3 +8,12 @@ export interface Product extends Document {
   readonly ingredients: { name: string; icon: string }[];
   readonly category: Schema.Types.ObjectId;
 }
+
+export type ProductType = {
+  name: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  ingredients: { name: string; icon: string }[];
+  category: Schema.Types.ObjectId;
+};
