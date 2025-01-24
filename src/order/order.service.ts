@@ -4,17 +4,22 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderRepository } from 'src/repository/order/order.service';
-import { Order, ProductsOrder, STATUS } from 'src/types/Order.type';
+import { Order } from 'src/types/Order.type';
+import { ChangeOrderDTO } from './dto/ChangeOrder.dto';
+import { CreateOrderDTO } from './dto/CreateOrder.dto';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly orderRepository: OrderRepository) {}
 
-  async changeOrderStatus(orderId: string, newStatus: STATUS): Promise<Order> {
+  async changeOrderStatus(
+    orderId: string,
+    newStatus: ChangeOrderDTO,
+  ): Promise<Order> {
     try {
       const order = await this.orderRepository.changeOrderStatus(
         orderId,
-        newStatus,
+        newStatus.status,
       );
 
       if (!order) {
@@ -28,9 +33,12 @@ export class OrderService {
     }
   }
 
-  async createOrder(table: string, products: ProductsOrder[]): Promise<Order> {
+  async createOrder(createOrderData: CreateOrderDTO): Promise<Order> {
     try {
-      const order = await this.orderRepository.createOrder(table, products);
+      const order = await this.orderRepository.createOrder(
+        createOrderData.table,
+        createOrderData.products,
+      );
       if (!order) {
         throw new InternalServerErrorException('Erro ao criar novo pedidod');
       }

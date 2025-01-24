@@ -7,7 +7,9 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { Order, STATUS } from 'src/types/Order.type';
+import { Order } from 'src/types/Order.type';
+import { ChangeOrderDTO } from './dto/ChangeOrder.dto';
+import { CreateOrderDTO } from './dto/CreateOrder.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -20,17 +22,14 @@ export class OrderController {
   }
 
   @Post('')
-  async createOrder(@Body() orderData: any): Promise<Order> {
-    return await this.orderService.createOrder(
-      orderData.table,
-      orderData.products,
-    );
+  async createOrder(@Body() orderData: CreateOrderDTO): Promise<Order> {
+    return await this.orderService.createOrder(orderData);
   }
 
   @Patch('/:orderId')
   async changeStatusOrder(
     @Param('orderId') orderId: string,
-    @Body() newStatus: STATUS,
+    @Body() newStatus: ChangeOrderDTO,
   ): Promise<Order> {
     return await this.orderService.changeOrderStatus(orderId, newStatus);
   }
