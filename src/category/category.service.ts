@@ -1,16 +1,34 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CategoryRepository } from 'src/repository/category/category.service';
 import { Category } from 'src/types/Category.type';
+import { CreateCategoryDTO } from './dto/CreateCategory.dto';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async createCategory(name: string, icon: string): Promise<Category> {
+  async createCategory(data: CreateCategoryDTO): Promise<Category> {
     try {
-      // TODO: Validação dos dados recebidos
-      // TODO: Verificar se a categoria já não existe
-      const category = await this.categoryRepository.createCategory(icon, name);
+      if (!data.name) {
+        throw new BadRequestException('Name is required to create a category');
+      }
+
+      const categoryExist = await this.categoryRepository.findCategoryByName(
+        data.name,
+      );
+
+      if (categoryExist) {
+        throw new BadRequestException('Categoria já existe');
+      }
+
+      const category = await this.categoryRepository.createCategory(
+        data.icon || '',
+        data.name,
+      );
       if (!category) {
         throw new InternalServerErrorException('Erro ao criar nova categoria');
       }

@@ -1,4 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from 'src/constants';
 import { Category } from 'src/types/Category.type';
@@ -28,6 +32,20 @@ export class CategoryRepository {
     } catch (error) {
       console.log(error);
       return null;
+    }
+  }
+
+  async findCategoryByName(name: string): Promise<boolean> {
+    try {
+      const category = await this.categoryModel.findOne({ name });
+
+      if (!category) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
