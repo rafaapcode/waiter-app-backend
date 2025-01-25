@@ -1,21 +1,17 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsString, ValidateNested } from 'class-validator';
-import { Schema } from 'mongoose';
-import { ProductsOrder } from './../../types/Order.type';
+import { z } from 'zod';
 
-class ProductsOrderType {
-  @IsString({ message: 'PRODUCT deve conter um ID válido' })
-  product: Schema.Types.ObjectId;
+const productOrderSchema = z.object({
+  product: z
+    .string({ message: 'PRODUCT deve conter um ID válido' })
+    .length(24, { message: 'ID invalido' }),
+  quantity: z
+    .number()
+    .positive({ message: 'Quantidade deve ser um número positivo' }),
+});
 
-  @IsInt({ message: 'Quantidade deve ser um número' })
-  quantity: number;
-}
+export const createOrderSchema = z.object({
+  table: z.string({ message: 'Mesa é obrigatório' }),
+  products: z.array(productOrderSchema, { message: 'Produtos é obrigatório' }),
+});
 
-export class CreateOrderDTO {
-  @IsString({ message: 'Mesa é obrigatório' })
-  table: string;
-
-  @ValidateNested({ each: true, message: 'Deve ser um array de produtos' })
-  @Type(() => ProductsOrderType)
-  products: ProductsOrder[];
-}
+export type CreateOrderDTO = z.infer<typeof createOrderSchema>;

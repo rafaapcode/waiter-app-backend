@@ -1,9 +1,8 @@
-import { IsOptional, IsString } from 'class-validator';
+import { z } from 'zod';
 
-export class CreateCategoryDTO {
-  @IsString()
-  name: string;
+export const createCategorySchema = z.object({
+  name: z.string({ message: 'Nome é obrigatório' }),
+  icon: z.string().optional(),
+});
 
-  @IsOptional()
-  icon?: string;
-}
+export type CreateCategoryDto = z.infer<typeof createCategorySchema>;

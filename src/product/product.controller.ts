@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
+import { ZodValidationPipe } from 'src/pipe/ZodValidationPipe';
 import { Product } from 'src/types/Product.type';
+import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
 import { ProductService } from './product.service';
 
 @Controller('product')
@@ -12,7 +14,8 @@ export class ProductController {
   }
 
   @Post('')
-  async createProduct(@Body() productData: any): Promise<Product> {
+  @UsePipes(new ZodValidationPipe(createProductSchema))
+  async createProduct(@Body() productData: CreateProductDTO): Promise<Product> {
     return await this.productService.createProduct(productData);
   }
 

@@ -4,13 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ProductRepository } from 'src/repository/product/product.service';
-import { Product, ProductType } from 'src/types/Product.type';
+import { Product } from 'src/types/Product.type';
+import { CreateProductDTO } from './dto/Product.dto';
 
 @Injectable()
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async createProduct(productData: ProductType): Promise<Product> {
+  async createProduct(productData: CreateProductDTO): Promise<Product> {
     try {
       const product = await this.productRepository.crateProduct(productData);
 

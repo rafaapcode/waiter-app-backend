@@ -1,10 +1,7 @@
-import { IsEnum } from 'class-validator';
-import { STATUS } from 'src/types/Order.type';
+import { z } from 'zod';
 
-export class ChangeOrderDTO {
-  @IsEnum(STATUS, {
-    message:
-      'O novo status deve ser um desses:  WAITING | IN_PRODUCTION | DONE',
-  })
-  status: STATUS;
-}
+export const changeOrderSchema = z.object({
+  status: z.enum(['WAITING', 'IN_PRODUCTION', 'DONE']),
+});
+
+export type ChangeOrderDto = z.infer<typeof changeOrderSchema>;

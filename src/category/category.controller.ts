@@ -1,7 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UsePipes } from '@nestjs/common';
+import { ZodValidationPipe } from 'src/pipe/ZodValidationPipe';
 import { Category } from 'src/types/Category.type';
 import { CategoryService } from './category.service';
-import { CreateCategoryDTO } from './dto/CreateCategory.dto';
+import {
+  CreateCategoryDto,
+  createCategorySchema,
+} from './dto/CreateCategory.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -13,8 +17,9 @@ export class CategoryController {
   }
 
   @Post('/categories')
+  @UsePipes(new ZodValidationPipe(createCategorySchema))
   async createCategory(
-    @Body() categoryData: CreateCategoryDTO,
+    @Body() categoryData: CreateCategoryDto,
   ): Promise<Category> {
     return await this.categoryService.createCategory(categoryData);
   }
