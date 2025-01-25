@@ -1,11 +1,13 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ProductRepository } from 'src/repository/product/product.service';
 import { Product } from 'src/types/Product.type';
-import { CreateProductDTO } from './dto/Product.dto';
+import { validateSchema } from 'src/utils/validateSchema';
+import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
 
 @Injectable()
 export class ProductService {
@@ -13,7 +15,16 @@ export class ProductService {
 
   async createProduct(productData: CreateProductDTO): Promise<Product> {
     try {
-      const product = await this.productRepository.crateProduct(productData);
+      const validateData = validateSchema(createProductSchema, productData);
+
+      if (!validateData.success) {
+        throw new BadRequestException(validateData.error.errors);
+      }
+
+      const product = await this.productRepository.crateProduct({
+        ...productData,
+        imageUrl: productData.imageUrl || '',
+      });
 
       if (!product) {
         throw new InternalServerErrorException('Erro ao criar o produto');
@@ -21,8 +32,16 @@ export class ProductService {
 
       return product;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -36,8 +55,16 @@ export class ProductService {
 
       return products;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -53,8 +80,16 @@ export class ProductService {
 
       return products;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

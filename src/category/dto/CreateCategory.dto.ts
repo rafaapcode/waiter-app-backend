@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createCategorySchema = z.object({
-  name: z.string({ message: 'Nome é obrigatório' }),
+  name: z.string({ message: 'Nome é obrigatório' }).min(2),
   icon: z.string().optional(),
 });
 

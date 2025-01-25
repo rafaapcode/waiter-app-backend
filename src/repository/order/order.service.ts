@@ -1,4 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from 'src/constants';
 import { ChangeOrderDto } from 'src/order/dto/ChangeOrder.dto';
@@ -25,8 +31,16 @@ export class OrderRepository {
 
       return order;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -35,8 +49,16 @@ export class OrderRepository {
       const order = await this.orderModel.create(createOrdeData);
       return order;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -45,8 +67,16 @@ export class OrderRepository {
       await this.orderModel.findByIdAndDelete(orderId);
       return true;
     } catch (error) {
-      console.log(error);
-      return false;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -59,8 +89,16 @@ export class OrderRepository {
 
       return orders;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

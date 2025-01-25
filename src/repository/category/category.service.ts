@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -24,8 +25,13 @@ export class CategoryRepository {
 
       return categorie;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -34,8 +40,13 @@ export class CategoryRepository {
       const categorie = await this.categoryModel.find();
       return categorie;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -49,6 +60,12 @@ export class CategoryRepository {
 
       return true;
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
       throw new InternalServerErrorException(error.message);
     }
   }

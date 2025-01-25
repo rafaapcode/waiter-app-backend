@@ -10,10 +10,7 @@ export const createProductSchema = z
     }),
     imageUrl: z
       .string({ message: 'ImageUrl é obrigatório' })
-      .regex(/[^(http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$]/, {
-        message: 'URL inválida',
-      })
-      .optional(),
+      .url({ message: 'URL inválida' }),
     price: z.number({ message: 'Preço é obrigatório' }),
     ingredients: z.array(
       z.object({

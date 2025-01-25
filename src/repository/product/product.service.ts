@@ -1,4 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from 'src/constants';
 import { CreateProductDTO } from 'src/product/dto/Product.dto';
@@ -16,8 +22,16 @@ export class ProductRepository {
       const product = await this.productModel.create(productData);
       return product;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -26,8 +40,16 @@ export class ProductRepository {
       const products = await this.productModel.find();
       return products;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -40,8 +62,16 @@ export class ProductRepository {
 
       return products;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

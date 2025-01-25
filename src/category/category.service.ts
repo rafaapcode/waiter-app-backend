@@ -5,7 +5,11 @@ import {
 } from '@nestjs/common';
 import { CategoryRepository } from 'src/repository/category/category.service';
 import { Category } from 'src/types/Category.type';
-import { CreateCategoryDto } from './dto/CreateCategory.dto';
+import { validateSchema } from 'src/utils/validateSchema';
+import {
+  CreateCategoryDto,
+  createCategorySchema,
+} from './dto/CreateCategory.dto';
 
 @Injectable()
 export class CategoryService {
@@ -13,6 +17,12 @@ export class CategoryService {
 
   async createCategory(data: CreateCategoryDto): Promise<Category> {
     try {
+      // Validate Data
+      const validateData = validateSchema(createCategorySchema, data);
+      if (!validateData.success) {
+        throw new BadRequestException(validateData.error.errors);
+      }
+
       const categoryExist = await this.categoryRepository.findCategoryByName(
         data.name,
       );
@@ -27,8 +37,13 @@ export class CategoryService {
       }
       return category;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -37,8 +52,13 @@ export class CategoryService {
       const categories = await this.categoryRepository.listCategory();
       return categories;
     } catch (error) {
-      console.log(error);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 }
