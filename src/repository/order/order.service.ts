@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { CONSTANTS } from 'src/constants';
-import { Order, STATUS } from 'src/types/Order.type';
+import { ChangeOrderDto } from 'src/order/dto/ChangeOrder.dto';
+import { CreateOrderDTO } from 'src/order/dto/CreateOrder.dto';
+import { Order } from 'src/types/Order.type';
 
 @Injectable()
 export class OrderRepository {
@@ -10,11 +12,14 @@ export class OrderRepository {
     private orderModel: Model<Order>,
   ) {}
 
-  async changeOrderStatus(orderId: string, newStatus: STATUS): Promise<Order> {
+  async changeOrderStatus(
+    orderId: string,
+    newStatus: ChangeOrderDto,
+  ): Promise<Order> {
     try {
       const order = await this.orderModel.findByIdAndUpdate(
         orderId,
-        { status: newStatus },
+        { status: newStatus.status },
         { new: true },
       );
 
@@ -25,12 +30,9 @@ export class OrderRepository {
     }
   }
 
-  async createOrder(
-    table: string,
-    products: { product: mongoose.Schema.Types.ObjectId; quantity: number }[],
-  ): Promise<Order> {
+  async createOrder(createOrdeData: CreateOrderDTO): Promise<Order> {
     try {
-      const order = await this.orderModel.create({ table, products });
+      const order = await this.orderModel.create(createOrdeData);
       return order;
     } catch (error) {
       console.log(error);

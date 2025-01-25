@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { CreateCategoryDto } from 'src/category/dto/CreateCategory.dto';
 import { CONSTANTS } from 'src/constants';
 import { Category } from 'src/types/Category.type';
 
@@ -14,9 +15,12 @@ export class CategoryRepository {
     private categoryModel: Model<Category>,
   ) {}
 
-  async createCategory(icon: string, name: string): Promise<Category> {
+  async createCategory(categoryData: CreateCategoryDto): Promise<Category> {
     try {
-      const categorie = await this.categoryModel.create({ icon, name });
+      const categorie = await this.categoryModel.create({
+        ...categoryData,
+        icon: categoryData.icon || '',
+      });
 
       return categorie;
     } catch (error) {

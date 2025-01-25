@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { OrderRepository } from 'src/repository/order/order.service';
 import { Order } from 'src/types/Order.type';
-import { ChangeOrderDTO } from './dto/ChangeOrder.dto';
+import { ChangeOrderDto } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO } from './dto/CreateOrder.dto';
 
 @Injectable()
@@ -14,12 +14,12 @@ export class OrderService {
 
   async changeOrderStatus(
     orderId: string,
-    newStatus: ChangeOrderDTO,
+    newStatus: ChangeOrderDto,
   ): Promise<Order> {
     try {
       const order = await this.orderRepository.changeOrderStatus(
         orderId,
-        newStatus.status,
+        newStatus,
       );
 
       if (!order) {
@@ -35,10 +35,7 @@ export class OrderService {
 
   async createOrder(createOrderData: CreateOrderDTO): Promise<Order> {
     try {
-      const order = await this.orderRepository.createOrder(
-        createOrderData.table,
-        createOrderData.products,
-      );
+      const order = await this.orderRepository.createOrder(createOrderData);
       if (!order) {
         throw new InternalServerErrorException('Erro ao criar novo pedidod');
       }

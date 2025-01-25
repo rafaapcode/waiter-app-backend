@@ -9,9 +9,13 @@ const productOrderSchema = z.object({
     .positive({ message: 'Quantidade deve ser um número positivo' }),
 });
 
-export const createOrderSchema = z.object({
-  table: z.string({ message: 'Mesa é obrigatório' }),
-  products: z.array(productOrderSchema, { message: 'Produtos é obrigatório' }),
-});
+export const createOrderSchema = z
+  .object({
+    table: z.string({ message: 'Mesa é obrigatório' }),
+    products: z.array(productOrderSchema, {
+      message: 'Produtos é obrigatório',
+    }),
+  })
+  .required();
 
 export type CreateOrderDTO = z.infer<typeof createOrderSchema>;
