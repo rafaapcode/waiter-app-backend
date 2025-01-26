@@ -8,6 +8,7 @@ import { ProductRepository } from 'src/repository/product/product.service';
 import { Product } from 'src/types/Product.type';
 import { validateSchema } from 'src/utils/validateSchema';
 import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
+import { UpdateProductDTO, updateProductSchema } from './dto/UpdateProduct.dto';
 
 @Injectable()
 export class ProductService {
@@ -113,6 +114,47 @@ export class ProductService {
       }
 
       return true;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateProduct(
+    productId: string,
+    data: UpdateProductDTO,
+  ): Promise<Product> {
+    try {
+      if (data.category) {
+        throw new BadRequestException(
+          'Não é permitido trocar a categoria de um produto',
+        );
+      }
+
+      const validateData = validateSchema(updateProductSchema, data);
+
+      if (!validateData.success) {
+        throw new BadRequestException(validateData.error.errors);
+      }
+
+      const updatedProduct = await this.productRepository.updateProduct(
+        productId,
+        data,
+      );
+
+      if (!updatedProduct) {
+        throw new NotFoundException('Nenhum produto encontrado !');
+      }
+
+      return updatedProduct;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

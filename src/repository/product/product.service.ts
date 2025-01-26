@@ -8,6 +8,7 @@ import {
 import { Model } from 'mongoose';
 import { CONSTANTS } from 'src/constants';
 import { CreateProductDTO } from 'src/product/dto/Product.dto';
+import { UpdateProductDTO } from 'src/product/dto/UpdateProduct.dto';
 import { Product } from 'src/types/Product.type';
 
 @Injectable()
@@ -105,6 +106,32 @@ export class ProductRepository {
         return false;
       }
       return true;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateProduct(
+    productId: string,
+    data: UpdateProductDTO,
+  ): Promise<Product> {
+    try {
+      const updatedProduct = await this.productModel.findByIdAndUpdate(
+        productId,
+        data,
+        { new: true },
+      );
+
+      return updatedProduct;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
