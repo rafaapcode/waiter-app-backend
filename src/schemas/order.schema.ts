@@ -32,5 +32,6 @@ export const OrderSchema = new mongoose.Schema({
       },
     ],
     required: true,
+    ref: 'Product',
   },
 });

@@ -7,7 +7,8 @@ const productOrderSchema = z
       .length(24, { message: 'ID invalido' }),
     quantity: z
       .number()
-      .positive({ message: 'Quantidade deve ser um número positivo' }),
+      .positive({ message: 'Quantidade deve ser um número positivo' })
+      .min(1),
   })
   .required();
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { Category } from 'src/types/Category.type';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/CreateCategory.dto';
@@ -17,5 +17,12 @@ export class CategoryController {
     @Body() categoryData: CreateCategoryDto,
   ): Promise<Category> {
     return await this.categoryService.createCategory(categoryData);
+  }
+
+  @Delete('/:categoryId')
+  async deleteCategory(
+    @Param('categoryId') categoryId: string,
+  ): Promise<boolean> {
+    return await this.categoryService.deleteCategory(categoryId);
   }
 }

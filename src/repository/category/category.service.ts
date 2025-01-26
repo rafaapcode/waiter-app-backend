@@ -69,4 +69,24 @@ export class CategoryRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async deleteCategory(categoryId: string): Promise<boolean> {
+    try {
+      const categoryDeleted =
+        await this.categoryModel.findByIdAndDelete(categoryId);
+
+      if (!categoryDeleted) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

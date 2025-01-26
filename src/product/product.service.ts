@@ -21,6 +21,16 @@ export class ProductService {
         throw new BadRequestException(validateData.error.errors);
       }
 
+      const productExists = await this.productRepository.productExists(
+        productData.name,
+      );
+
+      if (productExists) {
+        throw new BadRequestException(
+          `${productData.name} já existe, crie um produto com nome diferente.`,
+        );
+      }
+
       const product = await this.productRepository.crateProduct({
         ...productData,
         imageUrl: productData.imageUrl || '',
@@ -79,6 +89,30 @@ export class ProductService {
       }
 
       return products;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async deleteProduct(productId: string): Promise<boolean> {
+    try {
+      const productDeleted =
+        await this.productRepository.deleteProduct(productId);
+
+      if (!productDeleted) {
+        throw new NotFoundException('Produto não encontrado !');
+      }
+
+      return true;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

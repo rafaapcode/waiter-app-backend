@@ -64,7 +64,10 @@ export class OrderRepository {
 
   async deleteOrder(orderId: string): Promise<boolean> {
     try {
-      await this.orderModel.findByIdAndDelete(orderId);
+      const orderToDeleted = await this.orderModel.findByIdAndDelete(orderId);
+      if (!orderToDeleted) {
+        return false;
+      }
       return true;
     } catch (error) {
       if (error instanceof BadRequestException) {
