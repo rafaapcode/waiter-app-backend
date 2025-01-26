@@ -88,7 +88,11 @@ export class OrderRepository {
       const orders = await this.orderModel
         .find()
         .sort({ createdAt: -1 })
-        .populate('products.product');
+        .populate(
+          'products.product',
+          '_id name description imageUrl price category discount priceInDiscount',
+        )
+        .select('_id table status products createdAt');
 
       return orders;
     } catch (error) {
