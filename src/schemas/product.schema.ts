@@ -32,6 +32,14 @@ export const ProductSchema = new mongoose.Schema({
     ],
     required: true,
   },
+  discount: {
+    type: Boolean,
+    default: false,
+  },
+  priceInDiscount: {
+    type: Number,
+    default: 0,
+  },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

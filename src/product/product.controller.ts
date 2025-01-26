@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -44,5 +45,23 @@ export class ProductController {
     @Body() updateProduct: UpdateProductDTO,
   ): Promise<Product> {
     return await this.productService.updateProduct(productId, updateProduct);
+  }
+
+  @Patch('/discount/add/:productId')
+  async putProductInDiscount(
+    @Param('productId') productId: string,
+    @Body() newPrice: { newPrice: number },
+  ): Promise<Product> {
+    return await this.productService.productInDiscount(
+      productId,
+      newPrice.newPrice,
+    );
+  }
+
+  @Patch('/discount/remove/:productId')
+  async removeProductInDiscount(
+    @Param('productId') productId: string,
+  ): Promise<Product> {
+    return await this.productService.removeDiscountOfProduct(productId);
   }
 }

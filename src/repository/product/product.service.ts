@@ -147,4 +147,53 @@ export class ProductRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async putProductInDiscount(
+    productId: string,
+    discountPrice: number,
+  ): Promise<Product> {
+    try {
+      const productInDiscount = await this.productModel.findByIdAndUpdate(
+        productId,
+        { discount: true, priceInDiscount: discountPrice },
+        { new: true },
+      );
+
+      return productInDiscount;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeDiscountOfProduct(productId: string): Promise<Product> {
+    try {
+      const productWithoutDiscount = await this.productModel.findByIdAndUpdate(
+        productId,
+        { discount: false, priceInDiscount: 0 },
+        { new: true },
+      );
+
+      return productWithoutDiscount;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

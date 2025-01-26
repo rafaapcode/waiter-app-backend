@@ -168,4 +168,65 @@ export class ProductService {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async productInDiscount(
+    productId: string,
+    newPrice: number,
+  ): Promise<Product> {
+    try {
+      if (!newPrice) {
+        throw new BadRequestException('Um preço novo é obrigatório');
+      }
+
+      if (newPrice <= 0) {
+        throw new BadRequestException(
+          'Por favor, adicione um valor válido para o produto',
+        );
+      }
+
+      const productInDiscount =
+        await this.productRepository.putProductInDiscount(productId, newPrice);
+
+      if (!productInDiscount) {
+        throw new NotFoundException('Produto não encontrado');
+      }
+
+      return productInDiscount;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async removeDiscountOfProduct(productId: string): Promise<Product> {
+    try {
+      const productWithoutDiscount =
+        await this.productRepository.removeDiscountOfProduct(productId);
+
+      if (!productWithoutDiscount) {
+        throw new NotFoundException('Produto não encontrado');
+      }
+
+      return productWithoutDiscount;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }
