@@ -1,7 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
 import { Category } from '../../types/Category.type';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/CreateCategory.dto';
+import {
+  createCategorySchemaResponse,
+  ResponseCreateCategoryResponse,
+} from './dto/response-create-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -13,10 +26,18 @@ export class CategoryController {
   }
 
   @Post('/categories')
+  @UseInterceptors(new ResponseInterceptor(createCategorySchemaResponse))
   async createCategory(
     @Body() categoryData: CreateCategoryDto,
-  ): Promise<Category> {
-    return await this.categoryService.createCategory(categoryData);
+  ): Promise<ResponseCreateCategoryResponse> {
+    const categoryCreated =
+      await this.categoryService.createCategory(categoryData);
+
+    return {
+      name: categoryCreated.name,
+      icon: categoryCreated.icon,
+      _id: categoryCreated.id,
+    };
   }
 
   @Delete('/:categoryId')
