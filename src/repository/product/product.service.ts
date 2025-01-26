@@ -196,4 +196,22 @@ export class ProductRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async returnAllDiscountProducts(): Promise<Product[]> {
+    try {
+      const products = await this.productModel.where('discount', true).find();
+      return products;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

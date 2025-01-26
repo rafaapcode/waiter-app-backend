@@ -64,4 +64,9 @@ export class ProductController {
   ): Promise<Product> {
     return await this.productService.removeDiscountOfProduct(productId);
   }
+
+  @Get('/discount/products')
+  async getDiscountProducts(): Promise<Product[]> {
+    return await this.productService.getAllDiscountProducts();
+  }
 }
