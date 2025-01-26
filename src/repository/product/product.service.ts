@@ -127,7 +127,9 @@ export class ProductRepository {
     try {
       const updatedProduct = await this.productModel.findByIdAndUpdate(
         productId,
-        data,
+        {
+          ...data,
+        },
         { new: true },
       );
 
