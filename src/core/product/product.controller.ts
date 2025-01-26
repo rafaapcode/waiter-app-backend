@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Product } from 'src/types/Product.type';
+import { Product } from '../../types/Product.type';
 import { CreateProductDTO } from './dto/Product.dto';
 import { UpdateProductDTO } from './dto/UpdateProduct.dto';
 import { ProductService } from './product.service';

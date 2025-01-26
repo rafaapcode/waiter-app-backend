@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
-import { CONSTANTS } from 'src/constants';
-import { ProductSchema } from 'src/schemas/product.schema';
+import { CONSTANTS } from '../../../constants';
+import { ProductSchema } from '../../../schemas/product.schema';
 
 export const productProviders = [
   {

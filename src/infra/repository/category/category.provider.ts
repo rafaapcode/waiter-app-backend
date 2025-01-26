@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
-import { CONSTANTS } from 'src/constants';
-import { CategorySchema } from 'src/schemas/category.schema';
+import { CONSTANTS } from '../../../constants';
+import { CategorySchema } from '../../../schemas/category.schema';
 
 export const categoryProviders = [
   {

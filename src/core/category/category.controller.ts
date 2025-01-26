@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { Category } from 'src/types/Category.type';
+import { Category } from '../../types/Category.type';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/CreateCategory.dto';
 

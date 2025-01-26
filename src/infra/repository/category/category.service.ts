@@ -5,9 +5,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { CreateCategoryDto } from 'src/category/dto/CreateCategory.dto';
-import { CONSTANTS } from 'src/constants';
-import { Category } from 'src/types/Category.type';
+import { CONSTANTS } from '../../../constants';
+import { CreateCategoryDto } from '../../../core/category/dto/CreateCategory.dto';
+import { Category } from '../../../types/Category.type';
 
 @Injectable()
 export class CategoryRepository {

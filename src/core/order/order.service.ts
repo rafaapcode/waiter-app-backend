@@ -5,9 +5,9 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderRepository } from 'src/repository/order/order.service';
-import { Order } from 'src/types/Order.type';
-import { validateSchema } from 'src/utils/validateSchema';
+import { OrderRepository } from '../../infra/repository/order/order.service';
+import { Order } from '../../types/Order.type';
+import { validateSchema } from '../../utils/validateSchema';
 import { ChangeOrderDto, changeOrderSchema } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
 

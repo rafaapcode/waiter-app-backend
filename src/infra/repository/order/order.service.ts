@@ -6,10 +6,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { CONSTANTS } from 'src/constants';
-import { ChangeOrderDto } from 'src/order/dto/ChangeOrder.dto';
-import { CreateOrderDTO } from 'src/order/dto/CreateOrder.dto';
-import { Order } from 'src/types/Order.type';
+import { CONSTANTS } from '../../../constants';
+import { ChangeOrderDto } from '../../../core/order/dto/ChangeOrder.dto';
+import { CreateOrderDTO } from '../../../core/order/dto/CreateOrder.dto';
+import { Order } from '../../../types/Order.type';
 
 @Injectable()
 export class OrderRepository {
