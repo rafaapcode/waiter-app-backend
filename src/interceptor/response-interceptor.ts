@@ -6,14 +6,17 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, switchMap } from 'rxjs';
-import { ZodObject, ZodOptional } from 'zod';
+import { ZodArray, ZodObject, ZodOptional } from 'zod';
 
 @Injectable()
 export class ResponseInterceptor<T extends object>
   implements NestInterceptor<any, T>
 {
   constructor(
-    private readonly schema: ZodOptional<ZodObject<any>> | ZodObject<any>,
+    private readonly schema:
+      | ZodOptional<ZodObject<any>>
+      | ZodObject<any>
+      | ZodArray<ZodObject<any>>,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<T> {

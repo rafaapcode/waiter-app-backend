@@ -8,21 +8,34 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
-import { Category } from '../../types/Category.type';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/CreateCategory.dto';
 import {
   createCategorySchemaResponse,
   ResponseCreateCategoryResponse,
 } from './dto/response-create-category.dto';
+import {
+  deleteCategorySchemaResponse,
+  ResponseDeleteCategoryResponse,
+} from './dto/response-delete-category.dto';
+import {
+  listCategorySchemaResponse,
+  ResponseListCategoryResponse,
+} from './dto/response-list-category.dto';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get('/categories')
-  async listCategories(): Promise<Category[]> {
-    return await this.categoryService.listCategory();
+  @UseInterceptors(new ResponseInterceptor(listCategorySchemaResponse))
+  async listCategories(): Promise<ResponseListCategoryResponse> {
+    const listOfCategories = await this.categoryService.listCategory();
+    return listOfCategories.map((cat) => ({
+      _id: cat.id,
+      name: cat.name,
+      icon: cat.icon,
+    }));
   }
 
   @Post('/categories')
@@ -41,9 +54,13 @@ export class CategoryController {
   }
 
   @Delete('/:categoryId')
+  @UseInterceptors(new ResponseInterceptor(deleteCategorySchemaResponse))
   async deleteCategory(
     @Param('categoryId') categoryId: string,
-  ): Promise<boolean> {
-    return await this.categoryService.deleteCategory(categoryId);
+  ): Promise<ResponseDeleteCategoryResponse> {
+    await this.categoryService.deleteCategory(categoryId);
+    return {
+      message: 'Categoria deletada com sucesso !',
+    };
   }
 }
