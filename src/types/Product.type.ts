@@ -7,6 +7,8 @@ export interface Product extends Document {
   readonly price: number;
   readonly ingredients: { name: string; icon: string }[];
   readonly category: Schema.Types.ObjectId;
+  readonly discount: boolean;
+  readonly priceInDiscount: number;
 }
 
 export type ProductType = {
@@ -16,4 +18,6 @@ export type ProductType = {
   price: number;
   ingredients: { name: string; icon: string }[];
   category: Schema.Types.ObjectId;
+  discount: boolean;
+  priceInDiscount: number;
 };

@@ -7,9 +7,19 @@ import {
   Patch,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
 import { Product } from '../../types/Product.type';
 import { CreateProductDTO } from './dto/Product.dto';
+import {
+  createProductSchemaRes,
+  ResponseCreateProductDTO,
+} from './dto/response-create-product';
+import {
+  listProductSchemaRes,
+  ResponseListProductDTO,
+} from './dto/response-list-product';
 import { UpdateProductDTO } from './dto/UpdateProduct.dto';
 import { ProductService } from './product.service';
 
@@ -18,20 +28,52 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('')
-  async listProducts(): Promise<Product[]> {
-    return await this.productService.listProduct();
+  @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
+  async listProducts(): Promise<ResponseListProductDTO> {
+    const products = await this.productService.listProduct();
+    return products.map((product) => {
+      return {
+        _id: product.id,
+        name: product.name,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        category: product.category,
+        discount: product.discount,
+        priceInDiscount: product.priceInDiscount,
+        ingredients: product.ingredients,
+      };
+    });
   }
 
   @Post('')
-  async createProduct(@Body() productData: CreateProductDTO): Promise<Product> {
+  @UseInterceptors(new ResponseInterceptor(createProductSchemaRes))
+  async createProduct(
+    @Body() productData: CreateProductDTO,
+  ): Promise<ResponseCreateProductDTO> {
     return await this.productService.createProduct(productData);
   }
 
   @Get('/:categoryId')
+  @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
   async listProductsByCategorie(
     @Param('categoryId') categoryId: string,
-  ): Promise<Product[]> {
-    return await this.productService.listProductByCategory(categoryId);
+  ): Promise<ResponseListProductDTO> {
+    const products =
+      await this.productService.listProductByCategory(categoryId);
+    return products.map((product) => {
+      return {
+        _id: product.id,
+        name: product.name,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        category: product.category,
+        discount: product.discount,
+        priceInDiscount: product.priceInDiscount,
+        ingredients: product.ingredients,
+      };
+    });
   }
 
   @Delete('/:productId')
@@ -66,7 +108,21 @@ export class ProductController {
   }
 
   @Get('/discount/products')
-  async getDiscountProducts(): Promise<Product[]> {
-    return await this.productService.getAllDiscountProducts();
+  @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
+  async getDiscountProducts(): Promise<ResponseListProductDTO> {
+    const products = await this.productService.getAllDiscountProducts();
+    return products.map((product) => {
+      return {
+        _id: product.id,
+        name: product.name,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        category: product.category,
+        discount: product.discount,
+        priceInDiscount: product.priceInDiscount,
+        ingredients: product.ingredients,
+      };
+    });
   }
 }
