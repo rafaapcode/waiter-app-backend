@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -64,10 +65,22 @@ export class ProductService {
         throw new NotFoundException('Nenhum produto encontrado');
       }
 
+      if (products.length === 0) {
+        throw new HttpException(
+          {
+            message: 'Nenhum produto encontrado',
+          },
+          200,
+        );
+      }
+
       return products;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
       }
       if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException(error.message);
@@ -89,10 +102,22 @@ export class ProductService {
         );
       }
 
+      if (products.length === 0) {
+        throw new HttpException(
+          {
+            message: 'Nenhum produto encontrado',
+          },
+          200,
+        );
+      }
+
       return products;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
       }
       if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException(error.message);
@@ -232,10 +257,24 @@ export class ProductService {
 
   async getAllDiscountProducts(): Promise<Product[]> {
     try {
-      return await this.productRepository.returnAllDiscountProducts();
+      const products = await this.productRepository.returnAllDiscountProducts();
+
+      if (products.length === 0) {
+        throw new HttpException(
+          {
+            message: 'Nenhum produto encontrado',
+          },
+          200,
+        );
+      }
+
+      return products;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
       }
       if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException(error.message);
