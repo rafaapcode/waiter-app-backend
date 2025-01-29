@@ -10,16 +10,27 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
-import { Product } from '../../types/Product.type';
 import { CreateProductDTO } from './dto/Product.dto';
 import {
   createProductSchemaRes,
   ResponseCreateProductDTO,
 } from './dto/response-create-product';
 import {
+  deleteProductSchemaRes,
+  ResponseDeleteProductDTO,
+} from './dto/response-delete-product';
+import {
+  discountsProductSchemaRes,
+  ResponseDiscountsProductDTO,
+} from './dto/response-discounts-product';
+import {
   listProductSchemaRes,
   ResponseListProductDTO,
 } from './dto/response-list-product';
+import {
+  ResponseUpdateProductDTO,
+  updateProductSchemaRes,
+} from './dto/response-update-product';
 import { UpdateProductDTO } from './dto/UpdateProduct.dto';
 import { ProductService } from './product.service';
 
@@ -77,34 +88,49 @@ export class ProductController {
   }
 
   @Delete('/:productId')
-  async deleteProduct(@Param('productId') productId: string): Promise<boolean> {
-    return await this.productService.deleteProduct(productId);
+  @UseInterceptors(new ResponseInterceptor(deleteProductSchemaRes))
+  async deleteProduct(
+    @Param('productId') productId: string,
+  ): Promise<ResponseDeleteProductDTO> {
+    await this.productService.deleteProduct(productId);
+    return {
+      message: 'Produto deletado com sucesso !',
+    };
   }
 
   @Put('/:productId')
+  @UseInterceptors(new ResponseInterceptor(updateProductSchemaRes))
   async updateProduct(
     @Param('productId') productId: string,
     @Body() updateProduct: UpdateProductDTO,
-  ): Promise<Product> {
-    return await this.productService.updateProduct(productId, updateProduct);
+  ): Promise<ResponseUpdateProductDTO> {
+    await this.productService.updateProduct(productId, updateProduct);
+    return {
+      message: 'Produto atualizado com sucesso !',
+    };
   }
 
   @Patch('/discount/add/:productId')
+  @UseInterceptors(new ResponseInterceptor(discountsProductSchemaRes))
   async putProductInDiscount(
     @Param('productId') productId: string,
     @Body() newPrice: { newPrice: number },
-  ): Promise<Product> {
-    return await this.productService.productInDiscount(
-      productId,
-      newPrice.newPrice,
-    );
+  ): Promise<ResponseDiscountsProductDTO> {
+    await this.productService.productInDiscount(productId, newPrice.newPrice);
+    return {
+      message: 'Desconto adicionado ao produto',
+    };
   }
 
   @Patch('/discount/remove/:productId')
+  @UseInterceptors(new ResponseInterceptor(discountsProductSchemaRes))
   async removeProductInDiscount(
     @Param('productId') productId: string,
-  ): Promise<Product> {
-    return await this.productService.removeDiscountOfProduct(productId);
+  ): Promise<ResponseDiscountsProductDTO> {
+    await this.productService.removeDiscountOfProduct(productId);
+    return {
+      message: 'Desconto removido do produto',
+    };
   }
 
   @Get('/discount/products')

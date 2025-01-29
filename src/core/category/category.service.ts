@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -51,10 +52,18 @@ export class CategoryService {
   async listCategory(): Promise<Category[]> {
     try {
       const categories = await this.categoryRepository.listCategory();
+
+      if (categories.length === 0) {
+        throw new HttpException(null, 204);
+      }
+
       return categories;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
       }
       if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException(error.message);

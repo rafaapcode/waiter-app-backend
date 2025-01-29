@@ -66,12 +66,7 @@ export class ProductService {
       }
 
       if (products.length === 0) {
-        throw new HttpException(
-          {
-            message: 'Nenhum produto encontrado',
-          },
-          200,
-        );
+        throw new HttpException(null, 204);
       }
 
       return products;
@@ -103,12 +98,7 @@ export class ProductService {
       }
 
       if (products.length === 0) {
-        throw new HttpException(
-          {
-            message: 'Nenhum produto encontrado',
-          },
-          200,
-        );
+        throw new HttpException(null, 204);
       }
 
       return products;
@@ -260,12 +250,7 @@ export class ProductService {
       const products = await this.productRepository.returnAllDiscountProducts();
 
       if (products.length === 0) {
-        throw new HttpException(
-          {
-            message: 'Nenhum produto encontrado',
-          },
-          200,
-        );
+        throw new HttpException(null, 204);
       }
 
       return products;

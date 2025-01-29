@@ -1,6 +1,7 @@
 import {
   BadGatewayException,
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -105,10 +106,17 @@ export class OrderService {
         throw new InternalServerErrorException('Erro ao listar os pedidos');
       }
 
+      if (orders.length === 0) {
+        throw new HttpException(null, 204);
+      }
+
       return orders;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
       }
       if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException(error.message);
