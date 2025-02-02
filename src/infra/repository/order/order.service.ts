@@ -46,7 +46,9 @@ export class OrderRepository {
 
   async createOrder(createOrdeData: CreateOrderDTO): Promise<Order> {
     try {
-      const order = await this.orderModel.create(createOrdeData);
+      const order = (await this.orderModel.create(createOrdeData)).populate(
+        'products.product',
+      );
       return order;
     } catch (error) {
       if (error instanceof BadRequestException) {

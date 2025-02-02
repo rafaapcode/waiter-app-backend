@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { OrderGateway } from 'src/core/websocket/gateway/gateway';
 import { OrderRepository } from '../../../infra/repository/order/order.service';
 import { Order } from '../../../types/Order.type';
 import { validateSchema } from '../../../utils/validateSchema';
@@ -14,7 +15,10 @@ import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly orderWs: OrderGateway,
+  ) {}
 
   async changeOrderStatus(
     orderId: string,
@@ -62,6 +66,9 @@ export class OrderService {
       if (!order) {
         throw new InternalServerErrorException('Erro ao criar novo pedidod');
       }
+
+      this.orderWs.server.emit('orders@new', order);
+
       return order;
     } catch (error) {
       if (error instanceof BadRequestException) {
