@@ -5,9 +5,9 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CategoryRepository } from '../../infra/repository/category/category.service';
-import { Category } from '../../types/Category.type';
-import { validateSchema } from '../../utils/validateSchema';
+import { CategoryRepository } from '../../../infra/repository/category/category.service';
+import { Category } from '../../../types/Category.type';
+import { validateSchema } from '../../../utils/validateSchema';
 import {
   CreateCategoryDto,
   createCategorySchema,

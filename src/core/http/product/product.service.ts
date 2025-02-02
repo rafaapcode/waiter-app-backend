@@ -5,9 +5,9 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ProductRepository } from '../../infra/repository/product/product.service';
-import { Product } from '../../types/Product.type';
-import { validateSchema } from '../../utils/validateSchema';
+import { ProductRepository } from '../../../infra/repository/product/product.service';
+import { Product } from '../../../types/Product.type';
+import { validateSchema } from '../../../utils/validateSchema';
 import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
 import { UpdateProductDTO, updateProductSchema } from './dto/UpdateProduct.dto';
 

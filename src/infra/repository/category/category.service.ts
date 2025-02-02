@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
-import { CreateCategoryDto } from '../../../core/category/dto/CreateCategory.dto';
+import { CreateCategoryDto } from '../../../core/http/category/dto/CreateCategory.dto';
 import { Category } from '../../../types/Category.type';
 
 @Injectable()

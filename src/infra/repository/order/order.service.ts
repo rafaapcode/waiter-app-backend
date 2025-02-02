@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
-import { ChangeOrderDto } from '../../../core/order/dto/ChangeOrder.dto';
-import { CreateOrderDTO } from '../../../core/order/dto/CreateOrder.dto';
+import { ChangeOrderDto } from '../../../core/http/order/dto/ChangeOrder.dto';
+import { CreateOrderDTO } from '../../../core/http/order/dto/CreateOrder.dto';
 import { Order } from '../../../types/Order.type';
 
 @Injectable()

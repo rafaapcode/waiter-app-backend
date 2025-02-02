@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
-import { CreateProductDTO } from '../../../core/product/dto/Product.dto';
-import { UpdateProductDTO } from '../../../core/product/dto/UpdateProduct.dto';
+import { CreateProductDTO } from '../../../core/http/product/dto/Product.dto';
+import { UpdateProductDTO } from '../../../core/http/product/dto/UpdateProduct.dto';
 import { Product } from '../../../types/Product.type';
 
 @Injectable()
