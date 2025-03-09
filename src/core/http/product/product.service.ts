@@ -270,4 +270,30 @@ export class ProductService {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async getProduct(productId: string): Promise<Product> {
+    try {
+      const product = await this.productRepository.getProduct(productId);
+
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      return product;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 }

@@ -10,6 +10,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
+import { Product } from 'src/types/Product.type';
 import { CreateProductDTO } from './dto/Product.dto';
 import {
   createProductSchemaRes,
@@ -55,6 +56,12 @@ export class ProductController {
         ingredients: product.ingredients,
       };
     });
+  }
+
+  @Get('/:productId')
+  async getProduct(@Param('productId') productId: string): Promise<Product> {
+    const product = await this.productService.getProduct(productId);
+    return product;
   }
 
   @Post('')
