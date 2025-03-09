@@ -14,6 +14,7 @@ import { Product } from 'src/types/Product.type';
 import { CreateProductDTO } from './dto/Product.dto';
 import {
   createProductSchemaRes,
+  getProductSchemaRes,
   ResponseCreateProductDTO,
 } from './dto/response-create-product';
 import {
@@ -59,6 +60,7 @@ export class ProductController {
   }
 
   @Get('/:productId')
+  @UseInterceptors(new ResponseInterceptor(getProductSchemaRes))
   async getProduct(@Param('productId') productId: string): Promise<Product> {
     const product = await this.productService.getProduct(productId);
     return product;
