@@ -31,6 +31,15 @@ export class UserRepository {
         email: newUser.email,
       };
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -103,6 +112,32 @@ export class UserRepository {
         name: user.name,
         email: user.email,
       };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getAllUser(): Promise<Omit<AdminUserType, 'password'>[]> {
+    try {
+      const user = await this.userModel.find();
+      if (user.length === 0 || !user) {
+        throw new NotFoundException('Users not found');
+      }
+
+      return user.map((u) => ({
+        _id: u._id.toString(),
+        name: u.name,
+        email: u.email,
+      }));
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

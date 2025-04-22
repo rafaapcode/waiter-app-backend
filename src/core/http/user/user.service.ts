@@ -102,6 +102,11 @@ export class UserService {
     return await this.userRepo.getUser(id);
   }
 
+  async getAllUsers(): Promise<Omit<AdminUserType, 'password'>[]> {
+    const users = await this.userRepo.getAllUser();
+    return users;
+  }
+
   private generateToken(email: string): string {
     try {
       return this.jwtService.sign(

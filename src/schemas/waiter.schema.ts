@@ -32,3 +32,21 @@ WaiterSchema.pre('save', async function (next) {
     throw new Error('Error to hash the password' + error.message);
   }
 });
+
+WaiterSchema.pre('findOneAndUpdate', async function (next) {
+  try {
+    const update = this.getUpdate();
+
+    if (update && typeof update === 'object' && !Array.isArray(update)) {
+      const updateObj = update as mongoose.UpdateQuery<any>;
+
+      if (updateObj.password) {
+        updateObj.password = await createHash(updateObj.password);
+        this.setUpdate(updateObj);
+      }
+    }
+    next();
+  } catch (error) {
+    throw new Error('Error to hash the password' + error.message);
+  }
+});

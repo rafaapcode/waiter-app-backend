@@ -48,6 +48,11 @@ export class UserController {
     return await this.userService.deleteUser(id);
   }
 
+  @Get('all')
+  async getAllUser() {
+    return await this.userService.getAllUsers();
+  }
+
   @Get(':id')
   async getUser(@Param('id') id: string) {
     if (!id) {
