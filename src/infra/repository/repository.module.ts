@@ -6,6 +6,10 @@ import { orderProviders } from './order/order.provider';
 import { OrderRepository } from './order/order.service';
 import { productProviders } from './product/product.provider';
 import { ProductRepository } from './product/product.service';
+import { userProvider } from './user/user.provider';
+import { UserRepository } from './user/user.service';
+import { waiterProvider } from './waiter/waiter.provider';
+import { WaiterRepository } from './waiter/waiter.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -13,10 +17,20 @@ import { ProductRepository } from './product/product.service';
     ...categoryProviders,
     ...orderProviders,
     ...productProviders,
+    ...userProvider,
+    ...waiterProvider,
     CategoryRepository,
     OrderRepository,
     ProductRepository,
+    UserRepository,
+    WaiterRepository,
   ],
-  exports: [CategoryRepository, OrderRepository, ProductRepository],
+  exports: [
+    CategoryRepository,
+    OrderRepository,
+    ProductRepository,
+    UserRepository,
+    WaiterRepository,
+  ],
 })
 export class RepositoryModule {}

@@ -6,6 +6,7 @@ export interface AdminUser extends Document {
   readonly password: string;
 }
 export type AdminUserType = {
+  _id?: string;
   name: string;
   email: string;
   password: string;
