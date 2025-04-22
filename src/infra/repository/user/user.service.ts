@@ -159,8 +159,10 @@ export class UserRepository {
         throw new NotFoundException('User not found');
       }
       return {
-        ...user,
-        _id: user._id as string,
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        password: user.password,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {

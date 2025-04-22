@@ -4,11 +4,10 @@ import { AppController } from './app.controller';
 import { CategoryModule } from './core/http/category/category.module';
 import { OrderModule } from './core/http/order/order.module';
 import { ProductModule } from './core/http/product/product.module';
+import { UserModule } from './core/http/user/user.module';
 import { GatewayModule } from './core/websocket/gateway/gateway.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { RepositoryModule } from './infra/repository/repository.module';
-import { UserModule } from './core/http/user/user.module';
-import { WaiterModule } from './core/http/waiter/waiter.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { WaiterModule } from './core/http/waiter/waiter.module';
     RepositoryModule,
     GatewayModule,
     UserModule,
-    WaiterModule,
   ],
   controllers: [AppController],
   providers: [],

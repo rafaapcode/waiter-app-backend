@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import { createHash } from 'src/utils/createHash';
 
-export const WaiterSchema = new mongoose.Schema({
+export const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: false,
@@ -20,20 +20,26 @@ export const WaiterSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    min: [8, 'The password must have at least 8 characters'],
+  },
+  role: {
+    type: String,
+    enum: ['CLIENT', 'WAITER', 'ADMIN'],
+    default: 'ADMIN',
   },
 });
 
-WaiterSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function (next) {
   try {
     const hashedPass = await createHash(this.password);
     this.password = hashedPass;
     next();
   } catch (error) {
-    throw new Error('Error to hash the password' + error.message);
+    throw new Error('Error to hash the password ' + error.message);
   }
 });
 
-WaiterSchema.pre('findOneAndUpdate', async function (next) {
+UserSchema.pre('findOneAndUpdate', async function (next) {
   try {
     const update = this.getUpdate();
 
@@ -47,6 +53,6 @@ WaiterSchema.pre('findOneAndUpdate', async function (next) {
     }
     next();
   } catch (error) {
-    throw new Error('Error to hash the password' + error.message);
+    throw new Error('Error to hash the password ' + error.message);
   }
 });
