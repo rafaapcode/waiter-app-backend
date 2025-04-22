@@ -6,19 +6,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { AdminUser, AdminUserType } from 'src/types/Adm.type';
+import { User, UserType } from 'src/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @Inject(CONSTANTS.USER_PROVIDER)
-    private userModel: Model<AdminUser>,
+    private userModel: Model<User>,
   ) {}
 
-  async createUser(
-    user: AdminUserType,
-  ): Promise<Omit<AdminUserType, 'password'>> {
+  async createUser(user: UserType): Promise<Omit<UserType, 'password'>> {
     try {
       const userExists = await this.userModel.findOne({ email: user.email });
       if (userExists) {
@@ -29,6 +27,7 @@ export class UserRepository {
         _id: newUser._id as string,
         name: newUser.name,
         email: newUser.email,
+        role: newUser.role,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -46,8 +45,8 @@ export class UserRepository {
 
   async updateUser(
     userId: string,
-    user: Partial<AdminUserType>,
-  ): Promise<Omit<AdminUserType, 'password'>> {
+    user: Partial<UserType>,
+  ): Promise<Omit<UserType, 'password'>> {
     try {
       const newuser = await this.userModel.findByIdAndUpdate(
         userId,
@@ -65,6 +64,7 @@ export class UserRepository {
         _id: newuser._id as string,
         name: newuser.name,
         email: newuser.email,
+        role: newuser.role,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -101,7 +101,7 @@ export class UserRepository {
     }
   }
 
-  async getUser(userId: string): Promise<Omit<AdminUserType, 'password'>> {
+  async getUser(userId: string): Promise<Omit<UserType, 'password'>> {
     try {
       const user = await this.userModel.findById(userId);
       if (!user) {
@@ -111,6 +111,7 @@ export class UserRepository {
         _id: user._id as string,
         name: user.name,
         email: user.email,
+        role: user.role,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -126,7 +127,7 @@ export class UserRepository {
     }
   }
 
-  async getAllUser(): Promise<Omit<AdminUserType, 'password'>[]> {
+  async getAllUser(): Promise<Omit<UserType, 'password'>[]> {
     try {
       const user = await this.userModel.find();
       if (user.length === 0 || !user) {
@@ -137,6 +138,7 @@ export class UserRepository {
         _id: u._id.toString(),
         name: u.name,
         email: u.email,
+        role: u.role,
       }));
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -152,7 +154,7 @@ export class UserRepository {
     }
   }
 
-  async userExists(email: string): Promise<AdminUserType> {
+  async userExists(email: string): Promise<UserType> {
     try {
       const user = await this.userModel.findOne({ email });
       if (!user) {
@@ -163,6 +165,7 @@ export class UserRepository {
         name: user.name,
         email: user.email,
         password: user.password,
+        role: user.role,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {

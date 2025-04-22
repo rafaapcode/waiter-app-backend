@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/infra/repository/user/user.service';
-import { AdminUserType } from 'src/types/Adm.type';
+import { UserType } from 'src/types/User.type';
 import { validateSchema } from 'src/utils/validateSchema';
 import { verifyPassword } from 'src/utils/verifyPassword';
 import { LoginUserDTO, loginUserSchema } from './dto/LoginUser.dto';
@@ -44,7 +44,7 @@ export class UserService {
       throw new NotFoundException('Invalid password');
     }
 
-    const token = this.generateToken(user.email);
+    const token = this.generateToken(user.email, user.role);
 
     return { access_token: token };
   }
@@ -53,7 +53,7 @@ export class UserService {
     email,
     password,
     name,
-  }: CreateUserDTO): Promise<Omit<AdminUserType, 'password'>> {
+  }: CreateUserDTO): Promise<Omit<UserType, 'password'>> {
     const isValidPayload = validateSchema(createUserSchema, {
       email,
       password,
@@ -72,7 +72,7 @@ export class UserService {
   async updateUser(
     id: string,
     data: UpdateUserDTO,
-  ): Promise<Omit<AdminUserType, 'password'>> {
+  ): Promise<Omit<UserType, 'password'>> {
     const isValidPayload = validateSchema(updateUserSchema, data);
 
     if (!isValidPayload.success) {
@@ -94,7 +94,7 @@ export class UserService {
     return { message: 'User deleted successfully' };
   }
 
-  async getUser(id: string): Promise<Omit<AdminUserType, 'password'>> {
+  async getUser(id: string): Promise<Omit<UserType, 'password'>> {
     if (!id) {
       throw new BadRequestException('User ID is required');
     }
@@ -102,15 +102,15 @@ export class UserService {
     return await this.userRepo.getUser(id);
   }
 
-  async getAllUsers(): Promise<Omit<AdminUserType, 'password'>[]> {
+  async getAllUsers(): Promise<Omit<UserType, 'password'>[]> {
     const users = await this.userRepo.getAllUser();
     return users;
   }
 
-  private generateToken(email: string): string {
+  private generateToken(email: string, role: string): string {
     try {
       return this.jwtService.sign(
-        { email },
+        { email, role },
         {
           expiresIn: '1d',
           secret: this.configService.getOrThrow('JWT_SECRET'),
