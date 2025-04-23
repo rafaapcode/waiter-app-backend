@@ -162,6 +162,7 @@ export class OrderRepository {
           select: '_id name imageUrl price discount priceInDiscount category',
           populate: {
             path: 'category',
+            select: 'name icon',
           },
         })
         .sort({ createdAt: -1 });

@@ -7,6 +7,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderGateway } from 'src/core/websocket/gateway/gateway';
+import { Category } from 'src/types/Category.type';
+import { Product } from 'src/types/Product.type';
 import { OrderRepository } from '../../../infra/repository/order/order.service';
 import { Order } from '../../../types/Order.type';
 import { validateSchema } from '../../../utils/validateSchema';
@@ -160,30 +162,40 @@ export class OrderService {
   async historyPage(page: number): Promise<Order[]> {
     try {
       const orders = await this.orderRepository.historyOfOrders(page);
-      console.log(orders[0].products);
-      // const formatOrders = orders.map((order) => {
-      //   const namesAndPrice = order.products.reduce(
-      //     (acc, product) => {
-      //       const productInfo = product.product as Product;
 
-      //       acc.name += productInfo.name + ', ';
-      //       acc.totalPrice += productInfo.price * product.quantity;
+      if (orders && orders.length === 0) {
+        throw new NotFoundException('Nenhum pedido encontrado!');
+      }
 
-      //       return acc;
-      //     },
-      //     { name: '', totalPrice: 0 },
-      //   );
+      if (!orders) {
+        throw new NotFoundException('Nenhum pedido encontrado!');
+      }
 
-      //   return {
-      //     id: order._id.toString(),
-      //     table: order.table,
-      //     data: order.createdAt,
-      //     products: order.products,
-      //     totalPrice: namesAndPrice.totalPrice,
-      //     name: namesAndPrice.name,
-      //   };
-      // });
-      // console.log(formatOrders[0].products[0]);
+      const formatOrders = orders.map((order) => {
+        const product = order.products[0].product as Product;
+        const category = product.category as Category;
+        const namesAndPrice = order.products.reduce(
+          (acc, product) => {
+            const productInfo = product.product as Product;
+
+            acc.name += productInfo.name + ', ';
+            acc.totalPrice += productInfo.price * product.quantity;
+
+            return acc;
+          },
+          { name: '', totalPrice: 0 },
+        );
+        return {
+          id: order._id.toString(),
+          table: order.table,
+          data: order.createdAt,
+          products: order.products,
+          totalPrice: namesAndPrice.totalPrice,
+          name: namesAndPrice.name,
+          category: `${category.icon} ${category.name}`,
+        };
+      });
+      console.log(formatOrders);
       return orders;
     } catch (error) {
       if (error instanceof BadRequestException) {
