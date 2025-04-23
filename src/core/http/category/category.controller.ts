@@ -5,9 +5,13 @@ import {
   Get,
   Param,
   Post,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
+import { Roles } from '../authentication/decorators/role.decorator';
+import { UserGuard } from '../authentication/guard/userAuth.guard';
+import { Role } from '../authentication/roles/role.enum';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/CreateCategory.dto';
 import {
@@ -28,6 +32,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get('/categories')
+  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(listCategorySchemaResponse))
   async listCategories(): Promise<ResponseListCategoryResponse> {
     const listOfCategories = await this.categoryService.listCategory();
@@ -39,6 +44,8 @@ export class CategoryController {
   }
 
   @Post('/categories')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(createCategorySchemaResponse))
   async createCategory(
     @Body() categoryData: CreateCategoryDto,
@@ -54,6 +61,8 @@ export class CategoryController {
   }
 
   @Delete('/:categoryId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(deleteCategorySchemaResponse))
   async deleteCategory(
     @Param('categoryId') categoryId: string,

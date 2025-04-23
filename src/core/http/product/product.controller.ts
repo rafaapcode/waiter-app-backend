@@ -7,10 +7,14 @@ import {
   Patch,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
 import { Product } from 'src/types/Product.type';
+import { Roles } from '../authentication/decorators/role.decorator';
+import { UserGuard } from '../authentication/guard/userAuth.guard';
+import { Role } from '../authentication/roles/role.enum';
 import { CreateProductDTO } from './dto/Product.dto';
 import {
   createProductSchemaRes,
@@ -41,6 +45,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('')
+  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
   async listProducts(): Promise<ResponseListProductDTO> {
     const products = await this.productService.listProduct();
@@ -60,6 +65,7 @@ export class ProductController {
   }
 
   @Get('/:productId')
+  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(getProductSchemaRes))
   async getProduct(@Param('productId') productId: string): Promise<Product> {
     const product = await this.productService.getProduct(productId);
@@ -67,6 +73,8 @@ export class ProductController {
   }
 
   @Post('')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(createProductSchemaRes))
   async createProduct(
     @Body() productData: CreateProductDTO,
@@ -75,6 +83,7 @@ export class ProductController {
   }
 
   @Get('/:categoryId')
+  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
   async listProductsByCategorie(
     @Param('categoryId') categoryId: string,
@@ -97,6 +106,8 @@ export class ProductController {
   }
 
   @Delete('/:productId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(deleteProductSchemaRes))
   async deleteProduct(
     @Param('productId') productId: string,
@@ -108,6 +119,8 @@ export class ProductController {
   }
 
   @Put('/:productId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(updateProductSchemaRes))
   async updateProduct(
     @Param('productId') productId: string,
@@ -120,6 +133,8 @@ export class ProductController {
   }
 
   @Patch('/discount/add/:productId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(discountsProductSchemaRes))
   async putProductInDiscount(
     @Param('productId') productId: string,
@@ -132,6 +147,8 @@ export class ProductController {
   }
 
   @Patch('/discount/remove/:productId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(discountsProductSchemaRes))
   async removeProductInDiscount(
     @Param('productId') productId: string,
@@ -143,6 +160,7 @@ export class ProductController {
   }
 
   @Get('/discount/products')
+  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
   async getDiscountProducts(): Promise<ResponseListProductDTO> {
     const products = await this.productService.getAllDiscountProducts();

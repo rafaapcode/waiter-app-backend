@@ -6,9 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
+import { Roles } from '../authentication/decorators/role.decorator';
+import { UserGuard } from '../authentication/guard/userAuth.guard';
+import { Role } from '../authentication/roles/role.enum';
 import { ChangeOrderDto } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO } from './dto/CreateOrder.dto';
 import {
@@ -34,6 +38,8 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get('')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(listOrdersSchemaResponse))
   async listOrders(): Promise<ResponseListOrdersDTO> {
     const orders = await this.orderService.listOrders();
@@ -47,6 +53,7 @@ export class OrderController {
   }
 
   @Post('')
+  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(createOrderSchemaResponse))
   async createOrder(
     @Body() orderData: CreateOrderDTO,
@@ -60,6 +67,8 @@ export class OrderController {
   }
 
   @Patch('/:orderId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(updateOrderSchemaResponse))
   async changeStatusOrder(
     @Param('orderId') orderId: string,
@@ -78,6 +87,8 @@ export class OrderController {
   }
 
   @Delete('/:orderId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(deleteOrderSchemaResponse))
   async deleteOrder(
     @Param('orderId') orderId: string,
