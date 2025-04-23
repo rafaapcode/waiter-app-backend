@@ -159,7 +159,7 @@ export class OrderRepository {
         .limit(limit)
         .populate(
           'products.product',
-          '_id name imageUrl price discount priceInDiscount',
+          '_id name imageUrl price discount priceInDiscount category',
         )
         .sort({ createdAt: -1 });
 

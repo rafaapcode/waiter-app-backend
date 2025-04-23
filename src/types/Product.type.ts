@@ -1,4 +1,5 @@
 import { Document, Schema } from 'mongoose';
+import { Category } from './Category.type';
 
 export interface Product extends Document {
   readonly name: string;
@@ -6,7 +7,7 @@ export interface Product extends Document {
   readonly imageUrl: string;
   readonly price: number;
   readonly ingredients: { name: string; icon: string }[];
-  readonly category: Schema.Types.ObjectId;
+  readonly category: Schema.Types.ObjectId | Category;
   readonly discount: boolean;
   readonly priceInDiscount: number;
 }
