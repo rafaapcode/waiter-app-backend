@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { getTodayRange } from 'src/utils/getTodayrange';
 import { CONSTANTS } from '../../../constants';
 import { ChangeOrderDto } from '../../../core/http/order/dto/ChangeOrder.dto';
 import { CreateOrderDTO } from '../../../core/http/order/dto/CreateOrder.dto';
@@ -66,7 +67,9 @@ export class OrderRepository {
 
   async deleteOrder(orderId: string): Promise<boolean> {
     try {
-      const orderToDeleted = await this.orderModel.findByIdAndDelete(orderId);
+      const orderToDeleted = await this.orderModel.findByIdAndUpdate(orderId, {
+        deletedAt: new Date(),
+      });
       if (!orderToDeleted) {
         return false;
       }
@@ -88,7 +91,7 @@ export class OrderRepository {
   async listOrders(): Promise<Order[]> {
     try {
       const orders = await this.orderModel
-        .find()
+        .find({ deletedAt: null })
         .sort({ createdAt: -1 })
         .populate(
           'products.product',
@@ -97,6 +100,96 @@ export class OrderRepository {
         .select('_id table status products createdAt');
 
       return orders;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async restartDay(): Promise<boolean> {
+    try {
+      const { start, end } = getTodayRange();
+
+      const orders = await this.orderModel.updateMany(
+        {
+          $and: [
+            { createdAt: { $gte: start, $lte: end } },
+            { deletedAt: null },
+          ],
+        },
+        { deletedAt: new Date() },
+      );
+
+      if (orders.matchedCount === 0) {
+        throw new NotFoundException('Nenhum pedido encontrado no dia de hoje.');
+      }
+
+      return true;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async historyOfOrders(page?: number): Promise<Order[]> {
+    try {
+      const pageNumber = page && page !== 0 ? page : 1;
+      const limit = 5;
+      const skip = (pageNumber - 1) * limit;
+
+      const orders = await this.orderModel
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .populate(
+          'products.product',
+          '_id name imageUrl price discount priceInDiscount',
+        )
+        .sort({ createdAt: -1 });
+
+      if (!orders) {
+        throw new NotFoundException('Nenhum pedido encontrado');
+      }
+      return orders;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async deleteOrderHistory(orderId: string): Promise<boolean> {
+    try {
+      const orders = await this.orderModel.findByIdAndDelete(orderId);
+
+      if (!orders) {
+        throw new NotFoundException('Nenhum pedido encontrado');
+      }
+
+      return true;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

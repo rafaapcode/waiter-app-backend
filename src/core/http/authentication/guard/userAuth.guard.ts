@@ -1,8 +1,8 @@
 import {
-    CanActivate,
-    ExecutionContext,
-    Injectable,
-    UnauthorizedException,
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
@@ -23,6 +23,16 @@ export class UserGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = context.switchToHttp();
     const req = ctx.getRequest<Request>();
+
+    const requiredRole = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (requiredRole && requiredRole.includes(Role.CLIENT)) {
+      return true;
+    }
+
     if (!req.headers.authorization) {
       throw new UnauthorizedException('Token is Required');
     }
@@ -32,10 +42,6 @@ export class UserGuard implements CanActivate {
     if (!userData) {
       throw new UnauthorizedException('Token invalid');
     }
-    const requiredRole = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
     if (!requiredRole) {
       return true;
     }

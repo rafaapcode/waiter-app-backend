@@ -10,6 +10,7 @@ export interface Order extends Document {
   readonly table: string;
   readonly status: STATUS;
   readonly createdAt: Date;
+  readonly deletedAt?: Date;
   readonly products: { product: Schema.Types.ObjectId; quantity: number }[];
 }
 

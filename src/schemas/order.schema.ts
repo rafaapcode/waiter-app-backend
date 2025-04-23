@@ -14,7 +14,15 @@ export const OrderSchema = new mongoose.Schema({
     type: Date,
     // Não precisamos executar a função, pois o mongoose fará isso por nós.
     // E irá usar o valor de retorno como valor padrão.
+    index: true,
     default: Date.now,
+  },
+  deletedAt: {
+    type: Date,
+    // Não precisamos executar a função, pois o mongoose fará isso por nós.
+    // E irá usar o valor de retorno como valor padrão.
+    index: true,
+    default: null,
   },
   products: {
     type: [

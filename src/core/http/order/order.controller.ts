@@ -4,12 +4,14 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
+import { Order } from 'src/types/Order.type';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -37,6 +39,17 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @Get(':page')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN, Role.WAITER)
+  // @UseInterceptors(new ResponseInterceptor(listOrdersSchemaResponse))
+  async historyOfOrders(
+    @Param('page', ParseIntPipe) page: number,
+  ): Promise<Order[]> {
+    const orders = await this.orderService.historyPage(page);
+    return orders;
+  }
+
   @Get('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
@@ -54,6 +67,7 @@ export class OrderController {
 
   @Post('')
   @UseGuards(UserGuard)
+  @Roles(Role.ADMIN, Role.WAITER, Role.CLIENT)
   @UseInterceptors(new ResponseInterceptor(createOrderSchemaResponse))
   async createOrder(
     @Body() orderData: CreateOrderDTO,
@@ -96,6 +110,17 @@ export class OrderController {
     await this.orderService.deleteOrder(orderId);
     return {
       message: 'Ordem deletada com sucesso !',
+    };
+  }
+
+  @Patch('')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(new ResponseInterceptor(deleteOrderSchemaResponse))
+  async restartDay(): Promise<ResponseDeleteOrderDTO> {
+    await this.orderService.restartDay();
+    return {
+      message: 'Dia reiniciado com sucesso !',
     };
   }
 }
