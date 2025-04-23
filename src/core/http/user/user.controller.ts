@@ -7,7 +7,11 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { Roles } from '../authentication/decorators/role.decorator';
+import { UserGuard } from '../authentication/guard/userAuth.guard';
+import { Role } from '../authentication/roles/role.enum';
 import { LoginUserDTO } from './dto/LoginUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { CreateUserDTO } from './dto/User.dto';
@@ -28,6 +32,8 @@ export class UserController {
   }
 
   @Put(':id')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   async updateUser(
     @Param('id') id: string,
     @Body() userPayload: UpdateUserDTO,
@@ -40,6 +46,8 @@ export class UserController {
   }
 
   @Delete(':id')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   async deleteUser(@Param('id') id: string) {
     if (!id) {
       throw new BadRequestException('User ID is required');
@@ -49,11 +57,15 @@ export class UserController {
   }
 
   @Get('all')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   async getAllUser() {
     return await this.userService.getAllUsers();
   }
 
   @Get(':id')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   async getUser(@Param('id') id: string) {
     if (!id) {
       throw new BadRequestException('User ID is required');

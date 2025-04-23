@@ -10,6 +10,7 @@ import { UserRepository } from 'src/infra/repository/user/user.service';
 import { UserType } from 'src/types/User.type';
 import { validateSchema } from 'src/utils/validateSchema';
 import { verifyPassword } from 'src/utils/verifyPassword';
+import { Role } from '../authentication/roles/role.enum';
 import { LoginUserDTO, loginUserSchema } from './dto/LoginUser.dto';
 import { UpdateUserDTO, updateUserSchema } from './dto/UpdateUser.dto';
 import { CreateUserDTO, createUserSchema } from './dto/User.dto';
@@ -116,6 +117,20 @@ export class UserService {
           secret: this.configService.getOrThrow('JWT_SECRET'),
         },
       );
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  verifyToken(token: string): { email: string; role: Role } {
+    try {
+      const isTokenValid = this.jwtService.verify(token, {
+        secret: this.configService.getOrThrow('JWT_SECRET'),
+      });
+      if (!isTokenValid) {
+        return null;
+      }
+      return isTokenValid as { email: string; role: Role };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
