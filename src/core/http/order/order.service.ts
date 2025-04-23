@@ -7,7 +7,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderGateway } from 'src/core/websocket/gateway/gateway';
-import { Product } from 'src/types/Product.type';
 import { OrderRepository } from '../../../infra/repository/order/order.service';
 import { Order } from '../../../types/Order.type';
 import { validateSchema } from '../../../utils/validateSchema';
@@ -161,29 +160,30 @@ export class OrderService {
   async historyPage(page: number): Promise<Order[]> {
     try {
       const orders = await this.orderRepository.historyOfOrders(page);
-      const formatOrders = orders.map((order) => {
-        const namesAndPrice = order.products.reduce(
-          (acc, product) => {
-            const productInfo = product.product as Product;
+      console.log(orders[0].products);
+      // const formatOrders = orders.map((order) => {
+      //   const namesAndPrice = order.products.reduce(
+      //     (acc, product) => {
+      //       const productInfo = product.product as Product;
 
-            acc.name += productInfo.name + ', ';
-            acc.totalPrice += productInfo.price * product.quantity;
+      //       acc.name += productInfo.name + ', ';
+      //       acc.totalPrice += productInfo.price * product.quantity;
 
-            return acc;
-          },
-          { name: '', totalPrice: 0 },
-        );
+      //       return acc;
+      //     },
+      //     { name: '', totalPrice: 0 },
+      //   );
 
-        return {
-          id: order._id.toString(),
-          table: order.table,
-          data: order.createdAt,
-          products: order.products,
-          totalPrice: namesAndPrice.totalPrice,
-          name: namesAndPrice.name,
-        };
-      });
-      console.log(formatOrders[0].products[0]);
+      //   return {
+      //     id: order._id.toString(),
+      //     table: order.table,
+      //     data: order.createdAt,
+      //     products: order.products,
+      //     totalPrice: namesAndPrice.totalPrice,
+      //     name: namesAndPrice.name,
+      //   };
+      // });
+      // console.log(formatOrders[0].products[0]);
       return orders;
     } catch (error) {
       if (error instanceof BadRequestException) {

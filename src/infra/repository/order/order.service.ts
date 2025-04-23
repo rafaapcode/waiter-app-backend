@@ -157,10 +157,13 @@ export class OrderRepository {
         .find()
         .skip(skip)
         .limit(limit)
-        .populate(
-          'products.product',
-          '_id name imageUrl price discount priceInDiscount category',
-        )
+        .populate({
+          path: 'products.product',
+          select: '_id name imageUrl price discount priceInDiscount category',
+          populate: {
+            path: 'category',
+          },
+        })
         .sort({ createdAt: -1 });
 
       if (!orders) {
