@@ -9,8 +9,9 @@ import {
 import { OrderGateway } from 'src/core/websocket/gateway/gateway';
 import { Category } from 'src/types/Category.type';
 import { Product } from 'src/types/Product.type';
+import { formatCurrency } from 'src/utils/formatCurrency';
 import { OrderRepository } from '../../../infra/repository/order/order.service';
-import { Order } from '../../../types/Order.type';
+import { HistoryOrder, Order } from '../../../types/Order.type';
 import { validateSchema } from '../../../utils/validateSchema';
 import { ChangeOrderDto, changeOrderSchema } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
@@ -159,7 +160,7 @@ export class OrderService {
     }
   }
 
-  async historyPage(page: number): Promise<Order[]> {
+  async historyPage(page: number): Promise<HistoryOrder[]> {
     try {
       const orders = await this.orderRepository.historyOfOrders(page);
 
@@ -171,32 +172,7 @@ export class OrderService {
         throw new NotFoundException('Nenhum pedido encontrado!');
       }
 
-      const formatOrders = orders.map((order) => {
-        const product = order.products[0].product as Product;
-        const category = product.category as Category;
-        const namesAndPrice = order.products.reduce(
-          (acc, product) => {
-            const productInfo = product.product as Product;
-
-            acc.name += productInfo.name + ', ';
-            acc.totalPrice += productInfo.price * product.quantity;
-
-            return acc;
-          },
-          { name: '', totalPrice: 0 },
-        );
-        return {
-          id: order._id.toString(),
-          table: order.table,
-          data: order.createdAt,
-          products: order.products,
-          totalPrice: namesAndPrice.totalPrice,
-          name: namesAndPrice.name,
-          category: `${category.icon} ${category.name}`,
-        };
-      });
-      console.log(formatOrders);
-      return orders;
+      return this.toHistoryOrder(orders);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -233,5 +209,68 @@ export class OrderService {
       }
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  private toHistoryOrder(orders: Order[]): HistoryOrder[] {
+    const formatOrders: HistoryOrder[] = orders.map((order) => {
+      if (!order) throw new NotFoundException('Order not found');
+
+      const product = order.products[0].product as Product;
+      const category = product.category as Category;
+
+      if (!order.products || order.products.length === 0) {
+        return {
+          id: order._id.toString(),
+          table: order.table,
+          data: order.createdAt,
+          totalPrice: formatCurrency(0),
+          name: '',
+          category: '',
+          itens: [],
+        };
+      }
+
+      const namesAndPrice = order.products.reduce(
+        (acc, product) => {
+          const productInfo = product.product as Product;
+
+          acc.name += productInfo.name + ', ';
+          acc.totalPrice +=
+            (productInfo.discount
+              ? productInfo.priceInDiscount
+              : productInfo.price) * product.quantity;
+
+          return acc;
+        },
+        { name: '', totalPrice: 0 },
+      );
+
+      const itens = order.products.map((product) => {
+        const productInfo = product.product as Product;
+
+        return {
+          imageUrl: productInfo.imageUrl,
+          quantity: product.quantity,
+          name: productInfo.name,
+          price: formatCurrency(
+            productInfo.discount
+              ? productInfo.priceInDiscount
+              : productInfo.price,
+          ),
+        };
+      });
+
+      return {
+        id: order._id.toString(),
+        table: order.table,
+        data: order.createdAt,
+        totalPrice: formatCurrency(namesAndPrice.totalPrice),
+        name: namesAndPrice.name,
+        category: category ? `${category.icon} ${category.name}` : '',
+        itens,
+      };
+    });
+
+    return formatOrders;
   }
 }

@@ -22,3 +22,18 @@ export type ProductsOrder = {
   product: Schema.Types.ObjectId;
   quantity: number;
 };
+
+export type HistoryOrder = {
+  id: string;
+  table: string;
+  data: Date;
+  name: string;
+  category: string;
+  totalPrice: string;
+  itens: {
+    imageUrl: string;
+    quantity: number;
+    name: string;
+    price: string;
+  }[];
+};

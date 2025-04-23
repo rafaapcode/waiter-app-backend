@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
-import { Order } from 'src/types/Order.type';
+import { HistoryOrder } from 'src/types/Order.type';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -45,7 +45,7 @@ export class OrderController {
   // @UseInterceptors(new ResponseInterceptor(listOrdersSchemaResponse))
   async historyOfOrders(
     @Param('page', ParseIntPipe) page: number,
-  ): Promise<Order[]> {
+  ): Promise<HistoryOrder[]> {
     const orders = await this.orderService.historyPage(page);
     return orders;
   }
