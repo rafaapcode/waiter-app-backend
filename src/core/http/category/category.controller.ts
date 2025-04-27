@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/CreateCategory.dto';
+import { EditCategoryDto } from './dto/EditCategory.dto';
 import {
   createCategorySchemaResponse,
   ResponseCreateCategoryResponse,
@@ -22,6 +24,10 @@ import {
   deleteCategorySchemaResponse,
   ResponseDeleteCategoryResponse,
 } from './dto/response-delete-category.dto';
+import {
+  editCategorySchemaResponse,
+  ResponseEditCategoryResponse,
+} from './dto/response-edite-category.dto';
 import {
   listCategorySchemaResponse,
   ResponseListCategoryResponse,
@@ -57,6 +63,26 @@ export class CategoryController {
       name: categoryCreated.name,
       icon: categoryCreated.icon,
       _id: categoryCreated.id,
+    };
+  }
+
+  @Put('/categories/:id')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(new ResponseInterceptor(editCategorySchemaResponse))
+  async editCategory(
+    @Param('id') id: string,
+    @Body() editData: EditCategoryDto,
+  ): Promise<ResponseEditCategoryResponse> {
+    const categoryEdited = await this.categoryService.editCategory(
+      id,
+      editData,
+    );
+
+    return {
+      message: categoryEdited
+        ? 'Categoria editada com sucesso !'
+        : 'Não foi possível editar a categoria',
     };
   }
 

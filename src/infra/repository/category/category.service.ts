@@ -3,8 +3,10 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { EditCategoryDto } from 'src/core/http/category/dto/EditCategory.dto';
 import { CONSTANTS } from '../../../constants';
 import { CreateCategoryDto } from '../../../core/http/category/dto/CreateCategory.dto';
 import { Category } from '../../../types/Category.type';
@@ -56,6 +58,29 @@ export class CategoryRepository {
 
       if (!category) {
         return false;
+      }
+
+      return true;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async editCategory(id: string, data: EditCategoryDto): Promise<boolean> {
+    try {
+      const category = await this.categoryModel.findByIdAndUpdate(id, {
+        ...(data.icon && { icon: data.icon }),
+        ...(data.name && { name: data.name }),
+      });
+
+      if (!category) {
+        throw new NotFoundException('Categoria não encontrada');
       }
 
       return true;

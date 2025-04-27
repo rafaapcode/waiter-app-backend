@@ -12,6 +12,7 @@ import {
   CreateCategoryDto,
   createCategorySchema,
 } from './dto/CreateCategory.dto';
+import { EditCategoryDto } from './dto/EditCategory.dto';
 
 @Injectable()
 export class CategoryService {
@@ -56,6 +57,25 @@ export class CategoryService {
       if (categories.length === 0) {
         throw new HttpException(null, 204);
       }
+
+      return categories;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async editCategory(id: string, data: EditCategoryDto): Promise<boolean> {
+    try {
+      const categories = await this.categoryRepository.editCategory(id, data);
 
       return categories;
     } catch (error) {
