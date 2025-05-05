@@ -33,12 +33,12 @@ export class UserGuard implements CanActivate {
       return true;
     }
 
-    if (!req.headers.authorization) {
+    const token = req.signedCookies.token;
+
+    if (!token) {
       throw new UnauthorizedException('Token is Required');
     }
-    const userData = this.userService.verifyToken(
-      req.headers.authorization.split(' ')[1],
-    );
+    const userData = this.userService.verifyToken(token);
     if (!userData) {
       throw new UnauthorizedException('Token invalid');
     }

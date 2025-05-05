@@ -7,8 +7,10 @@ import {
   Param,
   Post,
   Put,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -22,8 +24,15 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('login')
-  async login(@Body() userPayload: LoginUserDTO) {
-    return await this.userService.signInUser(userPayload);
+  async login(
+    @Body() userPayload: LoginUserDTO,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const access_token = await this.userService.signInUser(userPayload);
+
+    response.cookie('token', access_token.access_token, { signed: true });
+
+    return { message: 'Usuário logado com sucesso !' };
   }
 
   @Post('')
