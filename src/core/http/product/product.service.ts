@@ -8,8 +8,13 @@ import {
 import { ProductRepository } from '../../../infra/repository/product/product.service';
 import { Product } from '../../../types/Product.type';
 import { validateSchema } from '../../../utils/validateSchema';
+import {
+  CreateIngredientDTO,
+  createIngredientSchema,
+} from './dto/CreateIngredient.dto';
 import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
 import { UpdateProductDTO, updateProductSchema } from './dto/UpdateProduct.dto';
+import { ResponseCreateIngredientDTO } from './dto/response-create-ingredient';
 
 @Injectable()
 export class ProductService {
@@ -170,6 +175,45 @@ export class ProductService {
       }
 
       return updatedProduct;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async createIngredient(
+    productId: string,
+    data: CreateIngredientDTO,
+  ): Promise<ResponseCreateIngredientDTO> {
+    try {
+      if (!data.name) {
+        throw new BadRequestException('O nome do ingrediente é obrigatório');
+      }
+
+      const validateData = validateSchema(createIngredientSchema, data);
+
+      if (!validateData.success) {
+        throw new BadRequestException(validateData.error.errors);
+      }
+
+      const ingredienteCreated = await this.productRepository.newIngredient(
+        productId,
+        data,
+      );
+
+      if (!ingredienteCreated) {
+        throw new NotFoundException('Produto não encontrado !');
+      }
+
+      return ingredienteCreated;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
