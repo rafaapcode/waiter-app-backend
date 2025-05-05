@@ -153,12 +153,6 @@ export class ProductService {
     data: UpdateProductDTO,
   ): Promise<Product> {
     try {
-      if (data.category) {
-        throw new BadRequestException(
-          'Não é permitido trocar a categoria de um produto',
-        );
-      }
-
       const validateData = validateSchema(updateProductSchema, data);
 
       if (!validateData.success) {
