@@ -23,6 +23,12 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Get('auth')
+  @UseGuards(UserGuard)
+  async isAuthenticate() {
+    return { ok: true };
+  }
+
   @Post('login')
   async login(
     @Body() userPayload: LoginUserDTO,
@@ -32,7 +38,9 @@ export class UserController {
 
     response.cookie('token', access_token.access_token, { signed: true });
 
-    return { message: 'Usuário logado com sucesso !' };
+    return response
+      .status(200)
+      .json({ message: 'Usuário logado com sucesso !' });
   }
 
   @Post('')

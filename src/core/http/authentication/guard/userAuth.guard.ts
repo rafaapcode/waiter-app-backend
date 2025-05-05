@@ -21,37 +21,42 @@ export class UserGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const ctx = context.switchToHttp();
-    const req = ctx.getRequest<Request>();
+    try {
+      const ctx = context.switchToHttp();
+      const req = ctx.getRequest<Request>();
 
-    const requiredRole = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+      const requiredRole = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
 
-    if (requiredRole && requiredRole.includes(Role.CLIENT)) {
+      if (requiredRole && requiredRole.includes(Role.CLIENT)) {
+        return true;
+      }
+
+      const token = req.signedCookies.token;
+
+      if (!token) {
+        throw new UnauthorizedException('Token is Required');
+      }
+      const userData = this.userService.verifyToken(token);
+      if (!userData) {
+        throw new UnauthorizedException('Token invalid');
+      }
+      if (!requiredRole) {
+        return true;
+      }
+      if (!userData.role) {
+        throw new UnauthorizedException('Sem permissão para acesso !');
+      }
+      const hasPermission = requiredRole.some((role) => role === userData.role);
+      if (!hasPermission) {
+        throw new UnauthorizedException('Sem permissão para acesso !');
+      }
       return true;
+    } catch (error: any) {
+      console.log(error.message);
+      return false;
     }
-
-    const token = req.signedCookies.token;
-
-    if (!token) {
-      throw new UnauthorizedException('Token is Required');
-    }
-    const userData = this.userService.verifyToken(token);
-    if (!userData) {
-      throw new UnauthorizedException('Token invalid');
-    }
-    if (!requiredRole) {
-      return true;
-    }
-    if (!userData.role) {
-      throw new UnauthorizedException('Sem permissão para acesso !');
-    }
-    const hasPermission = requiredRole.some((role) => role === userData.role);
-    if (!hasPermission) {
-      throw new UnauthorizedException('Sem permissão para acesso !');
-    }
-    return true;
   }
 }
