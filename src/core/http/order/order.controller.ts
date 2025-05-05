@@ -25,10 +25,12 @@ import {
   deleteOrderSchemaResponse,
   ResponseDeleteOrderDTO,
 } from './dto/response-delete-orders.dto';
+import { historyOrderSchema } from './dto/response-history-orders.dto';
 import {
   listOrdersSchemaResponse,
   ResponseListOrdersDTO,
 } from './dto/response-list-orders.dto';
+import { restartOrderSchemaResponse } from './dto/response-restart-orders.dto';
 import {
   ResponseUpdateOrderDTO,
   updateOrderSchemaResponse,
@@ -42,7 +44,7 @@ export class OrderController {
   @Get(':page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
-  // @UseInterceptors(new ResponseInterceptor(listOrdersSchemaResponse))
+  @UseInterceptors(new ResponseInterceptor(historyOrderSchema))
   async historyOfOrders(
     @Param('page', ParseIntPipe) page: number,
   ): Promise<HistoryOrder[]> {
@@ -116,7 +118,7 @@ export class OrderController {
   @Patch('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(deleteOrderSchemaResponse))
+  @UseInterceptors(new ResponseInterceptor(restartOrderSchemaResponse))
   async restartDay(): Promise<ResponseDeleteOrderDTO> {
     await this.orderService.restartDay();
     return {
