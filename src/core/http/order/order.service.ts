@@ -142,6 +142,10 @@ export class OrderService {
     try {
       const orders = await this.orderRepository.restartDay();
 
+      if (orders) {
+        this.orderWs.server.emit('orders@restart_day');
+      }
+
       return orders;
     } catch (error) {
       if (error instanceof BadRequestException) {
