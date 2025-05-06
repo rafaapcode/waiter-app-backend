@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Patch,
@@ -116,6 +117,7 @@ export class OrderController {
   }
 
   @Patch('')
+  @HttpCode(200)
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(restartOrderSchemaResponse))
