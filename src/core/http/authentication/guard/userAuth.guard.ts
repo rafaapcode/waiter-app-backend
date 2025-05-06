@@ -34,12 +34,18 @@ export class UserGuard implements CanActivate {
         return true;
       }
 
-      const token = req.signedCookies.token;
+      const token = req.headers.authorization;
 
       if (!token) {
         throw new UnauthorizedException('Token is Required');
       }
-      const userData = this.userService.verifyToken(token);
+
+      const [, authToken] = token.split(' ');
+      if (!authToken) {
+        throw new UnauthorizedException('Token is Required');
+      }
+
+      const userData = this.userService.verifyToken(authToken);
       if (!userData) {
         throw new UnauthorizedException('Token invalid');
       }
@@ -55,7 +61,6 @@ export class UserGuard implements CanActivate {
       }
       return true;
     } catch (error: any) {
-      console.log(error.message);
       return false;
     }
   }

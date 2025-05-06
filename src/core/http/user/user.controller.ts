@@ -4,13 +4,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
-  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -23,24 +23,12 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get('auth')
-  @UseGuards(UserGuard)
-  async isAuthenticate() {
-    return { ok: true };
-  }
-
   @Post('login')
-  async login(
-    @Body() userPayload: LoginUserDTO,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() userPayload: LoginUserDTO) {
     const access_token = await this.userService.signInUser(userPayload);
 
-    response.cookie('token', access_token.access_token, { signed: true });
-
-    return response
-      .status(200)
-      .json({ message: 'Usuário logado com sucesso !' });
+    return access_token;
   }
 
   @Post('')
