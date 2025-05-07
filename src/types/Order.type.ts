@@ -34,6 +34,9 @@ export type HistoryOrder = {
     imageUrl: string;
     quantity: number;
     name: string;
-    price: string;
+    price: number;
+    discount: boolean;
+    priceInDiscount: number;
+    id: string;
   }[];
 };

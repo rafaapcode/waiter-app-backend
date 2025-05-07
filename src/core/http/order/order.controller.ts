@@ -42,7 +42,7 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Get(':page')
+  @Get('history/:page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(historyOrderSchema))
@@ -113,6 +113,19 @@ export class OrderController {
     await this.orderService.deleteOrder(orderId);
     return {
       message: 'Ordem deletada com sucesso !',
+    };
+  }
+
+  @Delete('history/:orderId')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(new ResponseInterceptor(deleteOrderSchemaResponse))
+  async deleteHistoryOrder(
+    @Param('orderId') orderId: string,
+  ): Promise<ResponseDeleteOrderDTO> {
+    await this.orderService.deleteOrder(orderId);
+    return {
+      message: 'Registro deletado com sucesso !',
     };
   }
 

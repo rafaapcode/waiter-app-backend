@@ -4,7 +4,10 @@ const ItemSchema = z.object({
   imageUrl: z.string(),
   quantity: z.number(),
   name: z.string(),
-  price: z.string(),
+  price: z.number(),
+  discount: z.boolean(),
+  priceInDiscount: z.number(),
+  id: z.string(),
 });
 
 export const historyOrderSchema = z

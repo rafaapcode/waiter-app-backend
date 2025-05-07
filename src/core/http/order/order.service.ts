@@ -256,11 +256,12 @@ export class OrderService {
           imageUrl: productInfo.imageUrl,
           quantity: product.quantity,
           name: productInfo.name,
-          price: formatCurrency(
-            productInfo.discount
-              ? productInfo.priceInDiscount
-              : productInfo.price,
-          ),
+          price: productInfo.discount
+            ? productInfo.priceInDiscount
+            : productInfo.price,
+          discount: productInfo.discount,
+          priceInDiscount: productInfo.priceInDiscount,
+          id: productInfo.id,
         };
       });
 
@@ -270,7 +271,7 @@ export class OrderService {
         data: order.createdAt,
         totalPrice: formatCurrency(namesAndPrice.totalPrice),
         name: namesAndPrice.name,
-        category: category ? `${category.icon} ${category.name}` : '',
+        category: category ? `${category.icon} ${category.name}`.trim() : '',
         itens,
       };
     });
