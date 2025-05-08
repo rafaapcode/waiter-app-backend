@@ -5,6 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { addHours, endOfDay } from 'date-fns';
+// import { endOfDay } from '@date-fns';
 import { Model } from 'mongoose';
 import { getTodayRange } from 'src/utils/getTodayrange';
 import { CONSTANTS } from '../../../constants';
@@ -194,13 +196,11 @@ export class OrderRepository {
       const limit = 5;
       const skip = (pageNumber - 1) * limit;
 
-      console.log(filters);
-
       const orders = await this.orderModel
         .find({
           createdAt: {
             $gte: filters.from,
-            $lte: filters.to,
+            $lte: addHours(endOfDay(filters.to), 20),
           },
         })
         .skip(skip)

@@ -68,7 +68,10 @@ export class OrderController {
     }
 
     const orders = await this.orderService.historyFilterPage(
-      { from: new Date(filters.from), to: new Date(filters.to) },
+      {
+        from: new Date(filters.from),
+        to: new Date(filters.to),
+      },
       page,
     );
     return orders;
