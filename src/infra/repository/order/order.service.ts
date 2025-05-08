@@ -194,6 +194,8 @@ export class OrderRepository {
       const limit = 5;
       const skip = (pageNumber - 1) * limit;
 
+      console.log(filters);
+
       const orders = await this.orderModel
         .find({
           createdAt: {

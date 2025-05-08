@@ -67,7 +67,10 @@ export class OrderController {
       throw new BadRequestException('Os filtros de data são obrigatórios');
     }
 
-    const orders = await this.orderService.historyFilterPage(filters, page);
+    const orders = await this.orderService.historyFilterPage(
+      { from: new Date(filters.from), to: new Date(filters.to) },
+      page,
+    );
     return orders;
   }
 
