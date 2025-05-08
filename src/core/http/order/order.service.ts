@@ -194,6 +194,42 @@ export class OrderService {
     }
   }
 
+  async historyFilterPage(
+    filters: { to: Date; from: Date },
+    page: number,
+  ): Promise<HistoryOrder[]> {
+    try {
+      const orders = await this.orderRepository.historyOfOrdersWithFilters(
+        filters,
+        page,
+      );
+
+      if (orders && orders.length === 0) {
+        throw new NotFoundException('Nenhum pedido encontrado!');
+      }
+
+      if (!orders) {
+        throw new NotFoundException('Nenhum pedido encontrado!');
+      }
+
+      return this.toHistoryOrder(orders);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof HttpException) {
+        throw new HttpException(error.getResponse(), error.getStatus());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async deleteHistoryOrder(oderId: string): Promise<boolean> {
     try {
       const orders = await this.orderRepository.deleteOrderHistory(oderId);

@@ -185,6 +185,52 @@ export class OrderRepository {
     }
   }
 
+  async historyOfOrdersWithFilters(
+    filters: { to: Date; from: Date },
+    page?: number,
+  ): Promise<Order[]> {
+    try {
+      const pageNumber = page && page !== 0 ? page : 1;
+      const limit = 5;
+      const skip = (pageNumber - 1) * limit;
+
+      const orders = await this.orderModel
+        .find({
+          createdAt: {
+            $gte: filters.from,
+            $lte: filters.to,
+          },
+        })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: 'products.product',
+          select: '_id name imageUrl price discount priceInDiscount category',
+          populate: {
+            path: 'category',
+            select: 'name icon',
+          },
+        })
+        .sort({ createdAt: -1 });
+
+      if (!orders) {
+        throw new NotFoundException('Nenhum pedido encontrado');
+      }
+      return orders;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async deleteOrderHistory(orderId: string): Promise<boolean> {
     try {
       const orders = await this.orderModel.findByIdAndDelete(orderId);

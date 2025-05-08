@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -50,6 +52,22 @@ export class OrderController {
     @Param('page', ParseIntPipe) page: number,
   ): Promise<HistoryOrder[]> {
     const orders = await this.orderService.historyPage(page);
+    return orders;
+  }
+
+  @Get('history/filter/:page')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN, Role.WAITER)
+  @UseInterceptors(new ResponseInterceptor(historyOrderSchema))
+  async historyOfOrdersFiltered(
+    @Param('page', ParseIntPipe) page: number,
+    @Query() filters: { to: Date; from: Date },
+  ): Promise<HistoryOrder[]> {
+    if (!filters.to || !filters.from) {
+      throw new BadRequestException('Os filtros de data são obrigatórios');
+    }
+
+    const orders = await this.orderService.historyFilterPage(filters, page);
     return orders;
   }
 
