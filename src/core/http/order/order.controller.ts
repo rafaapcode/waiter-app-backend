@@ -66,7 +66,6 @@ export class OrderController {
     if (!filters.to || !filters.from) {
       throw new BadRequestException('Os filtros de data são obrigatórios');
     }
-
     const orders = await this.orderService.historyFilterPage(
       {
         from: new Date(filters.from),
@@ -147,7 +146,7 @@ export class OrderController {
   async deleteHistoryOrder(
     @Param('orderId') orderId: string,
   ): Promise<ResponseDeleteOrderDTO> {
-    await this.orderService.deleteOrder(orderId);
+    await this.orderService.deleteHistoryOrder(orderId);
     return {
       message: 'Registro deletado com sucesso !',
     };

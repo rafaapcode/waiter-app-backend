@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { addHours, endOfDay } from 'date-fns';
+import { endOfDay, subHours } from 'date-fns';
 // import { endOfDay } from '@date-fns';
 import { Model } from 'mongoose';
 import { getTodayRange } from 'src/utils/getTodayrange';
@@ -200,7 +200,7 @@ export class OrderRepository {
         .find({
           createdAt: {
             $gte: filters.from,
-            $lte: addHours(endOfDay(filters.to), 20),
+            $lte: subHours(endOfDay(filters.to), 3),
           },
         })
         .skip(skip)
