@@ -10,7 +10,7 @@ const ItemSchema = z.object({
   id: z.string(),
 });
 
-export const historyOrderSchema = z
+export const historySchema = z
   .object({
     id: z.string(),
     table: z.string(),
@@ -21,5 +21,10 @@ export const historyOrderSchema = z
     itens: z.array(ItemSchema),
   })
   .array();
+
+export const historyOrderSchema = z.object({
+  total_pages: z.number(),
+  history: historySchema,
+});
 
 export type ResponseHistoryOrderDTO = z.infer<typeof historyOrderSchema>;

@@ -50,7 +50,7 @@ export class OrderController {
   @UseInterceptors(new ResponseInterceptor(historyOrderSchema))
   async historyOfOrders(
     @Param('page', ParseIntPipe) page: number,
-  ): Promise<HistoryOrder[]> {
+  ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
     const orders = await this.orderService.historyPage(page);
     return orders;
   }
@@ -62,7 +62,7 @@ export class OrderController {
   async historyOfOrdersFiltered(
     @Param('page', ParseIntPipe) page: number,
     @Query() filters: { to: Date; from: Date },
-  ): Promise<HistoryOrder[]> {
+  ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
     if (!filters.to || !filters.from) {
       throw new BadRequestException('Os filtros de data são obrigatórios');
     }

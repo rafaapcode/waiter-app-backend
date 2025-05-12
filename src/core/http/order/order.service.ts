@@ -164,9 +164,12 @@ export class OrderService {
     }
   }
 
-  async historyPage(page: number): Promise<HistoryOrder[]> {
+  async historyPage(
+    page: number,
+  ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
     try {
-      const orders = await this.orderRepository.historyOfOrders(page);
+      const { total_pages, orders } =
+        await this.orderRepository.historyOfOrders(page);
 
       if (orders && orders.length === 0) {
         throw new NotFoundException('Nenhum pedido encontrado!');
@@ -176,7 +179,7 @@ export class OrderService {
         throw new NotFoundException('Nenhum pedido encontrado!');
       }
 
-      return this.toHistoryOrder(orders);
+      return { total_pages, history: this.toHistoryOrder(orders) };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -197,12 +200,10 @@ export class OrderService {
   async historyFilterPage(
     filters: { to: Date; from: Date },
     page: number,
-  ): Promise<HistoryOrder[]> {
+  ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
     try {
-      const orders = await this.orderRepository.historyOfOrdersWithFilters(
-        filters,
-        page,
-      );
+      const { total_pages, orders } =
+        await this.orderRepository.historyOfOrdersWithFilters(filters, page);
 
       if (orders && orders.length === 0) {
         throw new NotFoundException('Nenhum pedido encontrado!');
@@ -212,7 +213,7 @@ export class OrderService {
         throw new NotFoundException('Nenhum pedido encontrado!');
       }
 
-      return this.toHistoryOrder(orders);
+      return { total_pages, history: this.toHistoryOrder(orders) };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

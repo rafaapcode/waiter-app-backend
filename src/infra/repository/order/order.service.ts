@@ -149,11 +149,15 @@ export class OrderRepository {
     }
   }
 
-  async historyOfOrders(page?: number): Promise<Order[]> {
+  async historyOfOrders(
+    page?: number,
+  ): Promise<{ total_pages: number; orders: Order[] }> {
     try {
       const pageNumber = page && page !== 0 ? page : 1;
-      const limit = 5;
+      const limit = 6;
       const skip = (pageNumber - 1) * limit;
+
+      const countDocs = await this.orderModel.countDocuments();
 
       const orders = await this.orderModel
         .find()
@@ -172,7 +176,7 @@ export class OrderRepository {
       if (!orders) {
         throw new NotFoundException('Nenhum pedido encontrado');
       }
-      return orders;
+      return { total_pages: Math.ceil(countDocs / limit), orders };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -190,11 +194,18 @@ export class OrderRepository {
   async historyOfOrdersWithFilters(
     filters: { to: Date; from: Date },
     page?: number,
-  ): Promise<Order[]> {
+  ): Promise<{ total_pages: number; orders: Order[] }> {
     try {
       const pageNumber = page && page !== 0 ? page : 1;
-      const limit = 5;
+      const limit = 6;
       const skip = (pageNumber - 1) * limit;
+
+      const countDocs = await this.orderModel.countDocuments({
+        createdAt: {
+          $gte: filters.from,
+          $lte: subHours(endOfDay(filters.to), 3),
+        },
+      });
 
       const orders = await this.orderModel
         .find({
@@ -218,7 +229,7 @@ export class OrderRepository {
       if (!orders) {
         throw new NotFoundException('Nenhum pedido encontrado');
       }
-      return orders;
+      return { total_pages: Math.ceil(countDocs / limit), orders };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
