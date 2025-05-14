@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -38,22 +37,17 @@ import {
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Get('/categories/:page')
+  @Get('/categories')
   @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(listCategorySchemaResponse))
-  async listCategories(
-    @Param('page', ParseIntPipe) page: number,
-  ): Promise<ResponseListCategoryResponse> {
-    const { total_pages, categories } =
-      await this.categoryService.listCategory(page);
-    return {
-      total_pages,
-      categories: categories.map((cat) => ({
-        _id: cat.id,
-        name: cat.name,
-        icon: cat.icon,
-      })),
-    };
+  async listCategories(): Promise<ResponseListCategoryResponse> {
+    const categories = await this.categoryService.listCategory();
+
+    return categories.map((cat) => ({
+      _id: cat.id,
+      name: cat.name,
+      icon: cat.icon,
+    }));
   }
 
   @Post('/categories')

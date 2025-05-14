@@ -50,18 +50,15 @@ export class CategoryService {
     }
   }
 
-  async listCategory(
-    page: number,
-  ): Promise<{ total_pages: number; categories: Category[] }> {
+  async listCategory(): Promise<Category[]> {
     try {
-      const { total_pages, categories } =
-        await this.categoryRepository.listCategory(page);
+      const categories = await this.categoryRepository.listCategory();
 
       if (categories.length === 0) {
         throw new HttpException(null, 204);
       }
 
-      return { total_pages, categories };
+      return categories;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

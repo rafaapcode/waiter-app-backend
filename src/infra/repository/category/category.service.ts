@@ -37,23 +37,11 @@ export class CategoryRepository {
     }
   }
 
-  async listCategory(
-    page: number,
-  ): Promise<{ total_pages: number; categories: Category[] }> {
+  async listCategory(): Promise<Category[]> {
     try {
-      const pageNumber = page && page !== 0 ? page : 1;
-      const limit = 6;
-      const skip = (pageNumber - 1) * limit;
+      const categories = await this.categoryModel.find();
 
-      const countDocs = await this.categoryModel.countDocuments();
-
-      const categories = await this.categoryModel
-        .find()
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 });
-
-      return { total_pages: Math.ceil(countDocs / limit), categories };
+      return categories;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
