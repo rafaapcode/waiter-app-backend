@@ -8,6 +8,7 @@ import { UserModule } from './core/http/user/user.module';
 import { GatewayModule } from './core/websocket/gateway/gateway.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { RepositoryModule } from './infra/repository/repository.module';
+import { IngredientModule } from './core/http/ingredient/ingredient.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RepositoryModule } from './infra/repository/repository.module';
     RepositoryModule,
     GatewayModule,
     UserModule,
+    IngredientModule,
   ],
   controllers: [AppController],
   providers: [],
