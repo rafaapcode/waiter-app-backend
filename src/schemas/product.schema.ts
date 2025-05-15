@@ -17,13 +17,11 @@ export const ProductSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  ingredients: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'Ingredient',
-    },
-  ],
+  ingredients: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: true,
+    ref: 'Ingredient',
+  },
   discount: {
     type: Boolean,
     default: false,

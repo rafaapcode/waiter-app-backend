@@ -15,12 +15,7 @@ import { Product } from 'src/types/Product.type';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateIngredientDTO } from './dto/CreateIngredient.dto';
 import { CreateProductDTO } from './dto/Product.dto';
-import {
-  createIngredientSchemaRes,
-  ResponseCreateIngredientDTO,
-} from './dto/response-create-ingredient';
 import {
   createProductSchemaRes,
   getProductSchemaRes,
@@ -87,7 +82,7 @@ export class ProductController {
     return await this.productService.createProduct(productData);
   }
 
-  @Get('/:categoryId')
+  @Get('categorie/:categoryId')
   @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
   async listProductsByCategorie(
@@ -135,21 +130,6 @@ export class ProductController {
     return {
       message: 'Produto atualizado com sucesso !',
     };
-  }
-
-  @Patch('/ingredient/:productId')
-  @UseGuards(UserGuard)
-  @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(createIngredientSchemaRes))
-  async createIngredient(
-    @Param('productId') productId: string,
-    @Body() newIngredient: CreateIngredientDTO,
-  ): Promise<ResponseCreateIngredientDTO> {
-    const ingredienteCreated = await this.productService.createIngredient(
-      productId,
-      newIngredient,
-    );
-    return ingredienteCreated;
   }
 
   @Patch('/discount/add/:productId')

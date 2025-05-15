@@ -13,10 +13,9 @@ export const createProductSchema = z
       .url({ message: 'URL inválida' }),
     price: z.number({ message: 'Preço é obrigatório' }),
     ingredients: z.array(
-      z.object({
-        name: z.string({ message: 'Nome é obrigatório' }),
-        icon: z.string().optional(),
-      }),
+      z
+        .string({ message: 'PRODUCT deve conter um ID válido' })
+        .length(24, { message: 'ID invalido' }),
     ),
     category: z
       .string({ message: 'PRODUCT deve conter um ID válido' })

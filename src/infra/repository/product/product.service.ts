@@ -6,8 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { CreateIngredientDTO } from 'src/core/http/product/dto/CreateIngredient.dto';
-import { ResponseCreateIngredientDTO } from 'src/core/http/product/dto/response-create-ingredient';
 import { CONSTANTS } from '../../../constants';
 import { CreateProductDTO } from '../../../core/http/product/dto/Product.dto';
 import { UpdateProductDTO } from '../../../core/http/product/dto/UpdateProduct.dto';
@@ -40,7 +38,10 @@ export class ProductRepository {
 
   async listProducts(): Promise<Product[]> {
     try {
-      const products = await this.productModel.find();
+      const products = await this.productModel
+        .find()
+        .populate('ingredients', '_id name icon')
+        .populate('category', '_id name icon');
       return products;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -150,37 +151,6 @@ export class ProductRepository {
     }
   }
 
-  async newIngredient(
-    productId: string,
-    data: CreateIngredientDTO,
-  ): Promise<ResponseCreateIngredientDTO> {
-    try {
-      await this.productModel.findByIdAndUpdate(
-        productId,
-        {
-          $push: { ingredients: data },
-        },
-        { new: true },
-      );
-
-      return {
-        icon: data.icon,
-        name: data.name,
-      };
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
   async putProductInDiscount(
     productId: string,
     discountPrice: number,
@@ -250,7 +220,11 @@ export class ProductRepository {
 
   async getProduct(productId: string): Promise<Product> {
     try {
-      const product = await this.productModel.findById(productId);
+      const product = await this.productModel
+        .findById(productId)
+        .populate('ingredients', '_id name icon')
+        .populate('category', '_id name icon');
+
       return product;
     } catch (error) {
       if (error instanceof BadRequestException) {
