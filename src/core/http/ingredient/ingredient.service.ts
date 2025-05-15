@@ -17,7 +17,10 @@ export class IngredientService {
     const isValidSchema = validateSchema(createIngredientSchema, data);
 
     if (!isValidSchema.success) {
-      throw new BadRequestException(isValidSchema.error.errors);
+      const errorMessages = isValidSchema.error.errors.map(
+        (msgs) => msgs.message,
+      );
+      throw new BadRequestException(errorMessages.join(' , '));
     }
 
     return await this.ingredientRepository.createIngredient(data);
