@@ -8,6 +8,7 @@ import {
 import { endOfDay, subHours } from 'date-fns';
 // import { endOfDay } from '@date-fns';
 import { Model } from 'mongoose';
+import { Product } from 'src/types/Product.type';
 import { getTodayRange } from 'src/utils/getTodayrange';
 import { CONSTANTS } from '../../../constants';
 import { ChangeOrderDto } from '../../../core/http/order/dto/ChangeOrder.dto';
@@ -19,6 +20,8 @@ export class OrderRepository {
   constructor(
     @Inject(CONSTANTS.ORDER_PROVIDER)
     private orderModel: Model<Order>,
+    @Inject(CONSTANTS.PRODUCT_PROVIDER)
+    private productModel: Model<Product>,
   ) {}
 
   async changeOrderStatus(
@@ -49,10 +52,26 @@ export class OrderRepository {
 
   async createOrder(createOrdeData: CreateOrderDTO): Promise<Order> {
     try {
+      const productsIds = createOrdeData.products.map(
+        (product) => product.product,
+      );
+
+      const allProductsExists = await this.productModel.find({
+        _id: { $in: productsIds },
+      });
+
+      if (
+        !allProductsExists ||
+        allProductsExists.length !== createOrdeData.products.length
+      ) {
+        throw new NotFoundException('Um ou mais produtos não existe');
+      }
+
       const order = (await this.orderModel.create(createOrdeData)).populate(
         'products.product',
       );
-      return order;
+
+      return await order;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
