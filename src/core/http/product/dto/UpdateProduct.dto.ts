@@ -22,11 +22,8 @@ export const updateProductSchema = z
     ingredients: z
       .array(
         z
-          .object({
-            name: z.string({ message: 'Nome é obrigatório' }),
-            icon: z.string().optional(),
-          })
-          .optional(),
+          .string({ message: 'PRODUCT deve conter um ID válido' })
+          .length(24, { message: 'ID invalido' }),
       )
       .optional(),
     category: z

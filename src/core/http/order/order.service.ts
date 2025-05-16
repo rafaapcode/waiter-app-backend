@@ -178,7 +178,6 @@ export class OrderService {
       if (!orders) {
         throw new NotFoundException('Nenhum pedido encontrado!');
       }
-
       return { total_pages, history: this.toHistoryOrder(orders) };
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -255,18 +254,20 @@ export class OrderService {
   private toHistoryOrder(orders: Order[]): HistoryOrder[] {
     const formatOrders: HistoryOrder[] = orders.map((order) => {
       if (!order) throw new NotFoundException('Order not found');
+      const filteredProducts = order.products.filter((p) => p.product);
 
-      const product = order.products[0].product as Product;
-      const category = product.category as Category;
-
-      if (!order.products || order.products.length === 0) {
+      if (
+        !order.products ||
+        order.products.length === 0 ||
+        filteredProducts.length === 0
+      ) {
         return {
           id: order._id.toString(),
           table: order.table,
           data: order.createdAt,
           totalPrice: formatCurrency(0),
-          name: '',
-          category: '',
+          name: 'Nome não identificado',
+          category: 'Categoria não identificada',
           itens: [],
         };
       }
@@ -274,6 +275,9 @@ export class OrderService {
       const namesAndPrice = order.products.reduce(
         (acc, product) => {
           const productInfo = product.product as Product;
+          if (!productInfo.id) {
+            return acc;
+          }
 
           acc.name += productInfo.name + ', ';
           acc.totalPrice +=
@@ -302,6 +306,8 @@ export class OrderService {
         };
       });
 
+      const product = filteredProducts[0].product as Product;
+      const category = product.category as Category;
       return {
         id: order._id.toString(),
         table: order.table,
@@ -312,7 +318,6 @@ export class OrderService {
         itens,
       };
     });
-
     return formatOrders;
   }
 }
