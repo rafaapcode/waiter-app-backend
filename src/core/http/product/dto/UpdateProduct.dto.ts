@@ -19,6 +19,8 @@ export const updateProductSchema = z
       .url({ message: 'URL inválida' })
       .optional(),
     price: z.number({ message: 'Preço é obrigatório' }).optional(),
+    priceInDiscount: z.number().optional(),
+    discount: z.boolean().optional(),
     ingredients: z
       .array(
         z
