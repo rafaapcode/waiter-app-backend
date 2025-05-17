@@ -26,7 +26,6 @@ export class ProductService {
       const productExists = await this.productRepository.productExists(
         productData.name,
       );
-
       if (productExists) {
         throw new BadRequestException(
           `${productData.name} já existe, crie um produto com nome diferente.`,
