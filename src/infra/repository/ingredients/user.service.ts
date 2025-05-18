@@ -46,4 +46,32 @@ export class IngredientRepository {
       })),
     };
   }
+
+  async findIngredients(
+    ingredients: string[],
+  ): Promise<{ data: { id: string; name: string }[] }> {
+    const allIngredients = await this.ingredientModel.find({
+      name: { $in: ingredients },
+    });
+
+    return {
+      data: allIngredients.map((ing) => ({
+        id: ing.id,
+        name: ing.name,
+      })),
+    };
+  }
+
+  async createMany(
+    ingredients: CreateIngredientDTO[],
+  ): Promise<{ status: boolean }> {
+    try {
+      await this.ingredientModel.insertMany(ingredients);
+
+      return { status: true };
+    } catch (error: any) {
+      console.log(error.message);
+      return { status: false };
+    }
+  }
 }

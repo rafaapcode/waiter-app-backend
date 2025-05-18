@@ -29,4 +29,15 @@ export class IngredientService {
   async getAllIngredients(): Promise<{ data: IngredientType[] }> {
     return await this.ingredientRepository.getAllIngredients();
   }
+
+  async getIngredients(
+    ingredients: string[],
+  ): Promise<{ data: { id: string; name: string }[] }> {
+    return await this.ingredientRepository.findIngredients(ingredients);
+  }
+  async createManyIngredients(
+    ingredients: CreateIngredientDTO[],
+  ): Promise<{ status: boolean }> {
+    return await this.ingredientRepository.createMany(ingredients);
+  }
 }
