@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -26,7 +27,7 @@ export class UserService {
   async signInUser({
     email,
     password,
-  }: LoginUserDTO): Promise<{ access_token: string }> {
+  }: LoginUserDTO): Promise<{ access_token: string; role: string }> {
     const isValidPayload = validateSchema(loginUserSchema, { email, password });
 
     if (!isValidPayload.success) {
@@ -47,25 +48,32 @@ export class UserService {
 
     const token = this.generateToken(user.email, user.role);
 
-    return { access_token: token };
+    return { access_token: token, role: user.role };
   }
 
   async signUpUser({
     email,
     password,
     name,
+    role,
   }: CreateUserDTO): Promise<Omit<UserType, 'password'>> {
     const isValidPayload = validateSchema(createUserSchema, {
       email,
       password,
       name,
+      role,
     });
 
     if (!isValidPayload.success) {
       throw new BadRequestException(isValidPayload.error.errors);
     }
 
-    const newUser = await this.userRepo.createUser({ email, password, name });
+    const newUser = await this.userRepo.createUser({
+      email,
+      password,
+      name,
+      role,
+    });
 
     return newUser;
   }
@@ -103,8 +111,10 @@ export class UserService {
     return await this.userRepo.getUser(id);
   }
 
-  async getAllUsers(): Promise<Omit<UserType, 'password'>[]> {
-    const users = await this.userRepo.getAllUser();
+  async getAllUsers(
+    page: number,
+  ): Promise<{ total_pages: number; users: Omit<UserType, 'password'>[] }> {
+    const users = await this.userRepo.getAllUser(page);
     return users;
   }
 
@@ -132,7 +142,7 @@ export class UserService {
       }
       return isTokenValid as { email: string; role: Role };
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new UnauthorizedException(error.message);
     }
   }
 }

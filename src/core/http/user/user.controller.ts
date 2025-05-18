@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -26,9 +27,9 @@ export class UserController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() userPayload: LoginUserDTO) {
-    const access_token = await this.userService.signInUser(userPayload);
+    const data = await this.userService.signInUser(userPayload);
 
-    return access_token;
+    return data;
   }
 
   @Post('')
@@ -61,11 +62,11 @@ export class UserController {
     return await this.userService.deleteUser(id);
   }
 
-  @Get('all')
+  @Get('all/:page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async getAllUser() {
-    return await this.userService.getAllUsers();
+  async getAllUser(@Param('page', ParseIntPipe) page: number) {
+    return await this.userService.getAllUsers(page);
   }
 
   @Get(':id')

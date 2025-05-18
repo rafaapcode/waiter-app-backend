@@ -127,19 +127,35 @@ export class UserRepository {
     }
   }
 
-  async getAllUser(): Promise<Omit<UserType, 'password'>[]> {
+  async getAllUser(
+    page: number,
+  ): Promise<{ total_pages: number; users: Omit<UserType, 'password'>[] }> {
     try {
-      const user = await this.userModel.find();
+      const pageNumber = page && page !== 0 ? page : 1;
+      const limit = 6;
+      const skip = (pageNumber - 1) * limit;
+
+      const countDocs = await this.userModel.countDocuments();
+
+      const user = await this.userModel
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 });
+
       if (user.length === 0 || !user) {
         throw new NotFoundException('Users not found');
       }
 
-      return user.map((u) => ({
-        _id: u._id.toString(),
-        name: u.name,
-        email: u.email,
-        role: u.role,
-      }));
+      return {
+        total_pages: countDocs,
+        users: user.map((u) => ({
+          _id: u._id.toString(),
+          name: u.name,
+          email: u.email,
+          role: u.role,
+        })),
+      };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

@@ -14,6 +14,7 @@ export const createUserSchema = z
     password: z
       .string({ message: 'Senha é obrigatório' })
       .min(8, { message: 'Senha deve ter no mínimo 8 caracteres' }),
+    role: z.enum(['WAITER', 'ADMIN']),
   })
   .required();
 
