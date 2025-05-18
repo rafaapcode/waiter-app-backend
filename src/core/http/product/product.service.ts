@@ -31,10 +31,11 @@ export class ProductService {
           `${productData.name} já existe, crie um produto com nome diferente.`,
         );
       }
-
       const product = await this.productRepository.crateProduct({
         ...productData,
-        imageUrl: productData.imageUrl || '',
+        imageUrl:
+          productData.imageUrl ||
+          'https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg',
       });
 
       if (!product) {
