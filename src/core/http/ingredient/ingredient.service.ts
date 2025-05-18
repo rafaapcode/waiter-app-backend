@@ -39,7 +39,7 @@ export class IngredientService {
 
   async createManyIngredients(
     ingredients: CreateIngredientDTO[],
-  ): Promise<{ status: boolean }> {
+  ): Promise<{ data: { name: string; id: string }[] }> {
     const verifyIngredientsData =
       createManyIngredientSchema.safeParse(ingredients);
 

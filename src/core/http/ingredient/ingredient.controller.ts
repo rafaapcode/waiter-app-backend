@@ -39,10 +39,10 @@ export class IngredientController {
   @HttpCode(HttpStatus.CREATED)
   async createManyIngredients(
     @Body() data: CreateIngredientDTO[],
-  ): Promise<{ status: boolean }> {
+  ): Promise<{ data: { name: string; id: string }[] }> {
     const response = await this.ingredientsService.createManyIngredients(data);
 
-    if (!response.status) {
+    if (response.data.length === 0) {
       throw new BadRequestException('Erro ao criar os ingredientes');
     }
 
