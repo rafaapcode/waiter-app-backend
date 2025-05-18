@@ -6,6 +6,7 @@ import {
   CreateIngredientDTO,
   createIngredientSchema,
 } from './dto/createIngredient.dto';
+import { createManyIngredientSchema } from './dto/createManyIngredients.dto';
 
 @Injectable()
 export class IngredientService {
@@ -30,14 +31,22 @@ export class IngredientService {
     return await this.ingredientRepository.getAllIngredients();
   }
 
-  async getIngredients(
+  async verifyIngredients(
     ingredients: string[],
   ): Promise<{ data: { id: string; name: string }[] }> {
-    return await this.ingredientRepository.findIngredients(ingredients);
+    return await this.ingredientRepository.verfifyIngredients(ingredients);
   }
+
   async createManyIngredients(
     ingredients: CreateIngredientDTO[],
   ): Promise<{ status: boolean }> {
+    const verifyIngredientsData =
+      createManyIngredientSchema.safeParse(ingredients);
+
+    if (!verifyIngredientsData.success) {
+      throw new BadRequestException('Ingredients incorretos');
+    }
+
     return await this.ingredientRepository.createMany(ingredients);
   }
 }

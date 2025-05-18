@@ -27,12 +27,12 @@ export class IngredientController {
     return await this.ingredientsService.createIngredient(data);
   }
 
-  @Post('find')
+  @Post('verify')
   @HttpCode(HttpStatus.OK)
-  async findIngredients(
+  async verifyIngredients(
     @Body() data: string[],
   ): Promise<{ data: { id: string; name: string }[] }> {
-    return await this.ingredientsService.getIngredients(data);
+    return await this.ingredientsService.verifyIngredients(data);
   }
 
   @Post('create-many')

@@ -47,7 +47,7 @@ export class IngredientRepository {
     };
   }
 
-  async findIngredients(
+  async verfifyIngredients(
     ingredients: string[],
   ): Promise<{ data: { id: string; name: string }[] }> {
     const allIngredients = await this.ingredientModel.find({
