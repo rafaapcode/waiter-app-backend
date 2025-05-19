@@ -30,9 +30,9 @@ export class IngredientController {
   @Post('verify')
   @HttpCode(HttpStatus.OK)
   async verifyIngredients(
-    @Body() data: string[],
+    @Body() data: { ingredients: string[] },
   ): Promise<{ data: { id: string; name: string }[] }> {
-    return await this.ingredientsService.verifyIngredients(data);
+    return await this.ingredientsService.verifyIngredients(data.ingredients);
   }
 
   @Post('create-many')
