@@ -148,7 +148,7 @@ export class UserRepository {
       }
 
       return {
-        total_pages: countDocs,
+        total_pages: Math.ceil(countDocs / limit),
         users: user.map((u) => ({
           _id: u._id.toString(),
           name: u.name,
