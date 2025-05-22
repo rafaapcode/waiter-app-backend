@@ -15,7 +15,10 @@ export class IngredientService {
   async createIngredient(
     data: CreateIngredientDTO,
   ): Promise<{ message: string; data?: IngredientType }> {
-    const isValidSchema = validateSchema(createIngredientSchema, data);
+    const isValidSchema = validateSchema(createIngredientSchema, {
+      ...data,
+      name: data.name.toLowerCase(),
+    });
 
     if (!isValidSchema.success) {
       const errorMessages = isValidSchema.error.errors.map(
@@ -40,8 +43,14 @@ export class IngredientService {
   async createManyIngredients(
     ingredients: CreateIngredientDTO[],
   ): Promise<{ data: { name: string; id: string }[] }> {
-    const verifyIngredientsData =
-      createManyIngredientSchema.safeParse(ingredients);
+    const normalizedIngredients = ingredients.map((ing) => ({
+      ...ing,
+      name: ing.name.toLowerCase(),
+    }));
+
+    const verifyIngredientsData = createManyIngredientSchema.safeParse(
+      normalizedIngredients,
+    );
 
     if (!verifyIngredientsData.success) {
       throw new BadRequestException('Ingredients incorretos');
