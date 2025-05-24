@@ -13,6 +13,10 @@ import { validateSchema } from 'src/utils/validateSchema';
 import { verifyPassword } from 'src/utils/verifyPassword';
 import { Role } from '../authentication/roles/role.enum';
 import { LoginUserDTO, loginUserSchema } from './dto/LoginUser.dto';
+import {
+  UpdateCurrentUserDTO,
+  updateCurrentUserSchema,
+} from './dto/UpdateCurrentUser.dto';
 import { UpdateUserDTO, updateUserSchema } from './dto/UpdateUser.dto';
 import { CreateUserDTO, createUserSchema } from './dto/User.dto';
 
@@ -93,6 +97,23 @@ export class UserService {
     return newUser;
   }
 
+  async updateCurrentUser(
+    id: string,
+    data: UpdateCurrentUserDTO,
+  ): Promise<Omit<UserType, 'password'>> {
+    const isValidPayload = updateCurrentUserSchema.safeParse(data);
+
+    if (!isValidPayload.success) {
+      throw new BadRequestException(
+        isValidPayload.error.errors.map((e) => e.message).join(' , '),
+      );
+    }
+
+    const newUser = await this.userRepo.updateUser(id, data);
+
+    return newUser;
+  }
+
   async deleteUser(id: string): Promise<{ message: string }> {
     if (!id) {
       throw new BadRequestException('User ID is required');
@@ -109,6 +130,16 @@ export class UserService {
     }
 
     return await this.userRepo.getUser(id);
+  }
+
+  async getUserByEmail(
+    email: string,
+  ): Promise<{ name: string; email: string }> {
+    if (!email) {
+      throw new BadRequestException('User Email is required');
+    }
+
+    return await this.userRepo.getUserByEmail(email);
   }
 
   async getAllUsers(

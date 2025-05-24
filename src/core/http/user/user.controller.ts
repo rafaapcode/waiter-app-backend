@@ -6,12 +6,15 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
+import { JwtPayload } from 'src/types/express';
+import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -78,5 +81,17 @@ export class UserController {
     }
 
     return await this.userService.getUser(id);
+  }
+
+  @Get('current')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  async getCurrentUser(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<{ name: string; email: string }> {
+    if (!user) {
+      throw new InternalServerErrorException('User not found in the request');
+    }
+    return await this.userService.getUserByEmail(user.email);
   }
 }

@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { UpdateCurrentUserDTO } from 'src/core/http/user/dto/UpdateCurrentUser.dto';
 import { User, UserType } from 'src/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
@@ -80,6 +81,50 @@ export class UserRepository {
     }
   }
 
+  async updateCurrentUser(
+    email: string,
+    user: Partial<UpdateCurrentUserDTO>,
+  ): Promise<Omit<UserType, 'password'>> {
+    try {
+      const userId = await this.userModel.findOne({ email });
+
+      if (!userId) {
+        throw new NotFoundException('User not found');
+      }
+
+      const newuser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          ...(user.email && { email: user.email }),
+          ...(user.name && { name: user.name }),
+        },
+        { new: true, lean: true },
+      );
+
+      if (!newuser) {
+        throw new NotFoundException('User not found');
+      }
+
+      return {
+        _id: newuser._id as string,
+        name: newuser.name,
+        email: newuser.email,
+        role: newuser.role,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async deleteUser(userId: string): Promise<boolean> {
     try {
       const userDeleted = await this.userModel.findByIdAndDelete(userId);
@@ -112,6 +157,32 @@ export class UserRepository {
         name: user.name,
         email: user.email,
         role: user.role,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.getResponse());
+      }
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.getResponse());
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getUserByEmail(
+    userEmail: string,
+  ): Promise<{ name: string; email: string }> {
+    try {
+      const user = await this.userModel.findOne({ email: userEmail });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      return {
+        name: user.name,
+        email: user.email,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {
