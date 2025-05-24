@@ -19,6 +19,7 @@ import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { LoginUserDTO } from './dto/LoginUser.dto';
+import { UpdateCurrentUserDTO } from './dto/UpdateCurrentUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { CreateUserDTO } from './dto/User.dto';
 import { UserService } from './user.service';
@@ -38,6 +39,20 @@ export class UserController {
   @Post('')
   async signUpUser(@Body() userPayload: CreateUserDTO) {
     return await this.userService.signUpUser(userPayload);
+  }
+
+  @Put('current')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  async updateCurrentUser(
+    @CurrentUser() user: JwtPayload,
+    @Body() userPayload: UpdateCurrentUserDTO,
+  ) {
+    if (!user) {
+      throw new InternalServerErrorException('User not found in request');
+    }
+
+    return await this.userService.updateCurrentUser(user.email, userPayload);
   }
 
   @Put(':id')
@@ -72,17 +87,6 @@ export class UserController {
     return await this.userService.getAllUsers(page);
   }
 
-  @Get(':id')
-  @UseGuards(UserGuard)
-  @Roles(Role.ADMIN)
-  async getUser(@Param('id') id: string) {
-    if (!id) {
-      throw new BadRequestException('User ID is required');
-    }
-
-    return await this.userService.getUser(id);
-  }
-
   @Get('current')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
@@ -93,5 +97,16 @@ export class UserController {
       throw new InternalServerErrorException('User not found in the request');
     }
     return await this.userService.getUserByEmail(user.email);
+  }
+
+  @Get(':id')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  async getUser(@Param('id') id: string) {
+    if (!id) {
+      throw new BadRequestException('User ID is required');
+    }
+
+    return await this.userService.getUser(id);
   }
 }

@@ -98,7 +98,7 @@ export class UserService {
   }
 
   async updateCurrentUser(
-    id: string,
+    email: string,
     data: UpdateCurrentUserDTO,
   ): Promise<Omit<UserType, 'password'>> {
     const isValidPayload = updateCurrentUserSchema.safeParse(data);
@@ -109,7 +109,28 @@ export class UserService {
       );
     }
 
-    const newUser = await this.userRepo.updateUser(id, data);
+    if (data.new_password) {
+      const user = await this.userRepo.userExists(email);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const isValidPassword = await verifyPassword(
+        data.current_password,
+        user.password,
+      );
+
+      if (!isValidPassword) {
+        throw new UnauthorizedException('Current Password is invalid');
+      }
+    }
+
+    const newUser = await this.userRepo.updateCurrentUser(email, {
+      name: data.name,
+      email: data.email,
+      new_password: data.new_password,
+    });
 
     return newUser;
   }

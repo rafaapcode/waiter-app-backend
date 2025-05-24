@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { UpdateCurrentUserDTO } from 'src/core/http/user/dto/UpdateCurrentUser.dto';
 import { User, UserType } from 'src/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
@@ -83,7 +82,7 @@ export class UserRepository {
 
   async updateCurrentUser(
     email: string,
-    user: Partial<UpdateCurrentUserDTO>,
+    user: Partial<{ name: string; email: string; new_password: string }>,
   ): Promise<Omit<UserType, 'password'>> {
     try {
       const userId = await this.userModel.findOne({ email });
@@ -97,6 +96,7 @@ export class UserRepository {
         {
           ...(user.email && { email: user.email }),
           ...(user.name && { name: user.name }),
+          ...(user.new_password && { password: user.new_password }),
         },
         { new: true, lean: true },
       );
