@@ -28,10 +28,11 @@ export class UserService {
     private configService: ConfigService,
   ) {}
 
-  async signInUser({
-    email,
-    password,
-  }: LoginUserDTO): Promise<{ access_token: string; role: string }> {
+  async signInUser({ email, password }: LoginUserDTO): Promise<{
+    access_token: string;
+    role: string;
+    id: string;
+  }> {
     const isValidPayload = validateSchema(loginUserSchema, { email, password });
 
     if (!isValidPayload.success) {
@@ -52,7 +53,7 @@ export class UserService {
 
     const token = this.generateToken(user.email, user.role);
 
-    return { access_token: token, role: user.role };
+    return { access_token: token, role: user.role, id: user._id };
   }
 
   async signUpUser({
