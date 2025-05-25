@@ -14,6 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtPayload } from 'src/types/express';
+import { UserType } from 'src/types/User.type';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
@@ -47,7 +48,7 @@ export class UserController {
   async updateCurrentUser(
     @CurrentUser() user: JwtPayload,
     @Body() userPayload: UpdateCurrentUserDTO,
-  ) {
+  ): Promise<{ access_token?: string } & Omit<UserType, 'password'>> {
     if (!user) {
       throw new InternalServerErrorException('User not found in request');
     }

@@ -101,16 +101,17 @@ export class UserService {
   async updateCurrentUser(
     email: string,
     data: UpdateCurrentUserDTO,
-  ): Promise<Omit<UserType, 'password'>> {
+  ): Promise<{ access_token?: string } & Omit<UserType, 'password'>> {
     const isValidPayload = updateCurrentUserSchema.safeParse({
       ...(data.name && { name: data.name }),
       ...(data.email && { email: data.email }),
       ...(data.new_password && { new_password: data.new_password }),
+      ...(data.confirm_password && { confirm_password: data.confirm_password }),
     });
 
     if (!isValidPayload.success) {
       throw new BadRequestException(
-        isValidPayload.error.errors.map((e) => e.message).join(' , '),
+        isValidPayload.error.errors.map((e) => e.message).join('\n'),
       );
     }
 
@@ -127,7 +128,7 @@ export class UserService {
       );
 
       if (!isValidPassword) {
-        throw new UnauthorizedException('Current Password is invalid');
+        throw new UnauthorizedException('Senha atual inválida');
       }
     }
 
@@ -136,6 +137,11 @@ export class UserService {
       email: data.email,
       new_password: data.new_password,
     });
+
+    if (data.email) {
+      const token = this.generateToken(newUser.email, newUser.role);
+      return { ...newUser, access_token: token };
+    }
 
     return newUser;
   }
