@@ -102,7 +102,11 @@ export class UserService {
     email: string,
     data: UpdateCurrentUserDTO,
   ): Promise<Omit<UserType, 'password'>> {
-    const isValidPayload = updateCurrentUserSchema.safeParse(data);
+    const isValidPayload = updateCurrentUserSchema.safeParse({
+      ...(data.name && { name: data.name }),
+      ...(data.email && { email: data.email }),
+      ...(data.new_password && { new_password: data.new_password }),
+    });
 
     if (!isValidPayload.success) {
       throw new BadRequestException(
