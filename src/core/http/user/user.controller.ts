@@ -50,7 +50,9 @@ export class UserController {
     @Body() userPayload: UpdateCurrentUserDTO,
   ): Promise<{ access_token?: string } & Omit<UserType, 'password'>> {
     if (!user) {
-      throw new InternalServerErrorException('User not found in request');
+      throw new InternalServerErrorException(
+        'Usuário não encontrado na requisição',
+      );
     }
 
     return await this.userService.updateCurrentUser(user.email, userPayload);
@@ -64,7 +66,7 @@ export class UserController {
     @Body() userPayload: UpdateUserDTO,
   ) {
     if (!id) {
-      throw new BadRequestException('User ID is required');
+      throw new BadRequestException('ID do usuário é obrigatório');
     }
 
     return await this.userService.updateUser(id, userPayload);
@@ -75,7 +77,7 @@ export class UserController {
   @Roles(Role.ADMIN)
   async deleteUser(@Param('id') id: string) {
     if (!id) {
-      throw new BadRequestException('User ID is required');
+      throw new BadRequestException('ID do usuário é obrigatório');
     }
 
     return await this.userService.deleteUser(id);
@@ -95,7 +97,9 @@ export class UserController {
     @CurrentUser() user: JwtPayload,
   ): Promise<{ name: string; email: string }> {
     if (!user) {
-      throw new InternalServerErrorException('User not found in the request');
+      throw new InternalServerErrorException(
+        'Usuário não encontrado na requisição',
+      );
     }
     return await this.userService.getUserByEmail(user.email);
   }
@@ -105,7 +109,7 @@ export class UserController {
   @Roles(Role.ADMIN)
   async getUser(@Param('id') id: string) {
     if (!id) {
-      throw new BadRequestException('User ID is required');
+      throw new BadRequestException('ID do usuário é obrigatório');
     }
 
     return await this.userService.getUser(id);

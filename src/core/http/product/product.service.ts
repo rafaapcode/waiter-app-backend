@@ -271,7 +271,7 @@ export class ProductService {
       const product = await this.productRepository.getProduct(productId);
 
       if (!product) {
-        throw new NotFoundException('Product not found');
+        throw new NotFoundException('Product não encontrado');
       }
 
       return product;

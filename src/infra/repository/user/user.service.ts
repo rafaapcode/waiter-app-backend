@@ -20,7 +20,7 @@ export class UserRepository {
     try {
       const userExists = await this.userModel.findOne({ email: user.email });
       if (userExists) {
-        throw new BadRequestException('User already exists');
+        throw new BadRequestException('Usuário já existe');
       }
       const newUser = await this.userModel.create(user);
       return {
@@ -57,7 +57,7 @@ export class UserRepository {
       );
 
       if (!newuser) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       return {
@@ -88,7 +88,7 @@ export class UserRepository {
       const userId = await this.userModel.findOne({ email });
 
       if (!userId) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       const newuser = await this.userModel.findByIdAndUpdate(
@@ -102,7 +102,7 @@ export class UserRepository {
       );
 
       if (!newuser) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       return {
@@ -129,7 +129,7 @@ export class UserRepository {
     try {
       const userDeleted = await this.userModel.findByIdAndDelete(userId);
       if (!userDeleted) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
       return true;
     } catch (error) {
@@ -150,7 +150,7 @@ export class UserRepository {
     try {
       const user = await this.userModel.findById(userId);
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
       return {
         _id: user._id as string,
@@ -178,7 +178,7 @@ export class UserRepository {
     try {
       const user = await this.userModel.findOne({ email: userEmail });
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
       return {
         name: user.name,
@@ -215,7 +215,7 @@ export class UserRepository {
         .sort({ createdAt: -1 });
 
       if (user.length === 0 || !user) {
-        throw new NotFoundException('Users not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       return {
@@ -245,7 +245,7 @@ export class UserRepository {
     try {
       const user = await this.userModel.findOne({ email });
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
       return {
         _id: user._id.toString(),

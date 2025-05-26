@@ -20,7 +20,6 @@ export class CategoryService {
 
   async createCategory(data: CreateCategoryDto): Promise<Category> {
     try {
-      // Validate Data
       const validateData = validateSchema(createCategorySchema, data);
       if (!validateData.success) {
         throw new BadRequestException(validateData.error.errors);

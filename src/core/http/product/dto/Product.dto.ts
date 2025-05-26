@@ -14,11 +14,11 @@ export const createProductSchema = z
     price: z.number({ message: 'Preço é obrigatório' }),
     ingredients: z.array(
       z
-        .string({ message: 'PRODUCT deve conter um ID válido' })
+        .string({ message: 'Produto deve conter um ID válido' })
         .length(24, { message: 'ID invalido' }),
     ),
     category: z
-      .string({ message: 'PRODUCT deve conter um ID válido' })
+      .string({ message: 'Produto deve conter um ID válido' })
       .length(24, { message: 'ID invalido' }),
   })
   .required();

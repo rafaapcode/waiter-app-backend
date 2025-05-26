@@ -3,7 +3,7 @@ import { z } from 'zod';
 const productOrderSchema = z
   .object({
     product: z
-      .string({ message: 'PRODUCT deve conter um ID válido' })
+      .string({ message: 'PRODUTO deve conter um ID válido' })
       .length(24, { message: 'ID invalido' }),
     quantity: z
       .number()

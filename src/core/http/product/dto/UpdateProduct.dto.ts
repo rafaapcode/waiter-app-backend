@@ -24,12 +24,12 @@ export const updateProductSchema = z
     ingredients: z
       .array(
         z
-          .string({ message: 'PRODUCT deve conter um ID válido' })
+          .string({ message: 'Produto deve conter um ID válido' })
           .length(24, { message: 'ID invalido' }),
       )
       .optional(),
     category: z
-      .string({ message: 'PRODUCT deve conter um ID válido' })
+      .string({ message: 'Produto deve conter um ID válido' })
       .length(24, { message: 'ID invalido' })
       .optional(),
   })

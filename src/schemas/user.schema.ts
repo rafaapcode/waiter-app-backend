@@ -14,13 +14,13 @@ export const UserSchema = new mongoose.Schema({
       validator: function (value: string) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
       },
-      message: 'Invalid email address format',
+      message: 'Formato de e-mail inválido',
     },
   },
   password: {
     type: String,
     required: true,
-    min: [8, 'The password must have at least 8 characters'],
+    min: [8, 'A senha deve ter pelo menos 8 caracteres'],
   },
   role: {
     type: String,
@@ -35,7 +35,7 @@ UserSchema.pre('save', async function (next) {
     this.password = hashedPass;
     next();
   } catch (error) {
-    throw new Error('Error to hash the password ' + error.message);
+    throw new Error('Erro ao criar o hash da senha:  ' + error.message);
   }
 });
 
@@ -53,6 +53,6 @@ UserSchema.pre('findOneAndUpdate', async function (next) {
     }
     next();
   } catch (error) {
-    throw new Error('Error to hash the password ' + error.message);
+    throw new Error('Erro ao criar o hash da senha: ' + error.message);
   }
 });

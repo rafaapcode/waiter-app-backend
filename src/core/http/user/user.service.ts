@@ -42,13 +42,13 @@ export class UserService {
     const user = await this.userRepo.userExists(email);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
-      throw new NotFoundException('Invalid password');
+      throw new NotFoundException('Senha inválida');
     }
 
     const token = this.generateToken(user.email, user.role);
@@ -119,7 +119,7 @@ export class UserService {
       const user = await this.userRepo.userExists(email);
 
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       const isValidPassword = await verifyPassword(
@@ -148,17 +148,17 @@ export class UserService {
 
   async deleteUser(id: string): Promise<{ message: string }> {
     if (!id) {
-      throw new BadRequestException('User ID is required');
+      throw new BadRequestException('Id do usuário é obrigatório');
     }
 
     await this.userRepo.deleteUser(id);
 
-    return { message: 'User deleted successfully' };
+    return { message: 'Usuário deletado com sucesso !' };
   }
 
   async getUser(id: string): Promise<Omit<UserType, 'password'>> {
     if (!id) {
-      throw new BadRequestException('User ID is required');
+      throw new BadRequestException('ID do usuário é obrigatório');
     }
 
     return await this.userRepo.getUser(id);
@@ -168,7 +168,7 @@ export class UserService {
     email: string,
   ): Promise<{ name: string; email: string }> {
     if (!email) {
-      throw new BadRequestException('User Email is required');
+      throw new BadRequestException('Email do usuário é obrigatório');
     }
 
     return await this.userRepo.getUserByEmail(email);

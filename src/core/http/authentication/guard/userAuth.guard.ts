@@ -36,17 +36,17 @@ export class UserGuard implements CanActivate {
     const token = req.headers.authorization;
 
     if (!token) {
-      throw new UnauthorizedException('Token is Required');
+      throw new UnauthorizedException('Token é obrigatório');
     }
 
     const [, authToken] = token.split(' ');
     if (!authToken) {
-      throw new UnauthorizedException('Token is Required');
+      throw new UnauthorizedException('Token é obrigatório');
     }
 
     const userData = this.userService.verifyToken(authToken);
     if (!userData) {
-      throw new UnauthorizedException('Token invalid');
+      throw new UnauthorizedException('Token inválido ou expirado');
     }
     if (!requiredRole) {
       return true;

@@ -253,7 +253,7 @@ export class OrderService {
 
   private toHistoryOrder(orders: Order[]): HistoryOrder[] {
     const formatOrders: HistoryOrder[] = orders.map((order) => {
-      if (!order) throw new NotFoundException('Order not found');
+      if (!order) throw new NotFoundException('Pedido não encontrado !');
       const filteredProducts = order.products.filter((p) => p.product);
 
       if (
