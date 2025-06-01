@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { Order } from 'src/types/Order.type';
 import { CONSTANTS } from '../../../constants';
 import { CreateProductDTO } from '../../../core/http/product/dto/Product.dto';
 import { UpdateProductDTO } from '../../../core/http/product/dto/UpdateProduct.dto';
@@ -16,6 +17,8 @@ export class ProductRepository {
   constructor(
     @Inject(CONSTANTS.PRODUCT_PROVIDER)
     private productModel: Model<Product>,
+    @Inject(CONSTANTS.ORDER_PROVIDER)
+    private orderModel: Model<Order>,
   ) {}
 
   async crateProduct(productData: CreateProductDTO): Promise<Product> {
@@ -102,6 +105,17 @@ export class ProductRepository {
 
   async deleteProduct(productId: string): Promise<boolean> {
     try {
+      const productIsBeingUsed = await this.orderModel.findOne({
+        'products.product': productId,
+        deletedAt: null,
+      });
+
+      if (productIsBeingUsed) {
+        throw new BadRequestException(
+          'Atualmente o produto está sendo usado em algum PEDIDO.',
+        );
+      }
+
       const productDeleted =
         await this.productModel.findByIdAndDelete(productId);
 
