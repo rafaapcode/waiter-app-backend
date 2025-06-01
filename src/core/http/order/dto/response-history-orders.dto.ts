@@ -6,7 +6,6 @@ const ItemSchema = z.object({
   name: z.string(),
   price: z.number(),
   discount: z.boolean(),
-  priceInDiscount: z.number(),
   id: z.string(),
 });
 
