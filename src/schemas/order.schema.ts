@@ -37,6 +37,16 @@ export const OrderSchema = new mongoose.Schema({
           default: 1,
           required: true,
         },
+        price: {
+          type: Number,
+          default: 1,
+          required: true,
+        },
+        discount: {
+          type: Boolean,
+          default: false,
+          required: true,
+        },
       },
     ],
     required: true,

@@ -271,19 +271,14 @@ export class OrderService {
           itens: [],
         };
       }
-
       const namesAndPrice = order.products.reduce(
         (acc, product) => {
           const productInfo = product.product as Product;
           if (!productInfo.id) {
             return acc;
           }
-
           acc.name += productInfo.name + ', ';
-          acc.totalPrice +=
-            (productInfo.discount
-              ? productInfo.priceInDiscount
-              : productInfo.price) * product.quantity;
+          acc.totalPrice += product.price * product.quantity;
 
           return acc;
         },
@@ -292,16 +287,12 @@ export class OrderService {
 
       const itens = order.products.map((product) => {
         const productInfo = product.product as Product;
-
         return {
           imageUrl: productInfo.imageUrl,
           quantity: product.quantity,
           name: productInfo.name,
-          price: productInfo.discount
-            ? productInfo.priceInDiscount
-            : productInfo.price,
-          discount: productInfo.discount,
-          priceInDiscount: productInfo.priceInDiscount,
+          price: product.price,
+          discount: product.discount,
           id: productInfo.id,
         };
       });

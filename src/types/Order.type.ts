@@ -15,12 +15,16 @@ export interface Order extends Document {
   readonly products: {
     product: Schema.Types.ObjectId | Product;
     quantity: number;
+    price: number;
+    discount: boolean;
   }[];
 }
 
 export type ProductsOrder = {
   product: Schema.Types.ObjectId;
   quantity: number;
+  price: number;
+  discount: boolean;
 };
 
 export type HistoryOrder = {
@@ -36,7 +40,6 @@ export type HistoryOrder = {
     name: string;
     price: number;
     discount: boolean;
-    priceInDiscount: number;
     id: string;
   }[];
 };

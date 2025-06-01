@@ -59,15 +59,29 @@ export class OrderRepository {
       const allProductsExists = await this.productModel.find({
         _id: { $in: productsIds },
       });
-
-      if (
-        !allProductsExists ||
-        allProductsExists.length !== createOrdeData.products.length
-      ) {
+      if (!allProductsExists) {
         throw new NotFoundException('Um ou mais produtos não existe');
       }
 
-      const order = (await this.orderModel.create(createOrdeData)).populate(
+      const newOrder = {
+        table: createOrdeData.table,
+        products: [],
+      };
+
+      for (const productInfo of allProductsExists) {
+        const { id, price, priceInDiscount, discount } = productInfo;
+        const orderProducts = createOrdeData.products
+          .filter((p) => p.product === id)
+          .map((p) => ({
+            ...p,
+            price: discount ? priceInDiscount : price,
+            discount,
+          }));
+
+        newOrder.products.push(...orderProducts);
+      }
+
+      const order = (await this.orderModel.create(newOrder)).populate(
         'products.product',
       );
 
@@ -114,10 +128,7 @@ export class OrderRepository {
       const orders = await this.orderModel
         .find({ deletedAt: null })
         .sort({ createdAt: -1 })
-        .populate(
-          'products.product',
-          '_id name description imageUrl price category discount priceInDiscount',
-        )
+        .populate('products.product', '_id name description imageUrl category')
         .select('_id table status products createdAt');
 
       return orders;
@@ -184,7 +195,7 @@ export class OrderRepository {
         .limit(limit)
         .populate({
           path: 'products.product',
-          select: '_id name imageUrl price discount priceInDiscount category',
+          select: '_id name imageUrl category',
           populate: {
             path: 'category',
             select: 'name icon',
@@ -237,7 +248,7 @@ export class OrderRepository {
         .limit(limit)
         .populate({
           path: 'products.product',
-          select: '_id name imageUrl price discount priceInDiscount category',
+          select: '_id name imageUrl category',
           populate: {
             path: 'category',
             select: 'name icon',
