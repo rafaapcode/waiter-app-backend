@@ -6,13 +6,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { endOfDay, subHours } from 'date-fns';
-// import { endOfDay } from '@date-fns';
 import { Model } from 'mongoose';
+import { INewOrder } from 'src/core/http/order/types/neworder.type';
 import { Product } from 'src/types/Product.type';
 import { getTodayRange } from 'src/utils/getTodayrange';
 import { CONSTANTS } from '../../../constants';
 import { ChangeOrderDto } from '../../../core/http/order/dto/ChangeOrder.dto';
-import { CreateOrderDTO } from '../../../core/http/order/dto/CreateOrder.dto';
 import { Order } from '../../../types/Order.type';
 
 @Injectable()
@@ -50,37 +49,8 @@ export class OrderRepository {
     }
   }
 
-  async createOrder(createOrdeData: CreateOrderDTO): Promise<Order> {
+  async createOrder(newOrder: INewOrder): Promise<Order> {
     try {
-      const productsIds = createOrdeData.products.map(
-        (product) => product.product,
-      );
-
-      const allProductsExists = await this.productModel.find({
-        _id: { $in: productsIds },
-      });
-      if (!allProductsExists) {
-        throw new NotFoundException('Um ou mais produtos não existe');
-      }
-
-      const newOrder = {
-        table: createOrdeData.table,
-        products: [],
-      };
-
-      for (const productInfo of allProductsExists) {
-        const { id, price, priceInDiscount, discount } = productInfo;
-        const orderProducts = createOrdeData.products
-          .filter((p) => p.product === id)
-          .map((p) => ({
-            ...p,
-            price: discount ? priceInDiscount : price,
-            discount,
-          }));
-
-        newOrder.products.push(...orderProducts);
-      }
-
       const order = (await this.orderModel.create(newOrder)).populate(
         'products.product',
       );

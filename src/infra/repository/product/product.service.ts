@@ -253,4 +253,14 @@ export class ProductRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async allProductsExists(productsIds: string[]): Promise<Product[]> {
+    const allProductsExists = await this.productModel.find({
+      _id: { $in: productsIds },
+    });
+    if (!allProductsExists) {
+      throw new NotFoundException('Um ou mais produtos não existe');
+    }
+    return allProductsExists;
+  }
 }

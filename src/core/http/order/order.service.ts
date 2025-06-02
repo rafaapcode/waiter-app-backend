@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderGateway } from 'src/core/websocket/gateway/gateway';
+import { ProductRepository } from 'src/infra/repository/product/product.service';
 import { Category } from 'src/types/Category.type';
 import { Product } from 'src/types/Product.type';
 import { formatCurrency } from 'src/utils/formatCurrency';
@@ -15,11 +16,13 @@ import { HistoryOrder, Order } from '../../../types/Order.type';
 import { validateSchema } from '../../../utils/validateSchema';
 import { ChangeOrderDto, changeOrderSchema } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
+import { INewOrder } from './types/neworder.type';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
+    private readonly productRepository: ProductRepository,
     private readonly orderWs: OrderGateway,
   ) {}
 
@@ -65,7 +68,32 @@ export class OrderService {
         throw new BadGatewayException(validateData.error.errors);
       }
 
-      const order = await this.orderRepository.createOrder(createOrderData);
+      const productsIds = createOrderData.products.map(
+        (product) => product.product,
+      );
+
+      const allProductsExists =
+        await this.productRepository.allProductsExists(productsIds);
+
+      const newOrder: INewOrder = {
+        table: createOrderData.table,
+        products: [],
+      };
+
+      for (const productInfo of allProductsExists) {
+        const { id, price, priceInDiscount, discount } = productInfo;
+        const orderProducts = createOrderData.products
+          .filter((p) => p.product === id)
+          .map((p) => ({
+            ...p,
+            price: discount ? priceInDiscount : price,
+            discount,
+          }));
+
+        newOrder.products.push(...orderProducts);
+      }
+
+      const order = await this.orderRepository.createOrder(newOrder);
       if (!order) {
         throw new InternalServerErrorException('Erro ao criar novo pedidod');
       }
