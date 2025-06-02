@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { OrderRepository } from 'src/infra/repository/order/order.service';
 import { ProductRepository } from '../../../infra/repository/product/product.service';
 import { Product } from '../../../types/Product.type';
 import { validateSchema } from '../../../utils/validateSchema';
@@ -13,7 +14,10 @@ import { UpdateProductDTO, updateProductSchema } from './dto/UpdateProduct.dto';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    private readonly productRepository: ProductRepository,
+    private readonly orderRepository: OrderRepository,
+  ) {}
 
   async createProduct(productData: CreateProductDTO): Promise<Product> {
     try {
@@ -122,6 +126,15 @@ export class ProductService {
 
   async deleteProduct(productId: string): Promise<boolean> {
     try {
+      const productIsAlreadyBeingUsed =
+        await this.orderRepository.productIsBeingUsed(productId);
+
+      if (productIsAlreadyBeingUsed) {
+        throw new BadRequestException(
+          'Produto está sendo usado em algum PEDIDO.',
+        );
+      }
+
       const productDeleted =
         await this.productRepository.deleteProduct(productId);
 

@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ProductRepository } from 'src/infra/repository/product/product.service';
 import { CategoryRepository } from '../../../infra/repository/category/category.service';
 import { Category } from '../../../types/Category.type';
 import { validateSchema } from '../../../utils/validateSchema';
@@ -16,7 +17,10 @@ import { EditCategoryDto } from './dto/EditCategory.dto';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly productRepository: ProductRepository,
+  ) {}
 
   async createCategory(data: CreateCategoryDto): Promise<Category> {
     try {
@@ -93,6 +97,15 @@ export class CategoryService {
 
   async deleteCategory(categoryId: string): Promise<boolean> {
     try {
+      const categoryIsBeingUsed =
+        await this.productRepository.categoryIsBeingUsed(categoryId);
+
+      if (categoryIsBeingUsed) {
+        throw new BadRequestException(
+          'Categoria esta sendo usada por algum PRODUTO',
+        );
+      }
+
       const categorydeleted =
         await this.categoryRepository.deleteCategory(categoryId);
       if (!categorydeleted) {

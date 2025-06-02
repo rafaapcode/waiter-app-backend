@@ -8,7 +8,6 @@ import {
 import { endOfDay, subHours } from 'date-fns';
 import { Model } from 'mongoose';
 import { INewOrder } from 'src/core/http/order/types/neworder.type';
-import { Product } from 'src/types/Product.type';
 import { getTodayRange } from 'src/utils/getTodayrange';
 import { CONSTANTS } from '../../../constants';
 import { ChangeOrderDto } from '../../../core/http/order/dto/ChangeOrder.dto';
@@ -19,8 +18,6 @@ export class OrderRepository {
   constructor(
     @Inject(CONSTANTS.ORDER_PROVIDER)
     private orderModel: Model<Order>,
-    @Inject(CONSTANTS.PRODUCT_PROVIDER)
-    private productModel: Model<Product>,
   ) {}
 
   async changeOrderStatus(
@@ -265,5 +262,18 @@ export class OrderRepository {
       }
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async productIsBeingUsed(productId: string): Promise<boolean> {
+    const productIsBeingUsed = await this.orderModel.findOne({
+      'products.product': productId,
+      deletedAt: null,
+    });
+
+    if (productIsBeingUsed) {
+      return true;
+    }
+
+    return false;
   }
 }
