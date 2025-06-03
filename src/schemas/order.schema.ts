@@ -52,4 +52,9 @@ export const OrderSchema = new mongoose.Schema({
     required: true,
     ref: 'Product',
   },
+  org: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Org',
+  },
 });

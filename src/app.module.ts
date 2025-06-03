@@ -9,6 +9,7 @@ import { GatewayModule } from './core/websocket/gateway/gateway.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { RepositoryModule } from './infra/repository/repository.module';
 import { IngredientModule } from './core/http/ingredient/ingredient.module';
+import { OrgModule } from './core/http/org/org.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { IngredientModule } from './core/http/ingredient/ingredient.module';
     GatewayModule,
     UserModule,
     IngredientModule,
+    OrgModule,
   ],
   controllers: [AppController],
   providers: [],

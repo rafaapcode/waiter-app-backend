@@ -35,4 +35,9 @@ export const ProductSchema = new mongoose.Schema({
     required: true,
     ref: 'Category',
   },
+  org: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Org',
+  },
 });

@@ -8,4 +8,9 @@ export const CategorySchema = new mongoose.Schema({
   icon: {
     type: String,
   },
+  org: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Org',
+  },
 });
