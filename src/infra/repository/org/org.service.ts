@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CreateOrgDto } from 'src/core/http/org/dto/createOrg.dto';
+import { UpdateOrgDto } from 'src/core/http/org/dto/updateOrg.dto';
 import { Org, OrgType } from 'src/types/Org.type';
 import { User } from 'src/types/User.type';
 import { CONSTANTS } from '../../../constants';
@@ -35,7 +36,7 @@ export class OrgRepository {
     }
   }
 
-  async updateOrg(orgId: string, org: Partial<CreateOrgDto>): Promise<OrgType> {
+  async updateOrg(orgId: string, org: UpdateOrgDto): Promise<OrgType> {
     try {
       const newOrg = await this.orgModel.findByIdAndUpdate(
         orgId,
@@ -78,6 +79,20 @@ export class OrgRepository {
     }
   }
 
+  async getOrgByName(orgName: string): Promise<boolean> {
+    try {
+      const orgByName = await this.orgModel.findOne({ name: orgName });
+      if (orgByName) {
+        return true;
+      }
+      return false;
+    } catch {
+      throw new InternalServerErrorException(
+        'Erro ao criar uma nova organização',
+      );
+    }
+  }
+
   async getAllOrgsOfUser(userId: string): Promise<OrgType[]> {
     try {
       const allOrgs = await this.orgModel.find({
@@ -102,15 +117,15 @@ export class OrgRepository {
     }
   }
 
-  // Deleta a org e tudo relacionado a ela.
-  async deleteOrg(orgId: string): Promise<boolean> {
+  async deleteOrgById(orgId: string): Promise<boolean> {
     try {
-      console.log(orgId);
+      await this.orgModel.deleteOne({
+        id: orgId,
+      });
+
       return true;
     } catch {
-      throw new InternalServerErrorException(
-        'Erro ao criar uma nova organização',
-      );
+      throw new InternalServerErrorException('Erro ao deletear a organização');
     }
   }
 }

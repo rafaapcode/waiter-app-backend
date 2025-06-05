@@ -276,4 +276,17 @@ export class OrderRepository {
 
     return false;
   }
+
+  async deleteAllOrdersOfOrg(orgId: string): Promise<boolean> {
+    try {
+      await this.orderModel.deleteMany({
+        org: orgId,
+      });
+
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      return false;
+    }
+  }
 }

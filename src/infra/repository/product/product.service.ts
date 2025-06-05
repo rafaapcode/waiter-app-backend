@@ -261,4 +261,17 @@ export class ProductRepository {
 
     return false;
   }
+
+  async deleteAllProductsOfOrg(orgId: string): Promise<boolean> {
+    try {
+      await this.productModel.deleteMany({
+        org: orgId,
+      });
+
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      return false;
+    }
+  }
 }

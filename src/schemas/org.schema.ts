@@ -5,6 +5,7 @@ export const OrgSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    index: true,
   },
   imageUrl: {
     type: String,
@@ -14,6 +15,7 @@ export const OrgSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    index: true,
     validate: {
       validator: function (value: string) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -39,6 +41,7 @@ export const OrgSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    index: true,
     ref: 'User',
   },
 });

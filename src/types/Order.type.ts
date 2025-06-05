@@ -1,4 +1,5 @@
 import { Document, Schema } from 'mongoose';
+import { Org } from './Org.type';
 import { Product } from './Product.type';
 
 export enum STATUS {
@@ -18,6 +19,7 @@ export interface Order extends Document {
     price: number;
     discount: boolean;
   }[];
+  readonly org: Schema.Types.ObjectId | Org;
 }
 
 export type ProductsOrder = {

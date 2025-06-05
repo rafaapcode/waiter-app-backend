@@ -115,4 +115,17 @@ export class CategoryRepository {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async deleteAllCategoryOfOrg(orgId: string): Promise<boolean> {
+    try {
+      await this.categoryModel.deleteMany({
+        org: orgId,
+      });
+
+      return true;
+    } catch (error) {
+      console.log(error.message);
+      return false;
+    }
+  }
 }
