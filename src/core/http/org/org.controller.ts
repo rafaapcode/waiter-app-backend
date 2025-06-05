@@ -9,7 +9,9 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
+import { JwtPayload } from 'src/types/express';
 import { OrgType } from 'src/types/Org.type';
+import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -20,23 +22,6 @@ import { OrgService } from './org.service';
 @Controller('org')
 export class OrgController {
   constructor(private orgService: OrgService) {}
-
-  @Post('')
-  @UseGuards(UserGuard)
-  @Roles(Role.ADMIN)
-  async createOrg(@Body() orgData: CreateOrgDto): Promise<OrgType> {
-    return await this.orgService.createOrg(orgData);
-  }
-
-  @Put('/:id')
-  @UseGuards(UserGuard)
-  @Roles(Role.ADMIN)
-  async updateOrg(
-    @Param('id') id: string,
-    @Body() orgData: UpdateOrgDto,
-  ): Promise<OrgType> {
-    return await this.orgService.updateOrg(id, orgData);
-  }
 
   @Delete('/:id')
   @UseGuards(UserGuard)
@@ -49,11 +34,28 @@ export class OrgController {
     return { message: 'Organizção deletada !' };
   }
 
-  @Get('user/:userid')
+  @Put('/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async getOrgOfUser(@Param('userid') userid: string): Promise<OrgType[]> {
-    return await this.orgService.getAllOrgsOfUser(userid);
+  async updateOrg(
+    @Param('id') id: string,
+    @Body() orgData: UpdateOrgDto,
+  ): Promise<OrgType> {
+    return await this.orgService.updateOrg(id, orgData);
+  }
+
+  @Post('')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  async createOrg(@Body() orgData: CreateOrgDto): Promise<OrgType> {
+    return await this.orgService.createOrg(orgData);
+  }
+
+  @Get('user')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
+  async getOrgOfUser(@CurrentUser() user: JwtPayload): Promise<OrgType[]> {
+    return await this.orgService.getAllOrgsOfUser(user.id);
   }
 
   @Get('/:orgid')

@@ -51,7 +51,7 @@ export class UserService {
       throw new NotFoundException('Senha inválida');
     }
 
-    const token = this.generateToken(user.email, user.role);
+    const token = this.generateToken(user._id, user.email, user.role);
 
     return { access_token: token, role: user.role, id: user._id };
   }
@@ -139,7 +139,11 @@ export class UserService {
     });
 
     if (data.email) {
-      const token = this.generateToken(newUser.email, newUser.role);
+      const token = this.generateToken(
+        newUser._id,
+        newUser.email,
+        newUser.role,
+      );
       return { ...newUser, access_token: token };
     }
 
@@ -181,10 +185,10 @@ export class UserService {
     return users;
   }
 
-  private generateToken(email: string, role: string): string {
+  private generateToken(id: string, email: string, role: string): string {
     try {
       return this.jwtService.sign(
-        { email, role },
+        { id, email, role },
         {
           expiresIn: '1d',
           secret: this.configService.getOrThrow('JWT_SECRET'),
@@ -195,7 +199,7 @@ export class UserService {
     }
   }
 
-  verifyToken(token: string): { email: string; role: Role } {
+  verifyToken(token: string): { id: string; email: string; role: Role } {
     try {
       const isTokenValid = this.jwtService.verify(token, {
         secret: this.configService.getOrThrow('JWT_SECRET'),
@@ -203,7 +207,7 @@ export class UserService {
       if (!isTokenValid) {
         return null;
       }
-      return isTokenValid as { email: string; role: Role };
+      return isTokenValid as { id: string; email: string; role: Role };
     } catch (error) {
       throw new UnauthorizedException(error.message);
     }

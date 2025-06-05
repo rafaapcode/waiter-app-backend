@@ -58,7 +58,7 @@ export class UserGuard implements CanActivate {
     if (!hasPermission) {
       throw new UnauthorizedException('Sem permissão para acesso !');
     }
-    req.user = { email: userData.email, role: userData.role };
+    req.user = { id: userData.id, email: userData.email, role: userData.role };
     return true;
   }
 }

@@ -2,6 +2,7 @@ import { Request } from 'express';
 import { Role } from 'src/core/http/authentication/roles/role.enum';
 
 export interface JwtPayload {
+  id: string;
   email: string;
   role: Role;
 }
