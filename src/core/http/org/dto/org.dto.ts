@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsArray,
   IsEmail,
@@ -93,3 +94,5 @@ export class CreateOrgDTO {
   @IsMongoId()
   user: string;
 }
+
+export class UpdateOrgDTO extends PartialType(CreateOrgDTO) {}

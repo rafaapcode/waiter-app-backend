@@ -8,9 +8,7 @@ import { OrderRepository } from 'src/infra/repository/order/order.service';
 import { OrgRepository } from 'src/infra/repository/org/org.service';
 import { ProductRepository } from 'src/infra/repository/product/product.service';
 import { OrgType } from 'src/shared/types/Org.type';
-import { validateSchema } from 'src/shared/utils/validateSchema';
-import { CreateOrgDTO } from './dto/createOrg.dto';
-import { UpdateOrgDto, updateOrgSchema } from './dto/updateOrg.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from './dto/org.dto';
 
 @Injectable()
 export class OrgService {
@@ -36,12 +34,7 @@ export class OrgService {
     return org;
   }
 
-  async updateOrg(orgId: string, orgData: UpdateOrgDto): Promise<OrgType> {
-    const validateData = validateSchema(updateOrgSchema, orgData);
-    if (!validateData.success) {
-      throw new BadRequestException(validateData.error.errors);
-    }
-
+  async updateOrg(orgId: string, orgData: UpdateOrgDTO): Promise<OrgType> {
     const orgExists = await this.orgRepository.getOrgById(orgId);
 
     if (!orgExists) {

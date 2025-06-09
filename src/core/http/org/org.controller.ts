@@ -15,8 +15,7 @@ import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorat
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateOrgDTO } from './dto/createOrg.dto';
-import { UpdateOrgDto } from './dto/updateOrg.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from './dto/org.dto';
 import { OrgService } from './org.service';
 
 @Controller('org')
@@ -39,7 +38,7 @@ export class OrgController {
   @Roles(Role.ADMIN)
   async updateOrg(
     @Param('id') id: string,
-    @Body() orgData: UpdateOrgDto,
+    @Body() orgData: UpdateOrgDTO,
   ): Promise<OrgType> {
     return await this.orgService.updateOrg(id, orgData);
   }

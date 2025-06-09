@@ -1,7 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { CreateOrgDTO } from 'src/core/http/org/dto/createOrg.dto';
-import { UpdateOrgDto } from 'src/core/http/org/dto/updateOrg.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from 'src/core/http/org/dto/org.dto';
 import { Org, OrgType } from 'src/shared/types/Org.type';
 import { User } from 'src/shared/types/User.type';
 import { CONSTANTS } from '../../../constants';
@@ -32,7 +31,7 @@ export class OrgRepository {
     };
   }
 
-  async updateOrg(orgId: string, org: UpdateOrgDto): Promise<OrgType> {
+  async updateOrg(orgId: string, org: UpdateOrgDTO): Promise<OrgType> {
     const newOrg = await this.orgModel.findByIdAndUpdate(
       orgId,
       { ...org },
