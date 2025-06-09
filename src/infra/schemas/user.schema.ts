@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { createHash } from 'src/utils/createHash';
+import { createHash } from 'src/shared/utils/createHash';
 
 export const UserSchema = new mongoose.Schema({
   name: {

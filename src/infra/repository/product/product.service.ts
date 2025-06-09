@@ -1,15 +1,15 @@
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+    BadRequestException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 import { CreateProductDTO } from '../../../core/http/product/dto/Product.dto';
 import { UpdateProductDTO } from '../../../core/http/product/dto/UpdateProduct.dto';
-import { Product } from '../../../types/Product.type';
+import { Product } from '../../../shared/types/Product.type';
 
 @Injectable()
 export class ProductRepository {

@@ -1,15 +1,15 @@
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+    BadRequestException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { EditCategoryDto } from 'src/core/http/category/dto/EditCategory.dto';
 import { CONSTANTS } from '../../../constants';
 import { CreateCategoryDto } from '../../../core/http/category/dto/CreateCategory.dto';
-import { Category } from '../../../types/Category.type';
+import { Category } from '../../../shared/types/Category.type';
 
 @Injectable()
 export class CategoryRepository {

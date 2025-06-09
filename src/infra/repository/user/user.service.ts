@@ -1,12 +1,12 @@
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+    BadRequestException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { User, UserType } from 'src/types/User.type';
+import { User, UserType } from 'src/shared/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()

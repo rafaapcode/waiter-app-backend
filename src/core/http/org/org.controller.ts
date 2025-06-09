@@ -9,8 +9,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { JwtPayload } from 'src/types/express';
-import { OrgType } from 'src/types/Org.type';
+import { JwtPayload } from 'src/shared/types/express';
+import { OrgType } from 'src/shared/types/Org.type';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
@@ -31,7 +31,7 @@ export class OrgController {
     if (!deleted) {
       throw new BadGatewayException('Erro ao deletar a organização');
     }
-    return { message: 'Organizção deletada !' };
+    return { message: 'Organização deletada !' };
   }
 
   @Put('/:id')

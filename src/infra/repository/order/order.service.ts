@@ -1,17 +1,17 @@
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+    BadRequestException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { endOfDay, subHours } from 'date-fns';
 import { Model } from 'mongoose';
 import { INewOrder } from 'src/core/http/order/types/neworder.type';
-import { getTodayRange } from 'src/utils/getTodayrange';
+import { getTodayRange } from 'src/shared/utils/getTodayrange';
 import { CONSTANTS } from '../../../constants';
 import { ChangeOrderDto } from '../../../core/http/order/dto/ChangeOrder.dto';
-import { Order } from '../../../types/Order.type';
+import { Order } from '../../../shared/types/Order.type';
 
 @Injectable()
 export class OrderRepository {

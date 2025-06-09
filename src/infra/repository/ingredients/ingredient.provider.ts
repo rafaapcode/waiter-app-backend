@@ -1,5 +1,5 @@
 import { Connection } from 'mongoose';
-import { IngredientSchema } from 'src/schemas/ingredients.schema';
+import { IngredientSchema } from 'src/infra/schemas/ingredients.schema';
 import { CONSTANTS } from '../../../constants';
 
 export const ingredientProvider = [

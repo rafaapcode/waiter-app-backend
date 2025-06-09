@@ -7,8 +7,8 @@ import { CategoryRepository } from 'src/infra/repository/category/category.servi
 import { OrderRepository } from 'src/infra/repository/order/order.service';
 import { OrgRepository } from 'src/infra/repository/org/org.service';
 import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { OrgType } from 'src/types/Org.type';
-import { validateSchema } from 'src/utils/validateSchema';
+import { OrgType } from 'src/shared/types/Org.type';
+import { validateSchema } from 'src/shared/utils/validateSchema';
 import { CreateOrgDto, createOrgSchema } from './dto/createOrg.dto';
 import { UpdateOrgDto, updateOrgSchema } from './dto/updateOrg.dto';
 

@@ -1,17 +1,17 @@
 import {
-  BadRequestException,
-  HttpException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+    BadRequestException,
+    HttpException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { ProductRepository } from 'src/infra/repository/product/product.service';
 import { CategoryRepository } from '../../../infra/repository/category/category.service';
-import { Category } from '../../../types/Category.type';
-import { validateSchema } from '../../../utils/validateSchema';
+import { Category } from '../../../shared/types/Category.type';
+import { validateSchema } from '../../../shared/utils/validateSchema';
 import {
-  CreateCategoryDto,
-  createCategorySchema,
+    CreateCategoryDto,
+    createCategorySchema,
 } from './dto/CreateCategory.dto';
 import { EditCategoryDto } from './dto/EditCategory.dto';
 

@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
-import { UserSchema } from '../../../schemas/user.schema';
+import { UserSchema } from '../../schemas/user.schema';
 
 export const userProvider = [
   {

@@ -13,8 +13,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
-import { HistoryOrder } from 'src/types/Order.type';
+import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
+import { HistoryOrder } from 'src/shared/types/Order.type';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';

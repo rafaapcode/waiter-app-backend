@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CreateIngredientDTO } from 'src/core/http/ingredient/dto/createIngredient.dto';
-import { Ingredient, IngredientType } from 'src/types/Ingredient.type';
+import { Ingredient, IngredientType } from 'src/shared/types/Ingredient.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()

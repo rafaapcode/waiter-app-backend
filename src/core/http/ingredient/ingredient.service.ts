@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IngredientRepository } from 'src/infra/repository/ingredients/user.service';
-import { IngredientType } from 'src/types/Ingredient.type';
-import { validateSchema } from 'src/utils/validateSchema';
+import { IngredientType } from 'src/shared/types/Ingredient.type';
+import { validateSchema } from 'src/shared/utils/validateSchema';
 import {
   CreateIngredientDTO,
   createIngredientSchema,

@@ -1,4 +1,4 @@
-import { STATUS } from 'src/types/Order.type';
+import { STATUS } from 'src/shared/types/Order.type';
 import { z } from 'zod';
 
 export const createOrderSchemaResponse = z

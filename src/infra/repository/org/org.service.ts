@@ -2,8 +2,8 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { CreateOrgDto } from 'src/core/http/org/dto/createOrg.dto';
 import { UpdateOrgDto } from 'src/core/http/org/dto/updateOrg.dto';
-import { Org, OrgType } from 'src/types/Org.type';
-import { User } from 'src/types/User.type';
+import { Org, OrgType } from 'src/shared/types/Org.type';
+import { User } from 'src/shared/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()
@@ -16,10 +16,16 @@ export class OrgRepository {
   async createOrg(org: CreateOrgDto): Promise<OrgType> {
     const newOrg = await this.orgModel.create(org);
     return {
-      descricao: newOrg.descricao,
+      description: newOrg.description,
       email: newOrg.email,
       imageUrl: newOrg.imageUrl,
-      info: newOrg.info,
+      cep: newOrg.cep,
+      city: newOrg.city,
+      closeHour: newOrg.closeHour,
+      location: newOrg.location,
+      neighborhood: newOrg.neighborhood,
+      openHour: newOrg.openHour,
+      street: newOrg.street,
       name: newOrg.name,
       user: newOrg.user,
       _id: newOrg.id,
@@ -38,10 +44,16 @@ export class OrgRepository {
     }
 
     return {
-      descricao: newOrg.descricao,
+      description: newOrg.description,
       email: newOrg.email,
       imageUrl: newOrg.imageUrl,
-      info: newOrg.info,
+      cep: newOrg.cep,
+      city: newOrg.city,
+      closeHour: newOrg.closeHour,
+      location: newOrg.location,
+      neighborhood: newOrg.neighborhood,
+      openHour: newOrg.openHour,
+      street: newOrg.street,
       name: newOrg.name,
       user: newOrg.user,
       _id: newOrg.id,
@@ -57,10 +69,16 @@ export class OrgRepository {
 
     const orgPopulatedWithUser = await orgById.populate('user', 'name email');
     return {
-      descricao: orgPopulatedWithUser.descricao,
+      description: orgPopulatedWithUser.description,
       email: orgPopulatedWithUser.email,
       imageUrl: orgPopulatedWithUser.imageUrl,
-      info: orgPopulatedWithUser.info,
+      cep: orgPopulatedWithUser.cep,
+      city: orgPopulatedWithUser.city,
+      closeHour: orgPopulatedWithUser.closeHour,
+      location: orgPopulatedWithUser.location,
+      neighborhood: orgPopulatedWithUser.neighborhood,
+      openHour: orgPopulatedWithUser.openHour,
+      street: orgPopulatedWithUser.street,
       name: orgPopulatedWithUser.name,
       user: orgPopulatedWithUser.user as User,
       _id: orgPopulatedWithUser.id,
@@ -85,10 +103,16 @@ export class OrgRepository {
 
     return allOrgs.map((org) => {
       return {
-        descricao: org.descricao,
+        description: org.description,
         email: org.email,
         imageUrl: org.imageUrl,
-        info: org.info,
+        cep: org.cep,
+        city: org.city,
+        closeHour: org.closeHour,
+        location: org.location,
+        neighborhood: org.neighborhood,
+        openHour: org.openHour,
+        street: org.street,
         name: org.name,
         user: org.user,
         _id: org.id,

@@ -8,7 +8,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from 'src/interceptor/response-interceptor';
+import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
 import { CreateIngredientDTO } from './dto/createIngredient.dto';
 import {
   createManyIngredientSchemaResponse,

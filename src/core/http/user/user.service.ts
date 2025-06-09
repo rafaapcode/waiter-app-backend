@@ -8,9 +8,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/infra/repository/user/user.service';
-import { UserType } from 'src/types/User.type';
-import { validateSchema } from 'src/utils/validateSchema';
-import { verifyPassword } from 'src/utils/verifyPassword';
+import { UserType } from 'src/shared/types/User.type';
+import { validateSchema } from 'src/shared/utils/validateSchema';
+import { verifyPassword } from 'src/shared/utils/verifyPassword';
 import { Role } from '../authentication/roles/role.enum';
 import { LoginUserDTO, loginUserSchema } from './dto/LoginUser.dto';
 import {
@@ -51,7 +51,7 @@ export class UserService {
       throw new NotFoundException('Senha inválida');
     }
 
-    const token = this.generateToken(user._id, user.email, user.role);
+    const token = await this.generateToken(user._id, user.email, user.role);
 
     return { access_token: token, role: user.role, id: user._id };
   }
@@ -139,7 +139,7 @@ export class UserService {
     });
 
     if (data.email) {
-      const token = this.generateToken(
+      const token = await this.generateToken(
         newUser._id,
         newUser.email,
         newUser.role,
@@ -185,9 +185,13 @@ export class UserService {
     return users;
   }
 
-  private generateToken(id: string, email: string, role: string): string {
+  private async generateToken(
+    id: string,
+    email: string,
+    role: string,
+  ): Promise<string> {
     try {
-      return this.jwtService.sign(
+      return await this.jwtService.signAsync(
         { id, email, role },
         {
           expiresIn: '1d',
@@ -199,9 +203,11 @@ export class UserService {
     }
   }
 
-  verifyToken(token: string): { id: string; email: string; role: Role } {
+  async verifyToken(
+    token: string,
+  ): Promise<{ id: string; email: string; role: Role }> {
     try {
-      const isTokenValid = this.jwtService.verify(token, {
+      const isTokenValid = await this.jwtService.verifyAsync(token, {
         secret: this.configService.getOrThrow('JWT_SECRET'),
       });
       if (!isTokenValid) {

@@ -5,8 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
-import { AuthenticatedRequest } from 'src/types/express';
+import { AuthenticatedRequest } from 'src/shared/types/express';
 import { UserService } from '../../user/user.service';
 import { ROLES_KEY } from '../decorators/role.decorator';
 import { Role } from '../roles/role.enum';
@@ -18,9 +17,7 @@ export class UserGuard implements CanActivate {
     private readonly reflector: Reflector,
   ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = context.switchToHttp();
     const req = ctx.getRequest<AuthenticatedRequest>();
 
@@ -44,7 +41,7 @@ export class UserGuard implements CanActivate {
       throw new UnauthorizedException('Token é obrigatório');
     }
 
-    const userData = this.userService.verifyToken(authToken);
+    const userData = await this.userService.verifyToken(authToken);
     if (!userData) {
       throw new UnauthorizedException('Token inválido ou expirado');
     }

@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { OrderGateway } from 'src/core/websocket/gateway/gateway';
 import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { Category } from 'src/types/Category.type';
-import { Product } from 'src/types/Product.type';
-import { formatCurrency } from 'src/utils/formatCurrency';
+import { Category } from 'src/shared/types/Category.type';
+import { Product } from 'src/shared/types/Product.type';
+import { formatCurrency } from 'src/shared/utils/formatCurrency';
 import { OrderRepository } from '../../../infra/repository/order/order.service';
-import { HistoryOrder, Order } from '../../../types/Order.type';
-import { validateSchema } from '../../../utils/validateSchema';
+import { HistoryOrder, Order } from '../../../shared/types/Order.type';
+import { validateSchema } from '../../../shared/utils/validateSchema';
 import { ChangeOrderDto, changeOrderSchema } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
 import { INewOrder } from './types/neworder.type';
