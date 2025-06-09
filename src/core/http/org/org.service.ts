@@ -9,7 +9,7 @@ import { OrgRepository } from 'src/infra/repository/org/org.service';
 import { ProductRepository } from 'src/infra/repository/product/product.service';
 import { OrgType } from 'src/shared/types/Org.type';
 import { validateSchema } from 'src/shared/utils/validateSchema';
-import { CreateOrgDto, createOrgSchema } from './dto/createOrg.dto';
+import { CreateOrgDTO } from './dto/createOrg.dto';
 import { UpdateOrgDto, updateOrgSchema } from './dto/updateOrg.dto';
 
 @Injectable()
@@ -21,12 +21,7 @@ export class OrgService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async createOrg(orgData: CreateOrgDto): Promise<OrgType> {
-    const validateData = validateSchema(createOrgSchema, orgData);
-    if (!validateData.success) {
-      throw new BadRequestException(validateData.error.errors);
-    }
-
+  async createOrg(orgData: CreateOrgDTO): Promise<OrgType> {
     const orgExists = await this.orgRepository.getOrgByName(
       orgData.name,
       orgData.user,

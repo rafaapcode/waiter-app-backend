@@ -1,29 +1,95 @@
-import { z } from 'zod';
+import {
+  IsArray,
+  IsEmail,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
-export const createOrgSchema = z.object({
-  name: z.string().min(2, 'Nome da ORGANIZAÇÃO é obrigatório'),
-  imageUrl: z.string().optional(),
-  email: z.string().email('Email inválido'),
-  description: z
-    .string()
-    .min(4, 'A descrição da organização deve ter no minimo 4 caracteres'),
-  openHour: z
-    .string()
-    .min(4, 'O horário de abertura deve ter no mínimo 4 caracteres')
-    .max(6, 'O horário de abertura deve ter no máximo 6 caracteres'),
-  closeHour: z
-    .string()
-    .min(4, 'O horário de abertura deve ter no mínimo 4 caracteres')
-    .max(6, 'O horário de fechamento deve ter no máximo 6 caracteres'),
-  cep: z
-    .string()
-    .min(8, 'O CEP deve ter no mínimo 8 caracteres')
-    .max(9, 'O CEP deve ter no máximo 9 caracteres'),
-  city: z.string().min(3, 'A cidade deve ter no mínimo 3 caracteres'),
-  neighborhood: z.string().min(3, 'O bairro deve ter no mínimo 3 caracteres'),
-  street: z.string().min(3, 'A rua deve ter no mínimo 3 caracteres'),
-  location: z.number().array().optional(),
-  user: z.string().length(24, 'Id inválido'),
-});
+export class CreateOrgDTO {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-export type CreateOrgDto = z.infer<typeof createOrgSchema>;
+  @IsString()
+  @IsNotEmpty()
+  @IsUrl()
+  @IsOptional()
+  imageUrl: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4, {
+    message: 'A descrição da organização deve ter no minimo 4 caracteres',
+  })
+  description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4, {
+    message: 'O horário de abertura deve ter no mínimo 4 caracteres',
+  })
+  @MaxLength(6, {
+    message: 'O horário de abertura deve ter no máximo 6 caracteres',
+  })
+  openHour: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4, {
+    message: 'O horário de fechamento deve ter no mínimo 4 caracteres',
+  })
+  @MaxLength(6, {
+    message: 'O horário de fechamento deve ter no máximo 6 caracteres',
+  })
+  closeHour: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8, {
+    message: 'O CEP deve ter no mínimo 8 caracteres',
+  })
+  @MaxLength(9, {
+    message: 'O CEP deve ter no máximo 9 caracteres',
+  })
+  cep: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(3, {
+    message: 'A cidade deve ter no mínimo 3 caracteres',
+  })
+  city: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(3, {
+    message: 'O bairro deve ter no mínimo 3 caracteres',
+  })
+  neighborhood: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(3, {
+    message: 'O rua deve ter no mínimo 3 caracteres',
+  })
+  street: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  location: number[];
+
+  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
+  user: string;
+}

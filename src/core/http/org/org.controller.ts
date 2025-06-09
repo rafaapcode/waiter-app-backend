@@ -15,7 +15,7 @@ import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorat
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateOrgDto } from './dto/createOrg.dto';
+import { CreateOrgDTO } from './dto/createOrg.dto';
 import { UpdateOrgDto } from './dto/updateOrg.dto';
 import { OrgService } from './org.service';
 
@@ -47,7 +47,7 @@ export class OrgController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async createOrg(@Body() orgData: CreateOrgDto): Promise<OrgType> {
+  async createOrg(@Body() orgData: CreateOrgDTO): Promise<OrgType> {
     return await this.orgService.createOrg(orgData);
   }
 
