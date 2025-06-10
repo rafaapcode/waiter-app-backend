@@ -15,7 +15,7 @@ import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorat
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateOrgDTO, UpdateOrgDTO } from './dto/org.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 import { OrgService } from './org.service';
 
 @Controller('org')

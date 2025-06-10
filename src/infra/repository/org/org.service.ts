@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { CreateOrgDTO, UpdateOrgDTO } from 'src/core/http/org/dto/org.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from 'src/core/http/org/dto/Input.dto';
 import { Org, OrgType } from 'src/shared/types/Org.type';
 import { User } from 'src/shared/types/User.type';
 import { CONSTANTS } from '../../../constants';

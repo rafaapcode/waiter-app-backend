@@ -8,7 +8,7 @@ import { OrderRepository } from 'src/infra/repository/order/order.service';
 import { OrgRepository } from 'src/infra/repository/org/org.service';
 import { ProductRepository } from 'src/infra/repository/product/product.service';
 import { OrgType } from 'src/shared/types/Org.type';
-import { CreateOrgDTO, UpdateOrgDTO } from './dto/org.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 
 @Injectable()
 export class OrgService {

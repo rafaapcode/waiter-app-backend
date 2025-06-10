@@ -6,15 +6,13 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from 'src/infra/repository/user/user.service';
 import { UserType } from 'src/shared/types/User.type';
-import { validateSchema } from 'src/shared/utils/validateSchema';
 import { verifyPassword } from 'src/shared/utils/verifyPassword';
 import { AuthenticationService } from '../authentication/authentication.service';
+import { CreateUserDto, UpdateUserDto } from './dto/Input.dto';
 import {
   UpdateCurrentUserDTO,
   updateCurrentUserSchema,
 } from './dto/UpdateCurrentUser.dto';
-import { UpdateUserDTO, updateUserSchema } from './dto/UpdateUser.dto';
-import { CreateUserDTO, createUserSchema } from './dto/User.dto';
 
 @Injectable()
 export class UserService {
@@ -28,18 +26,7 @@ export class UserService {
     password,
     name,
     role,
-  }: CreateUserDTO): Promise<Omit<UserType, 'password'>> {
-    const isValidPayload = validateSchema(createUserSchema, {
-      email,
-      password,
-      name,
-      role,
-    });
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(isValidPayload.error.errors);
-    }
-
+  }: CreateUserDto): Promise<Omit<UserType, 'password'>> {
     const newUser = await this.userRepo.createUser({
       email,
       password,
@@ -52,14 +39,8 @@ export class UserService {
 
   async updateUser(
     id: string,
-    data: UpdateUserDTO,
+    data: UpdateUserDto,
   ): Promise<Omit<UserType, 'password'>> {
-    const isValidPayload = validateSchema(updateUserSchema, data);
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(isValidPayload.error.errors);
-    }
-
     const newUser = await this.userRepo.updateUser(id, data);
 
     return newUser;

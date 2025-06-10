@@ -18,6 +18,7 @@ import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorat
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
+import { CreateUserDto, UpdateUserDto } from './dto/Input.dto';
 import { ResponseCreateUserDTO } from './dto/response-create-user';
 import {
   deleteUserSchemaRes,
@@ -41,8 +42,6 @@ import {
   updateUserSchemaRes,
 } from './dto/response-update-user';
 import { UpdateCurrentUserDTO } from './dto/UpdateCurrentUser.dto';
-import { UpdateUserDTO } from './dto/UpdateUser.dto';
-import { CreateUserDTO, createUserSchema } from './dto/User.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -52,9 +51,8 @@ export class UserController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(createUserSchema))
   async createUser(
-    @Body() userPayload: CreateUserDTO,
+    @Body() userPayload: CreateUserDto,
   ): Promise<ResponseCreateUserDTO> {
     return await this.userService.create(userPayload);
   }
@@ -82,7 +80,7 @@ export class UserController {
   @UseInterceptors(new ResponseInterceptor(updateUserSchemaRes))
   async updateUser(
     @Param('id') id: string,
-    @Body() userPayload: UpdateUserDTO,
+    @Body() userPayload: UpdateUserDto,
   ): Promise<ResponseUpdateUserDTO> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
