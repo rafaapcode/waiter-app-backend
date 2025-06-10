@@ -8,24 +8,14 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';
 import {
-  createManyIngredientSchemaResponse,
-  ResponseCreateManyIngredients,
-} from './dto/response-create-many-ingredients';
-import {
-  createIngredientSchemaResponse,
-  ResponseCreateIngredient,
-} from './dto/response-created-ingredients';
-import {
-  getAllIngredientsSchemaResponse,
-  ResponseGetAllIngredients,
-} from './dto/response-get-all-ingredients';
-import {
-  ResponseVerifyIngredients,
-  verifyIngredientSchemaResponse,
-} from './dto/response-verify-ingredients';
+  OutPutCreateIngredientDto,
+  OutPutCreateManyIngredientsDto,
+  OutPutGetAllIngredientsDto,
+  OutPutVerifyIngredientsDto,
+} from './dto/OutPut.dto';
 import { IngredientService } from './ingredient.service';
 
 @Controller('ingredient')
@@ -33,34 +23,34 @@ export class IngredientController {
   constructor(private ingredientsService: IngredientService) {}
 
   @Get()
-  @UseInterceptors(new ResponseInterceptor(getAllIngredientsSchemaResponse))
-  async getAll(): Promise<ResponseGetAllIngredients> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutGetAllIngredientsDto))
+  async getAll(): Promise<OutPutGetAllIngredientsDto> {
     return await this.ingredientsService.getAllIngredients();
   }
 
   @Post()
-  @UseInterceptors(new ResponseInterceptor(createIngredientSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateIngredientDto))
   async createIngredient(
     @Body() data: CreateIngredientDto,
-  ): Promise<ResponseCreateIngredient> {
+  ): Promise<OutPutCreateIngredientDto> {
     return await this.ingredientsService.createIngredient(data);
   }
 
   @Post('verify')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(new ResponseInterceptor(verifyIngredientSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutVerifyIngredientsDto))
   async verifyIngredients(
     @Body() data: { ingredients: string[] },
-  ): Promise<ResponseVerifyIngredients> {
+  ): Promise<OutPutVerifyIngredientsDto> {
     return await this.ingredientsService.verifyIngredients(data.ingredients);
   }
 
   @Post('create-many')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(new ResponseInterceptor(createManyIngredientSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateManyIngredientsDto))
   async createManyIngredients(
     @Body() data: CreateManyIngredientDto,
-  ): Promise<ResponseCreateManyIngredients> {
+  ): Promise<OutPutCreateManyIngredientsDto> {
     const response = await this.ingredientsService.createManyIngredients(data);
 
     if (response.data.length === 0) {
