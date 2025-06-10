@@ -18,7 +18,11 @@ import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorat
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateUserDto, UpdateUserDto } from './dto/Input.dto';
+import {
+  CreateUserDto,
+  UpdateCurrentUserDto,
+  UpdateUserDto,
+} from './dto/Input.dto';
 import { ResponseCreateUserDTO } from './dto/response-create-user';
 import {
   deleteUserSchemaRes,
@@ -41,7 +45,6 @@ import {
   ResponseUpdateUserDTO,
   updateUserSchemaRes,
 } from './dto/response-update-user';
-import { UpdateCurrentUserDTO } from './dto/UpdateCurrentUser.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -63,7 +66,7 @@ export class UserController {
   @UseInterceptors(new ResponseInterceptor(updateCurrentUserSchemaRes))
   async updateCurrentUser(
     @CurrentUser() user: JwtPayload,
-    @Body() userPayload: UpdateCurrentUserDTO,
+    @Body() userPayload: UpdateCurrentUserDto,
   ): Promise<ResponseUpdateCurrentUserDTO> {
     if (!user) {
       throw new InternalServerErrorException(

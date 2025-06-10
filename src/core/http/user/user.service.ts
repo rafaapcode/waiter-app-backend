@@ -8,11 +8,11 @@ import {
 import { UserType } from '@shared/types/User.type';
 import { verifyPassword } from '@shared/utils/verifyPassword';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { CreateUserDto, UpdateUserDto } from './dto/Input.dto';
 import {
-  UpdateCurrentUserDTO,
-  updateCurrentUserSchema,
-} from './dto/UpdateCurrentUser.dto';
+  CreateUserDto,
+  UpdateCurrentUserDto,
+  UpdateUserDto,
+} from './dto/Input.dto';
 
 @Injectable()
 export class UserService {
@@ -48,21 +48,8 @@ export class UserService {
 
   async updateCurrentUser(
     email: string,
-    data: UpdateCurrentUserDTO,
+    data: UpdateCurrentUserDto,
   ): Promise<{ access_token?: string } & Omit<UserType, 'password'>> {
-    const isValidPayload = updateCurrentUserSchema.safeParse({
-      ...(data.name && { name: data.name }),
-      ...(data.email && { email: data.email }),
-      ...(data.new_password && { new_password: data.new_password }),
-      ...(data.confirm_password && { confirm_password: data.confirm_password }),
-    });
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(
-        isValidPayload.error.errors.map((e) => e.message).join('\n'),
-      );
-    }
-
     if (data.new_password) {
       if (!data.current_password) {
         throw new BadRequestException(

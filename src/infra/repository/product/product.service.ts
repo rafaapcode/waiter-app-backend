@@ -1,5 +1,7 @@
-import { CreateProductDTO } from '@core/http/product/dto/Product.dto';
-import { UpdateProductDTO } from '@core/http/product/dto/UpdateProduct.dto';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from '@core/http/product/dto/Input.dto';
 import {
   BadRequestException,
   Inject,
@@ -18,7 +20,7 @@ export class ProductRepository {
     private productModel: Model<Product>,
   ) {}
 
-  async crateProduct(productData: CreateProductDTO): Promise<Product> {
+  async crateProduct(productData: CreateProductDto): Promise<Product> {
     try {
       const product = await this.productModel.create(productData);
       return product;
@@ -125,7 +127,7 @@ export class ProductRepository {
 
   async updateProduct(
     productId: string,
-    data: UpdateProductDTO,
+    data: UpdateProductDto,
   ): Promise<Product> {
     try {
       const updatedProduct = await this.productModel.findByIdAndUpdate(
