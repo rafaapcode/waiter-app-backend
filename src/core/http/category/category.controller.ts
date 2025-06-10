@@ -1,36 +1,35 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Put,
-    UseGuards,
-    UseInterceptors,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/CreateCategory.dto';
-import { EditCategoryDto } from './dto/EditCategory.dto';
+import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
 import {
-    createCategorySchemaResponse,
-    ResponseCreateCategoryResponse,
+  createCategorySchemaResponse,
+  ResponseCreateCategoryResponse,
 } from './dto/response-create-category.dto';
 import {
-    deleteCategorySchemaResponse,
-    ResponseDeleteCategoryResponse,
+  deleteCategorySchemaResponse,
+  ResponseDeleteCategoryResponse,
 } from './dto/response-delete-category.dto';
 import {
-    editCategorySchemaResponse,
-    ResponseEditCategoryResponse,
+  editCategorySchemaResponse,
+  ResponseEditCategoryResponse,
 } from './dto/response-edite-category.dto';
 import {
-    listCategorySchemaResponse,
-    ResponseListCategoryResponse,
+  listCategorySchemaResponse,
+  ResponseListCategoryResponse,
 } from './dto/response-list-category.dto';
 
 @Controller('category')
