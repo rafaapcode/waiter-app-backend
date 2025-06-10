@@ -50,6 +50,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('')
+  @UseGuards(UserGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(createUserSchema))
   async createUser(
     @Body() userPayload: CreateUserDTO,
@@ -106,9 +108,10 @@ export class UserController {
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(getAllUsersSchemaRes))
   async getAllUser(
+    @CurrentUser() user: JwtPayload,
     @Param('page', ParseIntPipe) page: number,
   ): Promise<ResponseGetAllUsersDTO> {
-    return await this.userService.getAllUsers(page);
+    return await this.userService.getAllUsers(user.id, page);
   }
 
   @Get('current')

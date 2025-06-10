@@ -83,6 +83,12 @@ export class UserService {
     }
 
     if (data.new_password) {
+      if (!data.current_password) {
+        throw new BadRequestException(
+          'Senha atual é obrigatório para a mudança da senha',
+        );
+      }
+
       const user = await this.userRepo.userExists(email);
 
       if (!user) {
@@ -146,9 +152,10 @@ export class UserService {
   }
 
   async getAllUsers(
+    userId: string,
     page: number,
   ): Promise<{ total_pages: number; users: Omit<UserType, 'password'>[] }> {
-    const users = await this.userRepo.getAllUser(page);
+    const users = await this.userRepo.getAllUser(userId, page);
     return users;
   }
 }

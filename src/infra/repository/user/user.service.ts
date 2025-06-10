@@ -1,9 +1,9 @@
 import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException,
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User, UserType } from 'src/shared/types/User.type';
@@ -199,6 +199,7 @@ export class UserRepository {
   }
 
   async getAllUser(
+    userId: string,
     page: number,
   ): Promise<{ total_pages: number; users: Omit<UserType, 'password'>[] }> {
     try {
@@ -206,10 +207,12 @@ export class UserRepository {
       const limit = 6;
       const skip = (pageNumber - 1) * limit;
 
-      const countDocs = await this.userModel.countDocuments();
+      const countDocs = await this.userModel
+        .find({ id: { $ne: userId } })
+        .countDocuments();
 
       const user = await this.userModel
-        .find()
+        .find({ _id: { $ne: userId } })
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 });
