@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/infra/repository/user/user.service';
-import { Envs } from 'src/shared/config/env';
+import { env } from 'src/shared/config/env';
 import { UserType } from 'src/shared/types/User.type';
 import { validateSchema } from 'src/shared/utils/validateSchema';
 import { verifyPassword } from 'src/shared/utils/verifyPassword';
@@ -196,7 +196,7 @@ export class UserService {
         { id, email, role },
         {
           expiresIn: '1d',
-          secret: this.configService.getOrThrow(Envs.JWT_SECRET),
+          secret: env.JWT_SECRET,
         },
       );
     } catch (error) {
@@ -209,7 +209,7 @@ export class UserService {
   ): Promise<{ id: string; email: string; role: Role }> {
     try {
       const isTokenValid = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.getOrThrow(Envs.JWT_SECRET),
+        secret: env.JWT_SECRET,
       });
       if (!isTokenValid) {
         return null;
