@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -7,10 +6,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/infra/repository/user/user.service';
-import { validateSchema } from 'src/shared/utils/validateSchema';
 import { verifyPassword } from 'src/shared/utils/verifyPassword';
 import { env } from '../../../shared/config/env';
-import { LoginUserDTO, loginUserSchema } from './dto/LoginUser.dto';
+import { SignInUserDto } from './dto/Input.dto';
 import { Role } from './roles/role.enum';
 
 @Injectable()
@@ -20,17 +18,11 @@ export class AuthenticationService {
     private jwtService: JwtService,
   ) {}
 
-  async signInUser({ email, password }: LoginUserDTO): Promise<{
+  async signInUser({ email, password }: SignInUserDto): Promise<{
     access_token: string;
     role: string;
     id: string;
   }> {
-    const isValidPayload = validateSchema(loginUserSchema, { email, password });
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(isValidPayload.error.errors);
-    }
-
     const user = await this.userRepo.userExists(email);
 
     if (!user) {

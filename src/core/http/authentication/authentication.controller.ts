@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
 import { AuthenticationService } from './authentication.service';
-import { LoginUserDTO } from './dto/LoginUser.dto';
+import { SignInUserDto } from './dto/Input.dto';
 import {
   loginUserSchemaRes,
   ResponseLoginUserDTO,
@@ -22,9 +22,9 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(new ResponseInterceptor(loginUserSchemaRes))
   async login(
-    @Body() userPayload: LoginUserDTO,
+    @Body() signInUser: SignInUserDto,
   ): Promise<ResponseLoginUserDTO> {
-    const data = await this.authenticationService.signInUser(userPayload);
+    const data = await this.authenticationService.signInUser(signInUser);
 
     return data;
   }
