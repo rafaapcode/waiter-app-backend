@@ -1,3 +1,6 @@
+import { OrderGateway } from '@core/websocket/gateway/gateway';
+import { OrderRepository } from '@infra/repository/order/order.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadGatewayException,
   BadRequestException,
@@ -6,14 +9,11 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderGateway } from 'src/core/websocket/gateway/gateway';
-import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { Category } from 'src/shared/types/Category.type';
-import { Product } from 'src/shared/types/Product.type';
-import { formatCurrency } from 'src/shared/utils/formatCurrency';
-import { OrderRepository } from '../../../infra/repository/order/order.service';
-import { HistoryOrder, Order } from '../../../shared/types/Order.type';
-import { validateSchema } from '../../../shared/utils/validateSchema';
+import { Category } from '@shared/types/Category.type';
+import { HistoryOrder, Order } from '@shared/types/Order.type';
+import { Product } from '@shared/types/Product.type';
+import { formatCurrency } from '@shared/utils/formatCurrency';
+import { validateSchema } from '@shared/utils/validateSchema';
 import { ChangeOrderDto, changeOrderSchema } from './dto/ChangeOrder.dto';
 import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
 import { INewOrder } from './types/neworder.type';

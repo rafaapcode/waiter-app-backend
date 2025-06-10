@@ -5,8 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { User, UserType } from '@shared/types/User.type';
 import { Model } from 'mongoose';
-import { User, UserType } from 'src/shared/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()

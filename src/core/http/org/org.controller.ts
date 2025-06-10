@@ -9,8 +9,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { JwtPayload } from 'src/shared/types/express';
-import { OrgType } from 'src/shared/types/Org.type';
+import { JwtPayload } from '@shared/types/express';
+import { OrgType } from '@shared/types/Org.type';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';

@@ -1,6 +1,6 @@
+import { OrderSchema } from '@infra/schemas/order.schema';
 import { Connection } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
-import { OrderSchema } from '../../schemas/order.schema';
 
 export const orderProviders = [
   {

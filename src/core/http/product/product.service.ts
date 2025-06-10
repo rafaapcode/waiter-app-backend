@@ -1,3 +1,5 @@
+import { OrderRepository } from '@infra/repository/order/order.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadRequestException,
   HttpException,
@@ -5,10 +7,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderRepository } from 'src/infra/repository/order/order.service';
-import { ProductRepository } from '../../../infra/repository/product/product.service';
-import { Product } from '../../../shared/types/Product.type';
-import { validateSchema } from '../../../shared/utils/validateSchema';
+import { Product } from '@shared/types/Product.type';
+import { validateSchema } from '@shared/utils/validateSchema';
 import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
 import { UpdateProductDTO, updateProductSchema } from './dto/UpdateProduct.dto';
 

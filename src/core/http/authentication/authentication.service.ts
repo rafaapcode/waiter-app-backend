@@ -1,3 +1,4 @@
+import { UserRepository } from '@infra/repository/user/user.service';
 import {
   Injectable,
   InternalServerErrorException,
@@ -5,9 +6,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRepository } from 'src/infra/repository/user/user.service';
-import { verifyPassword } from 'src/shared/utils/verifyPassword';
-import { env } from '../../../shared/config/env';
+import { env } from '@shared/config/env';
+import { verifyPassword } from '@shared/utils/verifyPassword';
 import { SignInUserDto } from './dto/Input.dto';
 import { Role } from './roles/role.enum';
 

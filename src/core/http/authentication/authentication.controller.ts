@@ -6,7 +6,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { AuthenticationService } from './authentication.service';
 import { SignInUserDto } from './dto/Input.dto';
 import {

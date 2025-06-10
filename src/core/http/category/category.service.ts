@@ -1,3 +1,5 @@
+import { CategoryRepository } from '@infra/repository/category/category.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadRequestException,
   HttpException,
@@ -5,9 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { CategoryRepository } from '../../../infra/repository/category/category.service';
-import { Category } from '../../../shared/types/Category.type';
+import { Category } from '@shared/types/Category.type';
 import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
 
 @Injectable()

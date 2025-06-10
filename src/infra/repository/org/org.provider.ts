@@ -1,5 +1,5 @@
+import { OrgSchema } from '@infra/schemas/org.schema';
 import { Connection } from 'mongoose';
-import { OrgSchema } from 'src/infra/schemas/org.schema';
 import { CONSTANTS } from '../../../constants';
 
 export const orgProvider = [

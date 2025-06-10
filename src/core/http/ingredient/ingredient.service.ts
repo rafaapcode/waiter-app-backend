@@ -1,6 +1,6 @@
+import { IngredientRepository } from '@infra/repository/ingredients/user.service';
 import { Injectable } from '@nestjs/common';
-import { IngredientRepository } from 'src/infra/repository/ingredients/user.service';
-import { IngredientType } from 'src/shared/types/Ingredient.type';
+import { IngredientType } from '@shared/types/Ingredient.type';
 import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';
 
 @Injectable()
@@ -23,9 +23,7 @@ export class IngredientService {
     return await this.ingredientRepository.verfifyIngredients(ingredients);
   }
 
-  async createManyIngredients({
-    ingredients,
-  }: CreateManyIngredientDto): Promise<{
+  async createManyIngredients(ingredients: CreateManyIngredientDto): Promise<{
     data: { name: string; id: string }[];
   }> {
     return await this.ingredientRepository.createMany(ingredients);

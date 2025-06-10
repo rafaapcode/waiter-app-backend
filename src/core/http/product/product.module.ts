@@ -1,5 +1,5 @@
+import { RepositoryModule } from '@infra/repository/repository.module';
 import { Module } from '@nestjs/common';
-import { RepositoryModule } from '../../../infra/repository/repository.module';
 import { UserModule } from '../user/user.module';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';

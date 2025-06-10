@@ -1,8 +1,8 @@
+import { CreateOrgDTO, UpdateOrgDTO } from '@core/http/org/dto/Input.dto';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Org, OrgType } from '@shared/types/Org.type';
+import { User } from '@shared/types/User.type';
 import { Model } from 'mongoose';
-import { CreateOrgDTO, UpdateOrgDTO } from 'src/core/http/org/dto/Input.dto';
-import { Org, OrgType } from 'src/shared/types/Org.type';
-import { User } from 'src/shared/types/User.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()

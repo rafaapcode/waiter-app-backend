@@ -1,12 +1,12 @@
+import { UserRepository } from '@infra/repository/user/user.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserRepository } from 'src/infra/repository/user/user.service';
-import { UserType } from 'src/shared/types/User.type';
-import { verifyPassword } from 'src/shared/utils/verifyPassword';
+import { UserType } from '@shared/types/User.type';
+import { verifyPassword } from '@shared/utils/verifyPassword';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { CreateUserDto, UpdateUserDto } from './dto/Input.dto';
 import {

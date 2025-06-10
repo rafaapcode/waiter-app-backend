@@ -1,7 +1,10 @@
+import {
+  CreateIngredientDto,
+  CreateManyIngredientDto,
+} from '@core/http/ingredient/dto/Input.dto';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Ingredient, IngredientType } from '@shared/types/Ingredient.type';
 import { Model } from 'mongoose';
-import { CreateIngredientDTO } from 'src/core/http/ingredient/dto/createIngredient.dto';
-import { Ingredient, IngredientType } from 'src/shared/types/Ingredient.type';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()
@@ -11,7 +14,7 @@ export class IngredientRepository {
     private ingredientModel: Model<Ingredient>,
   ) {}
 
-  async createIngredient(dataIngredient: CreateIngredientDTO): Promise<{
+  async createIngredient(dataIngredient: CreateIngredientDto): Promise<{
     message: string;
     data?: IngredientType;
   }> {
@@ -63,7 +66,7 @@ export class IngredientRepository {
   }
 
   async createMany(
-    ingredients: CreateIngredientDTO[],
+    ingredients: CreateManyIngredientDto,
   ): Promise<{ data: { name: string; id: string }[] }> {
     try {
       const ingredientsAdded =
