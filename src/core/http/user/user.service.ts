@@ -5,7 +5,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/infra/repository/user/user.service';
 import { env } from 'src/shared/config/env';
@@ -26,7 +25,6 @@ export class UserService {
   constructor(
     private userRepo: UserRepository,
     private jwtService: JwtService,
-    private configService: ConfigService,
   ) {}
 
   async signInUser({ email, password }: LoginUserDTO): Promise<{
