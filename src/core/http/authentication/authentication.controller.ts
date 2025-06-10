@@ -6,13 +6,10 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { AuthenticationService } from './authentication.service';
 import { SignInUserDto } from './dto/Input.dto';
-import {
-  loginUserSchemaRes,
-  ResponseLoginUserDTO,
-} from './dto/response-login-user';
+import { OutputUserDto } from './dto/OutPut.dto';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -20,12 +17,14 @@ export class AuthenticationController {
 
   @Post('signin')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(new ResponseInterceptor(loginUserSchemaRes))
-  async login(
-    @Body() signInUser: SignInUserDto,
-  ): Promise<ResponseLoginUserDTO> {
+  @UseInterceptors(new ResponseInterceptorNew(OutputUserDto))
+  async login(@Body() signInUser: SignInUserDto): Promise<OutputUserDto> {
     const data = await this.authenticationService.signInUser(signInUser);
 
-    return data;
+    return {
+      role: data.role,
+      id: '1313133131313',
+      access_token: '131313131313',
+    };
   }
 }

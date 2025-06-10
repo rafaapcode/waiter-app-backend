@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { env } from '@shared/config/env';
+import { UserRoles } from '@shared/types/User.type';
 import { verifyPassword } from '@shared/utils/verifyPassword';
 import { SignInUserDto } from './dto/Input.dto';
 import { Role } from './roles/role.enum';
@@ -20,7 +21,7 @@ export class AuthenticationService {
 
   async signInUser({ email, password }: SignInUserDto): Promise<{
     access_token: string;
-    role: string;
+    role: UserRoles;
     id: string;
   }> {
     const user = await this.userRepo.userExists(email);
