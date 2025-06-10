@@ -10,10 +10,13 @@ import { validateSync } from 'class-validator';
 import { Observable, switchMap } from 'rxjs';
 
 @Injectable()
-export class ResponseInterceptorNew<T extends object, TClass extends object>
+export class ResponseInterceptorArray<T extends object, TClass extends object>
   implements NestInterceptor<any, T>
 {
-  constructor(private readonly validator: ClassConstructor<TClass>) {}
+  constructor(
+    private readonly validator: ClassConstructor<TClass>,
+    private readonly accessKey: string,
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<T> {
     return next.handle().pipe(
@@ -28,7 +31,7 @@ export class ResponseInterceptorNew<T extends object, TClass extends object>
           });
         }
 
-        return data;
+        return data[this.accessKey];
       }),
     );
   }

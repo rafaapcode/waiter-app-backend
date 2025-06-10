@@ -21,10 +21,6 @@ export class AuthenticationController {
   async login(@Body() signInUser: SignInUserDto): Promise<OutputUserDto> {
     const data = await this.authenticationService.signInUser(signInUser);
 
-    return {
-      role: data.role,
-      id: '1313133131313',
-      access_token: '131313131313',
-    };
+    return data;
   }
 }

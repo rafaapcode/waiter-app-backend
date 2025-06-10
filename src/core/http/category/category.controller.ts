@@ -9,28 +9,18 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
 import {
-  createCategorySchemaResponse,
-  ResponseCreateCategoryResponse,
-} from './dto/response-create-category.dto';
-import {
-  deleteCategorySchemaResponse,
-  ResponseDeleteCategoryResponse,
-} from './dto/response-delete-category.dto';
-import {
-  editCategorySchemaResponse,
-  ResponseEditCategoryResponse,
-} from './dto/response-edite-category.dto';
-import {
-  listCategorySchemaResponse,
-  ResponseListCategoryResponse,
-} from './dto/response-list-category.dto';
+  OutPutCreateCategoryDto,
+  OutPutListCategoryDto,
+  OutPutMessageDto,
+} from './dto/OutPut.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -38,24 +28,28 @@ export class CategoryController {
 
   @Get('/categories')
   @UseGuards(UserGuard)
-  @UseInterceptors(new ResponseInterceptor(listCategorySchemaResponse))
-  async listCategories(): Promise<ResponseListCategoryResponse> {
+  @UseInterceptors(
+    new ResponseInterceptorArray(OutPutListCategoryDto, 'categories'),
+  )
+  async listCategories(): Promise<OutPutListCategoryDto> {
     const categories = await this.categoryService.listCategory();
 
-    return categories.map((cat) => ({
-      _id: cat.id,
-      name: cat.name,
-      icon: cat.icon,
-    }));
+    return {
+      categories: categories.map((cat) => ({
+        _id: cat.id,
+        name: cat.name,
+        icon: cat.icon,
+      })),
+    };
   }
 
   @Post('/categories')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(createCategorySchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateCategoryDto))
   async createCategory(
     @Body() categoryData: CreateCategoryDto,
-  ): Promise<ResponseCreateCategoryResponse> {
+  ): Promise<OutPutCreateCategoryDto> {
     const categoryCreated =
       await this.categoryService.createCategory(categoryData);
 
@@ -69,11 +63,11 @@ export class CategoryController {
   @Put('/categories/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(editCategorySchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async editCategory(
     @Param('id') id: string,
     @Body() editData: EditCategoryDto,
-  ): Promise<ResponseEditCategoryResponse> {
+  ): Promise<OutPutMessageDto> {
     const categoryEdited = await this.categoryService.editCategory(
       id,
       editData,
@@ -89,10 +83,10 @@ export class CategoryController {
   @Delete('/:categoryId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(deleteCategorySchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async deleteCategory(
     @Param('categoryId') categoryId: string,
-  ): Promise<ResponseDeleteCategoryResponse> {
+  ): Promise<OutPutMessageDto> {
     await this.categoryService.deleteCategory(categoryId);
     return {
       message: 'Categoria deletada com sucesso !',
