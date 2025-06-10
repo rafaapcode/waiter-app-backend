@@ -1,6 +1,6 @@
+import { UserSchema } from '@infra/schemas/user.schema';
 import { Connection } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
-import { UserSchema } from '../../schemas/user.schema';
 
 export const userProvider = [
   {

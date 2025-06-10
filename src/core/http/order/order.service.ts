@@ -1,21 +1,18 @@
+import { OrderGateway } from '@core/websocket/gateway/gateway';
+import { OrderRepository } from '@infra/repository/order/order.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
-  BadGatewayException,
   BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderGateway } from 'src/core/websocket/gateway/gateway';
-import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { Category } from 'src/shared/types/Category.type';
-import { Product } from 'src/shared/types/Product.type';
-import { formatCurrency } from 'src/shared/utils/formatCurrency';
-import { OrderRepository } from '../../../infra/repository/order/order.service';
-import { HistoryOrder, Order } from '../../../shared/types/Order.type';
-import { validateSchema } from '../../../shared/utils/validateSchema';
-import { ChangeOrderDto, changeOrderSchema } from './dto/ChangeOrder.dto';
-import { CreateOrderDTO, createOrderSchema } from './dto/CreateOrder.dto';
+import { Category } from '@shared/types/Category.type';
+import { HistoryOrder, Order } from '@shared/types/Order.type';
+import { Product } from '@shared/types/Product.type';
+import { formatCurrency } from '@shared/utils/formatCurrency';
+import { ChangeOrderDto, CreateOrderDto } from './dto/Input.dto';
 import { INewOrder } from './types/neworder.type';
 
 @Injectable()
@@ -31,12 +28,6 @@ export class OrderService {
     newStatus: ChangeOrderDto,
   ): Promise<Order> {
     try {
-      const validateStatus = validateSchema(changeOrderSchema, newStatus);
-
-      if (!validateStatus.success) {
-        throw new BadRequestException(validateStatus.error.errors);
-      }
-
       const order = await this.orderRepository.changeOrderStatus(
         orderId,
         newStatus,
@@ -61,13 +52,8 @@ export class OrderService {
     }
   }
 
-  async createOrder(createOrderData: CreateOrderDTO): Promise<Order> {
+  async createOrder(createOrderData: CreateOrderDto): Promise<Order> {
     try {
-      const validateData = validateSchema(createOrderSchema, createOrderData);
-      if (!validateData.success) {
-        throw new BadGatewayException(validateData.error.errors);
-      }
-
       const productsIds = createOrderData.products.map(
         (product) => product.product,
       );

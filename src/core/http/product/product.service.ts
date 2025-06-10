@@ -1,3 +1,5 @@
+import { OrderRepository } from '@infra/repository/order/order.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadRequestException,
   HttpException,
@@ -5,12 +7,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderRepository } from 'src/infra/repository/order/order.service';
-import { ProductRepository } from '../../../infra/repository/product/product.service';
-import { Product } from '../../../shared/types/Product.type';
-import { validateSchema } from '../../../shared/utils/validateSchema';
-import { CreateProductDTO, createProductSchema } from './dto/Product.dto';
-import { UpdateProductDTO, updateProductSchema } from './dto/UpdateProduct.dto';
+import { Product } from '@shared/types/Product.type';
+import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 
 @Injectable()
 export class ProductService {
@@ -19,14 +17,8 @@ export class ProductService {
     private readonly orderRepository: OrderRepository,
   ) {}
 
-  async createProduct(productData: CreateProductDTO): Promise<Product> {
+  async createProduct(productData: CreateProductDto): Promise<Product> {
     try {
-      const validateData = validateSchema(createProductSchema, productData);
-
-      if (!validateData.success) {
-        throw new BadRequestException(validateData.error.errors);
-      }
-
       const productExists = await this.productRepository.productExists(
         productData.name,
       );
@@ -159,15 +151,9 @@ export class ProductService {
 
   async updateProduct(
     productId: string,
-    data: UpdateProductDTO,
+    data: UpdateProductDto,
   ): Promise<Product> {
     try {
-      const validateData = validateSchema(updateProductSchema, data);
-
-      if (!validateData.success) {
-        throw new BadRequestException(validateData.error.errors);
-      }
-
       const updatedProduct = await this.productRepository.updateProduct(
         productId,
         data,

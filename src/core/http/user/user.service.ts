@@ -1,20 +1,18 @@
+import { UserRepository } from '@infra/repository/user/user.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserRepository } from 'src/infra/repository/user/user.service';
-import { UserType } from 'src/shared/types/User.type';
-import { validateSchema } from 'src/shared/utils/validateSchema';
-import { verifyPassword } from 'src/shared/utils/verifyPassword';
+import { UserType } from '@shared/types/User.type';
+import { verifyPassword } from '@shared/utils/verifyPassword';
 import { AuthenticationService } from '../authentication/authentication.service';
 import {
-  UpdateCurrentUserDTO,
-  updateCurrentUserSchema,
-} from './dto/UpdateCurrentUser.dto';
-import { UpdateUserDTO, updateUserSchema } from './dto/UpdateUser.dto';
-import { CreateUserDTO, createUserSchema } from './dto/User.dto';
+  CreateUserDto,
+  UpdateCurrentUserDto,
+  UpdateUserDto,
+} from './dto/Input.dto';
 
 @Injectable()
 export class UserService {
@@ -28,18 +26,7 @@ export class UserService {
     password,
     name,
     role,
-  }: CreateUserDTO): Promise<Omit<UserType, 'password'>> {
-    const isValidPayload = validateSchema(createUserSchema, {
-      email,
-      password,
-      name,
-      role,
-    });
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(isValidPayload.error.errors);
-    }
-
+  }: CreateUserDto): Promise<Omit<UserType, 'password'>> {
     const newUser = await this.userRepo.createUser({
       email,
       password,
@@ -52,14 +39,8 @@ export class UserService {
 
   async updateUser(
     id: string,
-    data: UpdateUserDTO,
+    data: UpdateUserDto,
   ): Promise<Omit<UserType, 'password'>> {
-    const isValidPayload = validateSchema(updateUserSchema, data);
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(isValidPayload.error.errors);
-    }
-
     const newUser = await this.userRepo.updateUser(id, data);
 
     return newUser;
@@ -67,21 +48,8 @@ export class UserService {
 
   async updateCurrentUser(
     email: string,
-    data: UpdateCurrentUserDTO,
+    data: UpdateCurrentUserDto,
   ): Promise<{ access_token?: string } & Omit<UserType, 'password'>> {
-    const isValidPayload = updateCurrentUserSchema.safeParse({
-      ...(data.name && { name: data.name }),
-      ...(data.email && { email: data.email }),
-      ...(data.new_password && { new_password: data.new_password }),
-      ...(data.confirm_password && { confirm_password: data.confirm_password }),
-    });
-
-    if (!isValidPayload.success) {
-      throw new BadRequestException(
-        isValidPayload.error.errors.map((e) => e.message).join('\n'),
-      );
-    }
-
     if (data.new_password) {
       if (!data.current_password) {
         throw new BadRequestException(

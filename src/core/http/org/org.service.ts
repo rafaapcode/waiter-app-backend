@@ -1,14 +1,14 @@
+import { CategoryRepository } from '@infra/repository/category/category.service';
+import { OrderRepository } from '@infra/repository/order/order.service';
+import { OrgRepository } from '@infra/repository/org/org.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CategoryRepository } from 'src/infra/repository/category/category.service';
-import { OrderRepository } from 'src/infra/repository/order/order.service';
-import { OrgRepository } from 'src/infra/repository/org/org.service';
-import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { OrgType } from 'src/shared/types/Org.type';
-import { CreateOrgDTO, UpdateOrgDTO } from './dto/org.dto';
+import { OrgType } from '@shared/types/Org.type';
+import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 
 @Injectable()
 export class OrgService {

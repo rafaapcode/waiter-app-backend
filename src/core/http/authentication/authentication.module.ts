@@ -1,6 +1,6 @@
+import { RepositoryModule } from '@infra/repository/repository.module';
 import { Global, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RepositoryModule } from 'src/infra/repository/repository.module';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 

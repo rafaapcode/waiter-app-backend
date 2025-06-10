@@ -12,12 +12,17 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
-import { JwtPayload } from 'src/shared/types/express';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { JwtPayload } from '@shared/types/express';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
+import {
+  CreateUserDto,
+  UpdateCurrentUserDto,
+  UpdateUserDto,
+} from './dto/Input.dto';
 import { ResponseCreateUserDTO } from './dto/response-create-user';
 import {
   deleteUserSchemaRes,
@@ -40,9 +45,6 @@ import {
   ResponseUpdateUserDTO,
   updateUserSchemaRes,
 } from './dto/response-update-user';
-import { UpdateCurrentUserDTO } from './dto/UpdateCurrentUser.dto';
-import { UpdateUserDTO } from './dto/UpdateUser.dto';
-import { CreateUserDTO, createUserSchema } from './dto/User.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -52,9 +54,8 @@ export class UserController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(createUserSchema))
   async createUser(
-    @Body() userPayload: CreateUserDTO,
+    @Body() userPayload: CreateUserDto,
   ): Promise<ResponseCreateUserDTO> {
     return await this.userService.create(userPayload);
   }
@@ -65,7 +66,7 @@ export class UserController {
   @UseInterceptors(new ResponseInterceptor(updateCurrentUserSchemaRes))
   async updateCurrentUser(
     @CurrentUser() user: JwtPayload,
-    @Body() userPayload: UpdateCurrentUserDTO,
+    @Body() userPayload: UpdateCurrentUserDto,
   ): Promise<ResponseUpdateCurrentUserDTO> {
     if (!user) {
       throw new InternalServerErrorException(
@@ -82,7 +83,7 @@ export class UserController {
   @UseInterceptors(new ResponseInterceptor(updateUserSchemaRes))
   async updateUser(
     @Param('id') id: string,
-    @Body() userPayload: UpdateUserDTO,
+    @Body() userPayload: UpdateUserDto,
   ): Promise<ResponseUpdateUserDTO> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');

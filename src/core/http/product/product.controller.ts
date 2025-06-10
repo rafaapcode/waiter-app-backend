@@ -10,12 +10,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
-import { Product } from 'src/shared/types/Product.type';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { Product } from '@shared/types/Product.type';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateProductDTO } from './dto/Product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 import {
   createProductSchemaRes,
   getProductSchemaRes,
@@ -37,7 +37,6 @@ import {
   ResponseUpdateProductDTO,
   updateProductSchemaRes,
 } from './dto/response-update-product';
-import { UpdateProductDTO } from './dto/UpdateProduct.dto';
 import { ProductService } from './product.service';
 
 @Controller('product')
@@ -77,7 +76,7 @@ export class ProductController {
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(createProductSchemaRes))
   async createProduct(
-    @Body() productData: CreateProductDTO,
+    @Body() productData: CreateProductDto,
   ): Promise<ResponseCreateProductDTO> {
     return await this.productService.createProduct(productData);
   }
@@ -124,7 +123,7 @@ export class ProductController {
   @UseInterceptors(new ResponseInterceptor(updateProductSchemaRes))
   async updateProduct(
     @Param('productId') productId: string,
-    @Body() updateProduct: UpdateProductDTO,
+    @Body() updateProduct: UpdateProductDto,
   ): Promise<ResponseUpdateProductDTO> {
     await this.productService.updateProduct(productId, updateProduct);
     return {

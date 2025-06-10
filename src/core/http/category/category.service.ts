@@ -1,19 +1,14 @@
+import { CategoryRepository } from '@infra/repository/category/category.service';
+import { ProductRepository } from '@infra/repository/product/product.service';
 import {
-    BadRequestException,
-    HttpException,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException,
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { ProductRepository } from 'src/infra/repository/product/product.service';
-import { CategoryRepository } from '../../../infra/repository/category/category.service';
-import { Category } from '../../../shared/types/Category.type';
-import { validateSchema } from '../../../shared/utils/validateSchema';
-import {
-    CreateCategoryDto,
-    createCategorySchema,
-} from './dto/CreateCategory.dto';
-import { EditCategoryDto } from './dto/EditCategory.dto';
+import { Category } from '@shared/types/Category.type';
+import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
 
 @Injectable()
 export class CategoryService {
@@ -24,11 +19,6 @@ export class CategoryService {
 
   async createCategory(data: CreateCategoryDto): Promise<Category> {
     try {
-      const validateData = validateSchema(createCategorySchema, data);
-      if (!validateData.success) {
-        throw new BadRequestException(validateData.error.errors);
-      }
-
       const categoryExist = await this.categoryRepository.findCategoryByName(
         data.name,
       );

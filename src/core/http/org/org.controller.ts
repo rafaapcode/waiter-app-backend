@@ -9,13 +9,13 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { JwtPayload } from 'src/shared/types/express';
-import { OrgType } from 'src/shared/types/Org.type';
+import { JwtPayload } from '@shared/types/express';
+import { OrgType } from '@shared/types/Org.type';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { CreateOrgDTO, UpdateOrgDTO } from './dto/org.dto';
+import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 import { OrgService } from './org.service';
 
 @Controller('org')
