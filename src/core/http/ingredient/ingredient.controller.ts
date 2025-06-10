@@ -9,7 +9,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/shared/interceptor/response-interceptor';
-import { CreateIngredientDTO } from './dto/createIngredient.dto';
+import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';
 import {
   createManyIngredientSchemaResponse,
   ResponseCreateManyIngredients,
@@ -41,7 +41,7 @@ export class IngredientController {
   @Post()
   @UseInterceptors(new ResponseInterceptor(createIngredientSchemaResponse))
   async createIngredient(
-    @Body() data: CreateIngredientDTO,
+    @Body() data: CreateIngredientDto,
   ): Promise<ResponseCreateIngredient> {
     return await this.ingredientsService.createIngredient(data);
   }
@@ -59,7 +59,7 @@ export class IngredientController {
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(new ResponseInterceptor(createManyIngredientSchemaResponse))
   async createManyIngredients(
-    @Body() data: CreateIngredientDTO[],
+    @Body() data: CreateManyIngredientDto,
   ): Promise<ResponseCreateManyIngredients> {
     const response = await this.ingredientsService.createManyIngredients(data);
 
