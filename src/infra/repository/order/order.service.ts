@@ -1,4 +1,4 @@
-import { ChangeOrderDto } from '@core/http/order/dto/ChangeOrder.dto';
+import { ChangeOrderDto } from '@core/http/order/dto/Input.dto';
 import { INewOrder } from '@core/http/order/types/neworder.type';
 import {
   BadRequestException,

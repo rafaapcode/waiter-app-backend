@@ -18,8 +18,7 @@ import { HistoryOrder } from '@shared/types/Order.type';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { ChangeOrderDto } from './dto/ChangeOrder.dto';
-import { CreateOrderDTO } from './dto/CreateOrder.dto';
+import { ChangeOrderDto, CreateOrderDto } from './dto/Input.dto';
 import {
   createOrderSchemaResponse,
   ResponseCreateOrderDTO,
@@ -96,7 +95,7 @@ export class OrderController {
   @Roles(Role.ADMIN, Role.WAITER, Role.CLIENT)
   @UseInterceptors(new ResponseInterceptor(createOrderSchemaResponse))
   async createOrder(
-    @Body() orderData: CreateOrderDTO,
+    @Body() orderData: CreateOrderDto,
   ): Promise<ResponseCreateOrderDTO> {
     const orderCreated = await this.orderService.createOrder(orderData);
     return {
