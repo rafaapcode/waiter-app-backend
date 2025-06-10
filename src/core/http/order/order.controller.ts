@@ -13,30 +13,19 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
-import { HistoryOrder } from '@shared/types/Order.type';
+import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { ChangeOrderDto, CreateOrderDto } from './dto/Input.dto';
 import {
-  createOrderSchemaResponse,
-  ResponseCreateOrderDTO,
-} from './dto/response-create-orders.dto';
-import {
-  deleteOrderSchemaResponse,
-  ResponseDeleteOrderDTO,
-} from './dto/response-delete-orders.dto';
-import { historyOrderSchema } from './dto/response-history-orders.dto';
-import {
-  listOrdersSchemaResponse,
-  ResponseListOrdersDTO,
-} from './dto/response-list-orders.dto';
-import { restartOrderSchemaResponse } from './dto/response-restart-orders.dto';
-import {
-  ResponseUpdateOrderDTO,
-  updateOrderSchemaResponse,
-} from './dto/response-update-status-orders.dto';
+  OutPutCreateOrdersDto,
+  OutPutHistoryOrderDto,
+  OutPutListOrdersDto,
+  OutPutMessageDto,
+  OutPutUpdateOrderDto,
+} from './dto/OutPut.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -46,10 +35,10 @@ export class OrderController {
   @Get('history/:page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
-  @UseInterceptors(new ResponseInterceptor(historyOrderSchema))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutHistoryOrderDto))
   async historyOfOrders(
     @Param('page', ParseIntPipe) page: number,
-  ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
+  ): Promise<OutPutHistoryOrderDto> {
     const orders = await this.orderService.historyPage(page);
     return orders;
   }
@@ -57,11 +46,11 @@ export class OrderController {
   @Get('history/filter/:page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
-  @UseInterceptors(new ResponseInterceptor(historyOrderSchema))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutHistoryOrderDto))
   async historyOfOrdersFiltered(
     @Param('page', ParseIntPipe) page: number,
     @Query() filters: { to: Date; from: Date },
-  ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
+  ): Promise<OutPutHistoryOrderDto> {
     if (!filters.to || !filters.from) {
       throw new BadRequestException('Os filtros de data são obrigatórios');
     }
@@ -78,25 +67,27 @@ export class OrderController {
   @Get('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
-  @UseInterceptors(new ResponseInterceptor(listOrdersSchemaResponse))
-  async listOrders(): Promise<ResponseListOrdersDTO> {
+  @UseInterceptors(new ResponseInterceptorArray(OutPutListOrdersDto, 'orders'))
+  async listOrders(): Promise<OutPutListOrdersDto> {
     const orders = await this.orderService.listOrders();
-    return orders.map((order) => ({
-      _id: order.id,
-      createdAt: order.createdAt,
-      table: order.table,
-      status: order.status,
-      products: order.products,
-    }));
+    return {
+      orders: orders.map((order) => ({
+        _id: order.id,
+        createdAt: order.createdAt,
+        table: order.table,
+        status: order.status,
+        products: order.products,
+      })),
+    };
   }
 
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER, Role.CLIENT)
-  @UseInterceptors(new ResponseInterceptor(createOrderSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateOrdersDto))
   async createOrder(
     @Body() orderData: CreateOrderDto,
-  ): Promise<ResponseCreateOrderDTO> {
+  ): Promise<OutPutCreateOrdersDto> {
     const orderCreated = await this.orderService.createOrder(orderData);
     return {
       table: orderCreated.table,
@@ -108,11 +99,11 @@ export class OrderController {
   @Patch('/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(updateOrderSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateOrderDto))
   async changeStatusOrder(
     @Param('orderId') orderId: string,
     @Body() newStatus: ChangeOrderDto,
-  ): Promise<ResponseUpdateOrderDTO> {
+  ): Promise<OutPutUpdateOrderDto> {
     const orderUpdated = await this.orderService.changeOrderStatus(
       orderId,
       newStatus,
@@ -128,10 +119,10 @@ export class OrderController {
   @Delete('/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(deleteOrderSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async deleteOrder(
     @Param('orderId') orderId: string,
-  ): Promise<ResponseDeleteOrderDTO> {
+  ): Promise<OutPutMessageDto> {
     await this.orderService.deleteOrder(orderId);
     return {
       message: 'Ordem deletada com sucesso !',
@@ -141,10 +132,10 @@ export class OrderController {
   @Delete('history/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(deleteOrderSchemaResponse))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async deleteHistoryOrder(
     @Param('orderId') orderId: string,
-  ): Promise<ResponseDeleteOrderDTO> {
+  ): Promise<OutPutMessageDto> {
     await this.orderService.deleteHistoryOrder(orderId);
     return {
       message: 'Registro deletado com sucesso !',
@@ -155,8 +146,8 @@ export class OrderController {
   @HttpCode(200)
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(restartOrderSchemaResponse))
-  async restartDay(): Promise<ResponseDeleteOrderDTO> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  async restartDay(): Promise<OutPutMessageDto> {
     await this.orderService.restartDay();
     return {
       message: 'Dia reiniciado com sucesso !',

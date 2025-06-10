@@ -9,12 +9,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-export class OutPutMessageDto {
-  @IsString()
-  @IsNotEmpty()
-  message: string;
-}
-
 class verifyIngredientsDto {
   @IsString()
   @IsNotEmpty()

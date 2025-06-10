@@ -1,11 +1,18 @@
+import { PartialType } from '@nestjs/mapped-types';
+import { STATUS } from '@shared/types/Order.type';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
+  IsDate,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
-  IsOptional,
+  IsNumber,
+  IsPositive,
   IsString,
-  MinLength,
+  IsUrl,
+  Min,
   ValidateNested,
 } from 'class-validator';
 
@@ -15,89 +22,122 @@ export class OutPutMessageDto {
   message: string;
 }
 
-class verifyIngredientsDto {
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2, { message: 'Nome é obrigatório' })
+class itemDto {
+  @IsUrl(
+    { protocols: ['http', 'https'], require_protocol: true },
+    { message: 'imageUrl deve ser uma URL válida' },
+  )
+  @IsNotEmpty({ message: 'imageUrl é obrigatório' })
+  imageUrl: string;
+
+  @IsNumber({}, { message: 'quantity deve ser um número' })
+  @Min(1, { message: 'quantity deve ser maior que 0' })
+  quantity: number;
+
+  @IsString({ message: 'name deve ser uma string' })
+  @IsNotEmpty({ message: 'name é obrigatório' })
   name: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsNumber({}, { message: 'price deve ser um número' })
+  @Min(0, { message: 'price deve ser maior ou igual a 0' })
+  price: number;
+
+  @IsBoolean({ message: 'discount deve ser um boolean' })
+  discount: boolean;
+
+  @IsString({ message: 'id deve ser uma string' })
+  @IsNotEmpty({ message: 'id é obrigatório' })
   @IsMongoId()
   id: string;
 }
 
-class manyIngredientsDto {
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2, { message: 'Nome é obrigatório' })
-  name: string;
-
-  @IsString()
-  @IsNotEmpty()
+class historyOrderResponse {
+  @IsString({ message: 'id deve ser uma string' })
+  @IsNotEmpty({ message: 'id é obrigatório' })
   @IsMongoId()
   id: string;
-}
 
-class createIngredientDto {
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2, { message: 'Nome é obrigatório' })
+  @IsString({ message: 'table deve ser uma string' })
+  @IsNotEmpty({ message: 'table é obrigatório' })
+  table: string;
+
+  @IsDate({ message: 'data deve ser uma data válida' })
+  @Type(() => Date)
+  data: Date;
+
+  @IsString({ message: 'name deve ser uma string' })
+  @IsNotEmpty({ message: 'name é obrigatório' })
   name: string;
 
+  @IsString({ message: 'category deve ser uma string' })
+  @IsNotEmpty({ message: 'category é obrigatório' })
+  category: string;
+
+  @IsString({ message: 'totalPrice deve ser uma string' })
+  @IsNotEmpty({ message: 'totalPrice é obrigatório' })
+  totalPrice: string;
+
+  @IsArray({ message: 'itens deve ser um array' })
+  @ValidateNested({ each: true })
+  @Type(() => itemDto)
+  itens: itemDto[];
+}
+
+export class OutPutHistoryOrderDto {
+  @IsNumber()
+  @IsPositive()
+  total_pages: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => historyOrderResponse)
+  history: historyOrderResponse[];
+}
+
+export class OutPutCreateOrdersDto {
   @IsString()
   @IsNotEmpty()
-  icon: string;
+  table: string;
 
-  @IsString()
-  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(STATUS)
+  status: STATUS;
+
+  @IsArray()
+  products: any[];
+}
+
+class listOrdersDto {
+  @IsString({ message: '_id deve ser uma string' })
+  @IsNotEmpty({ message: '_id é obrigatório' })
   @IsMongoId()
-  _id?: string;
+  _id: string;
+
+  @IsString({ message: 'table deve ser uma string' })
+  @IsNotEmpty({ message: 'table é obrigatório' })
+  table: string;
+
+  @IsEnum(STATUS)
+  status: STATUS;
+
+  @IsArray({ message: 'products deve ser um array' })
+  products: any[];
+
+  @IsDate({ message: 'createdAt deve ser uma data válida' })
+  @Type(() => Date)
+  createdAt: Date;
 }
 
-class getAllIngredientsDto {
+export class OutPutListOrdersDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => listOrdersDto)
+  orders: listOrdersDto[];
+}
+
+export class OutPutUpdateOrderDto extends PartialType(OutPutCreateOrdersDto) {
   @IsString()
   @IsNotEmpty()
-  @MinLength(2, { message: 'Nome é obrigatório' })
-  name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  icon: string;
-
-  @IsString()
-  @IsOptional()
   @IsMongoId()
-  _id?: string;
-}
-
-export class OutPutCreateManyIngredientsDto {
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => manyIngredientsDto)
-  data: manyIngredientsDto[];
-}
-
-export class OutPutCreateIngredientDto {
-  @IsString()
-  @IsNotEmpty()
-  message: string;
-
-  @Type(() => createIngredientDto)
-  @IsOptional()
-  data?: createIngredientDto;
-}
-
-export class OutPutGetAllIngredientsDto {
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => getAllIngredientsDto)
-  data: getAllIngredientsDto[];
-}
-
-export class OutPutVerifyIngredientsDto {
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => verifyIngredientsDto)
-  data: verifyIngredientsDto[];
+  _id: string;
 }

@@ -8,14 +8,23 @@ import {
   Post,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { JwtPayload } from '@shared/types/express';
-import { OrgType } from '@shared/types/Org.type';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
+import {
+  OutPutCreateOrgDto,
+  OutPutGetOrgDto,
+  OutPutListOrgsOfUser,
+  OutPutMessageDto,
+  OutPutUpdateOrgDto,
+} from './dto/OutPut.dto';
 import { OrgService } from './org.service';
 
 @Controller('org')
@@ -25,7 +34,8 @@ export class OrgController {
   @Delete('/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async deleteOrg(@Param('id') id: string): Promise<{ message: string }> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  async deleteOrg(@Param('id') id: string): Promise<OutPutMessageDto> {
     const deleted = await this.orgService.deleteOrg(id);
     if (!deleted) {
       throw new BadGatewayException('Erro ao deletar a organização');
@@ -36,31 +46,40 @@ export class OrgController {
   @Put('/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
+  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateOrgDto))
   async updateOrg(
     @Param('id') id: string,
     @Body() orgData: UpdateOrgDTO,
-  ): Promise<OrgType> {
+  ): Promise<OutPutUpdateOrgDto> {
     return await this.orgService.updateOrg(id, orgData);
   }
 
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async createOrg(@Body() orgData: CreateOrgDTO): Promise<OrgType> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateOrgDto))
+  async createOrg(@Body() orgData: CreateOrgDTO): Promise<OutPutCreateOrgDto> {
     return await this.orgService.createOrg(orgData);
   }
 
   @Get('user')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async getOrgOfUser(@CurrentUser() user: JwtPayload): Promise<OrgType[]> {
-    return await this.orgService.getAllOrgsOfUser(user.id);
+  @UseInterceptors(new ResponseInterceptorArray(OutPutListOrgsOfUser, 'orgs'))
+  async getOrgOfUser(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<OutPutListOrgsOfUser> {
+    const orgs = await this.orgService.getAllOrgsOfUser(user.id);
+    return {
+      orgs,
+    };
   }
 
   @Get('/:orgid')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  async getOrg(@Param('orgid') orgid: string): Promise<OrgType> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutGetOrgDto))
+  async getOrg(@Param('orgid') orgid: string): Promise<OutPutGetOrgDto> {
     return await this.orgService.getOrgId(orgid);
   }
 }
