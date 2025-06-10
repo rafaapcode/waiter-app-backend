@@ -28,7 +28,13 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsUrl(null, { message: 'URL inválida' })
+  @IsUrl(
+    {
+      protocols: ['http', 'https'],
+      require_protocol: true,
+    },
+    { message: 'URL inválida' },
+  )
   imageUrl: string;
 
   @IsNumber()

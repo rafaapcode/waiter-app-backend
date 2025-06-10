@@ -65,9 +65,9 @@ export class IngredientRepository {
     };
   }
 
-  async createMany(
-    ingredients: CreateManyIngredientDto,
-  ): Promise<{ data: { name: string; id: string }[] }> {
+  async createMany({ ingredients }: CreateManyIngredientDto): Promise<{
+    data: { name: string; id: string }[];
+  }> {
     try {
       const ingredientsAdded =
         await this.ingredientModel.insertMany(ingredients);

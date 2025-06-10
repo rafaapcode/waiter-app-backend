@@ -1,4 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { UserRoles } from '@shared/types/User.type';
 import {
   IsEmail,
   IsEnum,
@@ -7,7 +8,6 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { UserRoles } from 'src/shared/types/User.type';
 
 export class CreateUserDto {
   @IsString()
@@ -16,7 +16,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEmail(null, { message: 'Email inválido' })
+  @IsEmail(undefined, { message: 'Email inválido' })
   email: string;
 
   @IsString()
@@ -39,7 +39,7 @@ export class UpdateCurrentUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEmail(null, { message: 'Email inválido' })
+  @IsEmail(undefined, { message: 'Email inválido' })
   @IsOptional()
   email: string;
 

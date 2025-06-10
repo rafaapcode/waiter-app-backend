@@ -18,7 +18,10 @@ export class CreateOrgDTO {
 
   @IsString()
   @IsNotEmpty()
-  @IsUrl()
+  @IsUrl({
+    protocols: ['http', 'https'],
+    require_protocol: true,
+  })
   @IsOptional()
   imageUrl: string;
 
