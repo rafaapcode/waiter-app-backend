@@ -6,14 +6,14 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthenticatedRequest } from 'src/shared/types/express';
-import { UserService } from '../../user/user.service';
+import { AuthenticationService } from '../authentication.service';
 import { ROLES_KEY } from '../decorators/role.decorator';
 import { Role } from '../roles/role.enum';
 
 @Injectable()
 export class UserGuard implements CanActivate {
   constructor(
-    private readonly userService: UserService,
+    private readonly authService: AuthenticationService,
     private readonly reflector: Reflector,
   ) {}
 
@@ -41,7 +41,7 @@ export class UserGuard implements CanActivate {
       throw new UnauthorizedException('Token é obrigatório');
     }
 
-    const userData = await this.userService.verifyToken(authToken);
+    const userData = await this.authService.verifyToken(authToken);
     if (!userData) {
       throw new UnauthorizedException('Token inválido ou expirado');
     }

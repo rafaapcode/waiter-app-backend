@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const signupUserSchemaRes = z.object({
+export const createUserSchemaRes = z.object({
   email: z.string().email({ message: 'Email inválido' }),
   name: z.string(),
   role: z.enum(['CLIENT', 'WAITER', 'ADMIN']).optional(),
@@ -9,4 +9,4 @@ export const signupUserSchemaRes = z.object({
     .length(24, { message: 'ID deve ter 24 caracteres' })
     .optional(),
 });
-export type ResponseSignUpUserDTO = z.infer<typeof signupUserSchemaRes>;
+export type ResponseCreateUserDTO = z.infer<typeof createUserSchemaRes>;

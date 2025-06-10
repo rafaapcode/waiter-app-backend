@@ -4,8 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   InternalServerErrorException,
   Param,
   ParseIntPipe,
@@ -20,7 +18,7 @@ import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorat
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
-import { LoginUserDTO } from './dto/LoginUser.dto';
+import { ResponseCreateUserDTO } from './dto/response-create-user';
 import {
   deleteUserSchemaRes,
   ResponseDeleteUserDTO,
@@ -35,14 +33,6 @@ import {
   ResponseGetCurrentUserDTO,
 } from './dto/response-getcurrent-user';
 import {
-  loginUserSchemaRes,
-  ResponseLoginUserDTO,
-} from './dto/response-login-user';
-import {
-  ResponseSignUpUserDTO,
-  signupUserSchemaRes,
-} from './dto/response-singup-user';
-import {
   ResponseUpdateCurrentUserDTO,
   updateCurrentUserSchemaRes,
 } from './dto/response-update-current-user';
@@ -52,30 +42,19 @@ import {
 } from './dto/response-update-user';
 import { UpdateCurrentUserDTO } from './dto/UpdateCurrentUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
-import { CreateUserDTO } from './dto/User.dto';
+import { CreateUserDTO, createUserSchema } from './dto/User.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @UseInterceptors(new ResponseInterceptor(loginUserSchemaRes))
-  async login(
-    @Body() userPayload: LoginUserDTO,
-  ): Promise<ResponseLoginUserDTO> {
-    const data = await this.userService.signInUser(userPayload);
-
-    return data;
-  }
-
   @Post('')
-  @UseInterceptors(new ResponseInterceptor(signupUserSchemaRes))
-  async signUpUser(
+  @UseInterceptors(new ResponseInterceptor(createUserSchema))
+  async createUser(
     @Body() userPayload: CreateUserDTO,
-  ): Promise<ResponseSignUpUserDTO> {
-    return await this.userService.signUpUser(userPayload);
+  ): Promise<ResponseCreateUserDTO> {
+    return await this.userService.create(userPayload);
   }
 
   @Put('current')

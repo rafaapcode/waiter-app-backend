@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AuthenticationModule } from './core/http/authentication/authentication.module';
 import { CategoryModule } from './core/http/category/category.module';
 import { IngredientModule } from './core/http/ingredient/ingredient.module';
 import { OrderModule } from './core/http/order/order.module';
@@ -9,8 +10,6 @@ import { UserModule } from './core/http/user/user.module';
 import { GatewayModule } from './core/websocket/gateway/gateway.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { RepositoryModule } from './infra/repository/repository.module';
-import { AuthenticationModule } from './src/core/http/authentication/authentication.module';
-import { AuthenticationModule } from './core/http/authentication/authentication.module';
 
 @Module({
   imports: [
