@@ -9,8 +9,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Product } from '@shared/types/Product.type';
-import { Model } from 'mongoose';
+import { Product, ProductType } from '@shared/types/Product.type';
+import { Model, Schema } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
 @Injectable()
@@ -20,10 +20,18 @@ export class ProductRepository {
     private productModel: Model<Product>,
   ) {}
 
-  async crateProduct(productData: CreateProductDto): Promise<Product> {
+  async createProduct(
+    productData: CreateProductDto,
+  ): Promise<ProductType<string, string>> {
     try {
       const product = await this.productModel.create(productData);
-      return product;
+      const ingredients = product.ingredients.map((id) => id.toString());
+      return {
+        ...product,
+        _id: product.id,
+        ingredients,
+        category: product.category.toString(),
+      };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -38,13 +46,48 @@ export class ProductRepository {
     }
   }
 
-  async listProducts(): Promise<Product[]> {
+  async listProducts(): Promise<
+    ProductType<
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      },
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      }
+    >[]
+  > {
     try {
       const products = await this.productModel
         .find()
         .populate('ingredients', '_id name icon')
         .populate('category', '_id name icon');
-      return products;
+      return products.map((p) => {
+        const cat = p.category as {
+          _id: Schema.Types.ObjectId;
+          name: string;
+          icon: string;
+        };
+        const categorie = {
+          ...cat,
+          _id: cat._id.toString(),
+        };
+
+        const ingredients = p.ingredients.map((ing) => ({
+          ...ing,
+          _id: ing._id.toString(),
+        }));
+
+        return {
+          ...p,
+          _id: p._id.toString(),
+          category: categorie,
+          ingredients,
+        };
+      });
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -59,14 +102,21 @@ export class ProductRepository {
     }
   }
 
-  async listProductsByCategorie(categoryId: string): Promise<Product[]> {
+  async listProductsByCategorie(
+    categoryId: string,
+  ): Promise<ProductType<string, string>[]> {
     try {
       const products = await this.productModel
         .find()
         .where('category')
         .equals(categoryId);
 
-      return products;
+      return products.map((p) => ({
+        ...p,
+        _id: p._id.toString(),
+        category: p.category.toString(),
+        ingredients: p.ingredients.map((id) => id.toString()),
+      }));
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -202,10 +252,15 @@ export class ProductRepository {
     }
   }
 
-  async returnAllDiscountProducts(): Promise<Product[]> {
+  async returnAllDiscountProducts(): Promise<ProductType<string, string>[]> {
     try {
       const products = await this.productModel.where('discount', true).find();
-      return products;
+      return products.map((p) => ({
+        ...p,
+        _id: p._id.toString(),
+        category: p.category.toString(),
+        ingredients: p.ingredients.map((id) => id.toString()),
+      }));
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());
@@ -220,14 +275,47 @@ export class ProductRepository {
     }
   }
 
-  async getProduct(productId: string): Promise<Product> {
+  async getProduct(productId: string): Promise<
+    ProductType<
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      },
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      }
+    >
+  > {
     try {
       const product = await this.productModel
         .findById(productId)
         .populate('ingredients', '_id name icon')
         .populate('category', '_id name icon');
 
-      return product;
+      const cat = product.category as {
+        _id: Schema.Types.ObjectId;
+        name: string;
+        icon: string;
+      };
+      const categorie = {
+        ...cat,
+        _id: cat._id.toString(),
+      };
+
+      const ingredients = product.ingredients.map((ing) => ({
+        ...ing,
+        _id: ing._id.toString(),
+      }));
+
+      return {
+        ...product,
+        _id: product._id.toString(),
+        category: categorie,
+        ingredients,
+      };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.getResponse());

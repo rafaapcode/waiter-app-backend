@@ -8,22 +8,26 @@ export enum STATUS {
   DONE = 'DONE',
 }
 
-export interface Order extends Document {
+type OrgPropertie = Schema.Types.ObjectId | Org;
+type ProductPropertie = Schema.Types.ObjectId | Product;
+
+export interface Order<TOrg = OrgPropertie, TProduct = ProductPropertie>
+  extends Document {
   readonly table: string;
   readonly status: STATUS;
   readonly createdAt: Date;
   readonly deletedAt?: Date;
   readonly products: {
-    product: Schema.Types.ObjectId | Product;
+    product: TProduct;
     quantity: number;
     price: number;
     discount: boolean;
   }[];
-  readonly org: Schema.Types.ObjectId | Org;
+  readonly org: TOrg;
 }
 
-export type ProductsOrder = {
-  product: Schema.Types.ObjectId;
+export type ProductsOrder<TProduct = Schema.Types.ObjectId> = {
+  product: TProduct;
   quantity: number;
   price: number;
   discount: boolean;

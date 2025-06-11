@@ -1,7 +1,9 @@
 import { Document, Schema } from 'mongoose';
 import { User } from './User.type';
 
-export interface Org extends Document {
+type UserPropertie = Schema.Types.ObjectId | User;
+
+export interface Org<TUser = UserPropertie> extends Document {
   readonly name: string;
   readonly imageUrl: string;
   readonly email: string;
@@ -16,10 +18,10 @@ export interface Org extends Document {
     type?: 'Point';
     coordinates?: [number, number];
   };
-  readonly user: Schema.Types.ObjectId | User;
+  readonly user: TUser;
 }
 
-export type OrgType<Tuser = string> = {
+export type OrgType<TUser = string> = {
   _id?: string;
   name: string;
   email: string;
@@ -35,5 +37,5 @@ export type OrgType<Tuser = string> = {
     type?: 'Point';
     coordinates?: [number, number];
   };
-  user: Tuser;
+  user: TUser;
 };

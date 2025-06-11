@@ -10,33 +10,20 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
-import { Product } from '@shared/types/Product.type';
+import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 import {
-  createProductSchemaRes,
-  getProductSchemaRes,
-  ResponseCreateProductDTO,
-} from './dto/response-create-product';
-import {
-  deleteProductSchemaRes,
-  ResponseDeleteProductDTO,
-} from './dto/response-delete-product';
-import {
-  discountsProductSchemaRes,
-  ResponseDiscountsProductDTO,
-} from './dto/response-discounts-product';
-import {
-  listProductSchemaRes,
-  ResponseListProductDTO,
-} from './dto/response-list-product';
-import {
-  ResponseUpdateProductDTO,
-  updateProductSchemaRes,
-} from './dto/response-update-product';
+  OutPutCreateProductDto,
+  OutPutDiscountProductDto,
+  OutPutGetProductDto,
+  OutPutListProductByCategorieDto,
+  OutPutListProductDto,
+  OutPutMessageDto,
+} from './dto/OutPut.dto';
 import { ProductService } from './product.service';
 
 @Controller('product')
@@ -45,28 +32,34 @@ export class ProductController {
 
   @Get('')
   @UseGuards(UserGuard)
-  @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
-  async listProducts(): Promise<ResponseListProductDTO> {
+  @UseInterceptors(
+    new ResponseInterceptorArray(OutPutListProductDto, 'products'),
+  )
+  async listProducts(): Promise<OutPutListProductDto> {
     const products = await this.productService.listProduct();
-    return products.map((product) => {
-      return {
-        _id: product.id,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price,
-        category: product.category,
-        discount: product.discount,
-        priceInDiscount: product.priceInDiscount,
-        ingredients: product.ingredients,
-      };
-    });
+    return {
+      products: products.map((product) => {
+        return {
+          _id: product._id,
+          name: product.name,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          category: product.category,
+          discount: product.discount,
+          priceInDiscount: product.priceInDiscount,
+          ingredients: product.ingredients,
+        };
+      }),
+    };
   }
 
   @Get('/:productId')
   @UseGuards(UserGuard)
-  @UseInterceptors(new ResponseInterceptor(getProductSchemaRes))
-  async getProduct(@Param('productId') productId: string): Promise<Product> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutGetProductDto))
+  async getProduct(
+    @Param('productId') productId: string,
+  ): Promise<OutPutGetProductDto> {
     const product = await this.productService.getProduct(productId);
     return product;
   }
@@ -74,43 +67,47 @@ export class ProductController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(createProductSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateProductDto))
   async createProduct(
     @Body() productData: CreateProductDto,
-  ): Promise<ResponseCreateProductDTO> {
+  ): Promise<OutPutCreateProductDto> {
     return await this.productService.createProduct(productData);
   }
 
   @Get('categorie/:categoryId')
   @UseGuards(UserGuard)
-  @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
+  @UseInterceptors(
+    new ResponseInterceptorArray(OutPutListProductByCategorieDto, 'products'),
+  )
   async listProductsByCategorie(
     @Param('categoryId') categoryId: string,
-  ): Promise<ResponseListProductDTO> {
+  ): Promise<OutPutListProductByCategorieDto> {
     const products =
       await this.productService.listProductByCategory(categoryId);
-    return products.map((product) => {
-      return {
-        _id: product.id,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price,
-        category: product.category,
-        discount: product.discount,
-        priceInDiscount: product.priceInDiscount,
-        ingredients: product.ingredients,
-      };
-    });
+    return {
+      products: products.map((product) => {
+        return {
+          _id: product._id,
+          name: product.name,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          category: product.category,
+          discount: product.discount,
+          priceInDiscount: product.priceInDiscount,
+          ingredients: product.ingredients,
+        };
+      }),
+    };
   }
 
   @Delete('/:productId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(deleteProductSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async deleteProduct(
     @Param('productId') productId: string,
-  ): Promise<ResponseDeleteProductDTO> {
+  ): Promise<OutPutMessageDto> {
     await this.productService.deleteProduct(productId);
     return {
       message: 'Produto deletado com sucesso !',
@@ -120,11 +117,11 @@ export class ProductController {
   @Put('/:productId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(updateProductSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async updateProduct(
     @Param('productId') productId: string,
     @Body() updateProduct: UpdateProductDto,
-  ): Promise<ResponseUpdateProductDTO> {
+  ): Promise<OutPutMessageDto> {
     await this.productService.updateProduct(productId, updateProduct);
     return {
       message: 'Produto atualizado com sucesso !',
@@ -134,11 +131,11 @@ export class ProductController {
   @Patch('/discount/add/:productId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(discountsProductSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async putProductInDiscount(
     @Param('productId') productId: string,
     @Body() newPrice: { newPrice: number },
-  ): Promise<ResponseDiscountsProductDTO> {
+  ): Promise<OutPutMessageDto> {
     await this.productService.productInDiscount(productId, newPrice.newPrice);
     return {
       message: 'Desconto adicionado ao produto',
@@ -148,10 +145,10 @@ export class ProductController {
   @Patch('/discount/remove/:productId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(discountsProductSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async removeProductInDiscount(
     @Param('productId') productId: string,
-  ): Promise<ResponseDiscountsProductDTO> {
+  ): Promise<OutPutMessageDto> {
     await this.productService.removeDiscountOfProduct(productId);
     return {
       message: 'Desconto removido do produto',
@@ -160,21 +157,25 @@ export class ProductController {
 
   @Get('/discount/products')
   @UseGuards(UserGuard)
-  @UseInterceptors(new ResponseInterceptor(listProductSchemaRes))
-  async getDiscountProducts(): Promise<ResponseListProductDTO> {
+  @UseInterceptors(
+    new ResponseInterceptorArray(OutPutDiscountProductDto, 'products'),
+  )
+  async getDiscountProducts(): Promise<OutPutDiscountProductDto> {
     const products = await this.productService.getAllDiscountProducts();
-    return products.map((product) => {
-      return {
-        _id: product.id,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price,
-        category: product.category,
-        discount: product.discount,
-        priceInDiscount: product.priceInDiscount,
-        ingredients: product.ingredients,
-      };
-    });
+    return {
+      products: products.map((product) => {
+        return {
+          _id: product._id,
+          name: product.name,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          category: product.category,
+          discount: product.discount,
+          priceInDiscount: product.priceInDiscount,
+          ingredients: product.ingredients,
+        };
+      }),
+    };
   }
 }

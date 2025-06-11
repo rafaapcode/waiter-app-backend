@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Product } from '@shared/types/Product.type';
+import { Product, ProductType } from '@shared/types/Product.type';
 import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 
 @Injectable()
@@ -17,7 +17,9 @@ export class ProductService {
     private readonly orderRepository: OrderRepository,
   ) {}
 
-  async createProduct(productData: CreateProductDto): Promise<Product> {
+  async createProduct(
+    productData: CreateProductDto,
+  ): Promise<ProductType<string, string>> {
     try {
       const productExists = await this.productRepository.productExists(
         productData.name,
@@ -27,7 +29,7 @@ export class ProductService {
           `${productData.name} já existe, crie um produto com nome diferente.`,
         );
       }
-      const product = await this.productRepository.crateProduct({
+      const product = await this.productRepository.createProduct({
         ...productData,
         imageUrl:
           productData.imageUrl ||
@@ -53,7 +55,20 @@ export class ProductService {
     }
   }
 
-  async listProduct(): Promise<Product[]> {
+  async listProduct(): Promise<
+    ProductType<
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      },
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      }
+    >[]
+  > {
     try {
       const products = await this.productRepository.listProducts();
 
@@ -83,7 +98,9 @@ export class ProductService {
     }
   }
 
-  async listProductByCategory(categoryId: string): Promise<Product[]> {
+  async listProductByCategory(
+    categoryId: string,
+  ): Promise<ProductType<string, string>[]> {
     try {
       const products =
         await this.productRepository.listProductsByCategorie(categoryId);
@@ -239,7 +256,7 @@ export class ProductService {
     }
   }
 
-  async getAllDiscountProducts(): Promise<Product[]> {
+  async getAllDiscountProducts(): Promise<ProductType<string, string>[]> {
     try {
       const products = await this.productRepository.returnAllDiscountProducts();
 
@@ -265,7 +282,20 @@ export class ProductService {
     }
   }
 
-  async getProduct(productId: string): Promise<Product> {
+  async getProduct(productId: string): Promise<
+    ProductType<
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      },
+      {
+        _id: string;
+        name: string;
+        icon: string;
+      }
+    >
+  > {
     try {
       const product = await this.productRepository.getProduct(productId);
 
