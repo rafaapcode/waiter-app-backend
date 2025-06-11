@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { JwtPayload } from '@shared/types/express';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
@@ -23,28 +23,15 @@ import {
   UpdateCurrentUserDto,
   UpdateUserDto,
 } from './dto/Input.dto';
-import { ResponseCreateUserDTO } from './dto/response-create-user';
 import {
-  deleteUserSchemaRes,
-  ResponseDeleteUserDTO,
-} from './dto/response-delete-user';
-import { getUserSchemaRes, ResponseGetUserDTO } from './dto/response-get-user';
-import {
-  getAllUsersSchemaRes,
-  ResponseGetAllUsersDTO,
-} from './dto/response-getall-users';
-import {
-  getCurrentUserSchemaRes,
-  ResponseGetCurrentUserDTO,
-} from './dto/response-getcurrent-user';
-import {
-  ResponseUpdateCurrentUserDTO,
-  updateCurrentUserSchemaRes,
-} from './dto/response-update-current-user';
-import {
-  ResponseUpdateUserDTO,
-  updateUserSchemaRes,
-} from './dto/response-update-user';
+  OutPutCreateUserDto,
+  OutPutGetAllUsersDto,
+  OutPutGetCurrentUserDto,
+  OutPutGetUserDto,
+  OutPutMessageDto,
+  OutPutUpdateCurrentUserDto,
+  OutPutUpdateUserDto,
+} from './dto/OutPut.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -54,20 +41,21 @@ export class UserController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
+  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateUserDto))
   async createUser(
     @Body() userPayload: CreateUserDto,
-  ): Promise<ResponseCreateUserDTO> {
+  ): Promise<OutPutCreateUserDto> {
     return await this.userService.create(userPayload);
   }
 
   @Put('current')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(updateCurrentUserSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateCurrentUserDto))
   async updateCurrentUser(
     @CurrentUser() user: JwtPayload,
     @Body() userPayload: UpdateCurrentUserDto,
-  ): Promise<ResponseUpdateCurrentUserDTO> {
+  ): Promise<OutPutUpdateCurrentUserDto> {
     if (!user) {
       throw new InternalServerErrorException(
         'Usuário não encontrado na requisição',
@@ -80,11 +68,11 @@ export class UserController {
   @Put(':id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(updateUserSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateUserDto))
   async updateUser(
     @Param('id') id: string,
     @Body() userPayload: UpdateUserDto,
-  ): Promise<ResponseUpdateUserDTO> {
+  ): Promise<OutPutUpdateUserDto> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
     }
@@ -95,8 +83,8 @@ export class UserController {
   @Delete(':id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(deleteUserSchemaRes))
-  async deleteUser(@Param('id') id: string): Promise<ResponseDeleteUserDTO> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  async deleteUser(@Param('id') id: string): Promise<OutPutMessageDto> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
     }
@@ -107,21 +95,21 @@ export class UserController {
   @Get('all/:page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(getAllUsersSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutGetAllUsersDto))
   async getAllUser(
     @CurrentUser() user: JwtPayload,
     @Param('page', ParseIntPipe) page: number,
-  ): Promise<ResponseGetAllUsersDTO> {
+  ): Promise<OutPutGetAllUsersDto> {
     return await this.userService.getAllUsers(user.id, page);
   }
 
   @Get('current')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(getCurrentUserSchemaRes))
+  @UseInterceptors(new ResponseInterceptorNew(OutPutGetCurrentUserDto))
   async getCurrentUser(
     @CurrentUser() user: JwtPayload,
-  ): Promise<ResponseGetCurrentUserDTO> {
+  ): Promise<OutPutGetCurrentUserDto> {
     if (!user) {
       throw new InternalServerErrorException(
         'Usuário não encontrado na requisição',
@@ -133,12 +121,11 @@ export class UserController {
   @Get(':id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(getUserSchemaRes))
-  async getUser(@Param('id') id: string): Promise<ResponseGetUserDTO> {
+  @UseInterceptors(new ResponseInterceptorNew(OutPutGetUserDto))
+  async getUser(@Param('id') id: string): Promise<OutPutGetUserDto> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
     }
-
     return await this.userService.getUser(id);
   }
 }
