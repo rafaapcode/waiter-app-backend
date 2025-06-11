@@ -19,7 +19,7 @@ export interface Org extends Document {
   readonly user: Schema.Types.ObjectId | User;
 }
 
-export type OrgType = {
+export type OrgType<Tuser = string> = {
   _id?: string;
   name: string;
   email: string;
@@ -35,5 +35,5 @@ export type OrgType = {
     type?: 'Point';
     coordinates?: [number, number];
   };
-  user: Schema.Types.ObjectId | User;
+  user: Tuser;
 };

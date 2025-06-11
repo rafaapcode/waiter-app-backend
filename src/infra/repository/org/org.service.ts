@@ -1,7 +1,6 @@
 import { CreateOrgDTO, UpdateOrgDTO } from '@core/http/org/dto/Input.dto';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Org, OrgType } from '@shared/types/Org.type';
-import { User } from '@shared/types/User.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -26,7 +25,7 @@ export class OrgRepository {
       openHour: newOrg.openHour,
       street: newOrg.street,
       name: newOrg.name,
-      user: newOrg.user,
+      user: newOrg.user.toString(),
       _id: newOrg.id,
     };
   }
@@ -54,7 +53,7 @@ export class OrgRepository {
       openHour: newOrg.openHour,
       street: newOrg.street,
       name: newOrg.name,
-      user: newOrg.user,
+      user: newOrg.user.toString(),
       _id: newOrg.id,
     };
   }
@@ -65,22 +64,20 @@ export class OrgRepository {
     if (!orgById) {
       throw new NotFoundException('Organização não encontrada');
     }
-
-    const orgPopulatedWithUser = await orgById.populate('user', 'name email');
     return {
-      description: orgPopulatedWithUser.description,
-      email: orgPopulatedWithUser.email,
-      imageUrl: orgPopulatedWithUser.imageUrl,
-      cep: orgPopulatedWithUser.cep,
-      city: orgPopulatedWithUser.city,
-      closeHour: orgPopulatedWithUser.closeHour,
-      location: orgPopulatedWithUser.location,
-      neighborhood: orgPopulatedWithUser.neighborhood,
-      openHour: orgPopulatedWithUser.openHour,
-      street: orgPopulatedWithUser.street,
-      name: orgPopulatedWithUser.name,
-      user: orgPopulatedWithUser.user as User,
-      _id: orgPopulatedWithUser.id,
+      description: orgById.description,
+      email: orgById.email,
+      imageUrl: orgById.imageUrl,
+      cep: orgById.cep,
+      city: orgById.city,
+      closeHour: orgById.closeHour,
+      location: orgById.location,
+      neighborhood: orgById.neighborhood,
+      openHour: orgById.openHour,
+      street: orgById.street,
+      name: orgById.name,
+      user: orgById.user.toString(),
+      _id: orgById.id,
     };
   }
 
@@ -113,7 +110,7 @@ export class OrgRepository {
         openHour: org.openHour,
         street: org.street,
         name: org.name,
-        user: org.user,
+        user: org.user.toString(),
         _id: org.id,
       };
     });

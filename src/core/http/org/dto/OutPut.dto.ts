@@ -2,7 +2,6 @@ import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
-  ArrayMinSize,
   IsArray,
   IsEmail,
   IsMongoId,
@@ -20,24 +19,6 @@ export class OutPutMessageDto {
   @IsNotEmpty()
   message: string;
 }
-// {
-//     _id?: string;
-//     name: string;
-//     email: string;
-//     imageUrl: string;
-//     description: string;
-//     openHour: string;
-//     closeHour: string;
-//     cep: string;
-//     city: string;
-//     neighborhood: string;
-//     street: string;
-//     location: {
-//         type?: "Point";
-//         coordinates?: [number, number];
-//     };
-//     user: Schema.Types.ObjectId | User;
-// }
 
 class location {
   @IsString()
@@ -50,7 +31,6 @@ class location {
     {},
     { each: true, message: 'coordinates deve conter apenas números' },
   )
-  @ArrayMinSize(2, { message: 'coordinates deve ter exatamente 2 elementos' })
   @ArrayMaxSize(2, { message: 'coordinates deve ter exatamente 2 elementos' })
   @IsOptional()
   coordinates?: [number, number];
@@ -112,8 +92,9 @@ class orgDto {
   @IsNotEmpty({ message: 'street é obrigatório' })
   street: string;
 
-  @IsNotEmpty({ message: 'user é obrigatório' })
-  user: any;
+  @IsString({ message: '_id deve ser uma string' })
+  @IsMongoId()
+  user: string;
 }
 
 export class OutPutCreateOrgDto extends orgDto {}

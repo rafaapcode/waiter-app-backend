@@ -27,7 +27,6 @@ export class ResponseInterceptorNew<T extends object, TClass extends object>
             error: JSON.stringify(validation),
           });
         }
-
         return data;
       }),
     );
