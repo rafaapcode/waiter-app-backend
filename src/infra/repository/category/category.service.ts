@@ -39,9 +39,9 @@ export class CategoryRepository {
     }
   }
 
-  async listCategory(): Promise<Category[]> {
+  async listCategory(orgId: string): Promise<Category[]> {
     try {
-      const categories = await this.categoryModel.find();
+      const categories = await this.categoryModel.find({ org: orgId });
 
       return categories;
     } catch (error) {
@@ -55,9 +55,9 @@ export class CategoryRepository {
     }
   }
 
-  async findCategoryByName(name: string): Promise<boolean> {
+  async findCategoryByName(name: string, orgId: string): Promise<boolean> {
     try {
-      const category = await this.categoryModel.findOne({ name });
+      const category = await this.categoryModel.findOne({ name, org: orgId });
 
       if (!category) {
         return false;

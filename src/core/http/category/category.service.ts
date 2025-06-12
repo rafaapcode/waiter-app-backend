@@ -21,6 +21,7 @@ export class CategoryService {
     try {
       const categoryExist = await this.categoryRepository.findCategoryByName(
         data.name,
+        data.org,
       );
 
       if (categoryExist) {
@@ -43,9 +44,9 @@ export class CategoryService {
     }
   }
 
-  async listCategory(): Promise<Category[]> {
+  async listCategory(orgId: string): Promise<Category[]> {
     try {
-      const categories = await this.categoryRepository.listCategory();
+      const categories = await this.categoryRepository.listCategory(orgId);
 
       if (categories.length === 0) {
         throw new HttpException(null, 204);

@@ -26,13 +26,15 @@ import {
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Get('/categories')
+  @Get('/categories/:orgId')
   @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListCategoryDto, 'categories'),
   )
-  async listCategories(): Promise<OutPutListCategoryDto> {
-    const categories = await this.categoryService.listCategory();
+  async listCategories(
+    @Param('orgId') orgId: string,
+  ): Promise<OutPutListCategoryDto> {
+    const categories = await this.categoryService.listCategory(orgId);
 
     return {
       categories: categories.map((cat) => ({
