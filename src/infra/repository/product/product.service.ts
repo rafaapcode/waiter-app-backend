@@ -27,10 +27,15 @@ export class ProductRepository {
       const product = await this.productModel.create(productData);
       const ingredients = product.ingredients.map((id) => id.toString());
       return {
-        ...product,
         _id: product.id,
         ingredients,
         category: product.category.toString(),
+        description: product.description,
+        discount: product.discount,
+        imageUrl: product.imageUrl,
+        name: product.name,
+        price: product.price,
+        priceInDiscount: product.priceInDiscount,
       };
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -46,7 +51,7 @@ export class ProductRepository {
     }
   }
 
-  async listProducts(): Promise<
+  async listProducts(orgId: string): Promise<
     ProductType<
       {
         _id: string;
@@ -62,9 +67,10 @@ export class ProductRepository {
   > {
     try {
       const products = await this.productModel
-        .find()
+        .find({ org: orgId })
         .populate('ingredients', '_id name icon')
         .populate('category', '_id name icon');
+
       return products.map((p) => {
         const cat = p.category as {
           _id: Schema.Types.ObjectId;
@@ -72,20 +78,27 @@ export class ProductRepository {
           icon: string;
         };
         const categorie = {
-          ...cat,
           _id: cat._id.toString(),
+          name: cat.name,
+          icon: cat.icon,
         };
 
         const ingredients = p.ingredients.map((ing) => ({
-          ...ing,
           _id: ing._id.toString(),
+          name: ing.name,
+          icon: ing.icon,
         }));
 
         return {
-          ...p,
           _id: p._id.toString(),
           category: categorie,
           ingredients,
+          description: p.description,
+          discount: p.discount,
+          imageUrl: p.imageUrl,
+          name: p.name,
+          price: p.price,
+          priceInDiscount: p.priceInDiscount,
         };
       });
     } catch (error) {
@@ -103,13 +116,14 @@ export class ProductRepository {
   }
 
   async listProductsByCategorie(
+    orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
     try {
-      const products = await this.productModel
-        .find()
-        .where('category')
-        .equals(categoryId);
+      const products = await this.productModel.find({
+        org: orgId,
+        category: categoryId,
+      });
 
       return products.map((p) => ({
         ...p,
@@ -131,9 +145,9 @@ export class ProductRepository {
     }
   }
 
-  async productExists(name: string): Promise<boolean> {
+  async productExists(name: string, orgId: string): Promise<boolean> {
     try {
-      const product = await this.productModel.findOne({ name });
+      const product = await this.productModel.findOne({ name, org: orgId });
       if (!product) {
         return false;
       }
@@ -252,9 +266,14 @@ export class ProductRepository {
     }
   }
 
-  async returnAllDiscountProducts(): Promise<ProductType<string, string>[]> {
+  async returnAllDiscountProducts(
+    orgId: string,
+  ): Promise<ProductType<string, string>[]> {
     try {
-      const products = await this.productModel.where('discount', true).find();
+      const products = await this.productModel.find({
+        discount: true,
+        org: orgId,
+      });
       return products.map((p) => ({
         ...p,
         _id: p._id.toString(),
@@ -340,9 +359,13 @@ export class ProductRepository {
     return allProductsExists;
   }
 
-  async categoryIsBeingUsed(categoryId: string): Promise<boolean> {
+  async categoryIsBeingUsed(
+    categoryId: string,
+    orgId: string,
+  ): Promise<boolean> {
     const productWithCategory = await this.productModel.findOne({
       category: categoryId,
+      org: orgId,
     });
 
     if (productWithCategory) {

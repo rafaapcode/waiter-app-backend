@@ -49,6 +49,11 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsMongoId()
   category: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
+  org: string;
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {

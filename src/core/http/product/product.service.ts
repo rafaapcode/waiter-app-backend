@@ -23,6 +23,7 @@ export class ProductService {
     try {
       const productExists = await this.productRepository.productExists(
         productData.name,
+        productData.org,
       );
       if (productExists) {
         throw new BadRequestException(
@@ -39,7 +40,6 @@ export class ProductService {
       if (!product) {
         throw new InternalServerErrorException('Erro ao criar o produto');
       }
-
       return product;
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -55,7 +55,7 @@ export class ProductService {
     }
   }
 
-  async listProduct(): Promise<
+  async listProduct(orgId: string): Promise<
     ProductType<
       {
         _id: string;
@@ -70,7 +70,7 @@ export class ProductService {
     >[]
   > {
     try {
-      const products = await this.productRepository.listProducts();
+      const products = await this.productRepository.listProducts(orgId);
 
       if (!products) {
         throw new NotFoundException('Nenhum produto encontrado');
@@ -99,11 +99,14 @@ export class ProductService {
   }
 
   async listProductByCategory(
+    orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
     try {
-      const products =
-        await this.productRepository.listProductsByCategorie(categoryId);
+      const products = await this.productRepository.listProductsByCategorie(
+        orgId,
+        categoryId,
+      );
 
       if (!products) {
         throw new NotFoundException(
@@ -256,9 +259,12 @@ export class ProductService {
     }
   }
 
-  async getAllDiscountProducts(): Promise<ProductType<string, string>[]> {
+  async getAllDiscountProducts(
+    orgId: string,
+  ): Promise<ProductType<string, string>[]> {
     try {
-      const products = await this.productRepository.returnAllDiscountProducts();
+      const products =
+        await this.productRepository.returnAllDiscountProducts(orgId);
 
       if (products.length === 0) {
         throw new HttpException(null, 204);

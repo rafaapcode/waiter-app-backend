@@ -86,10 +86,10 @@ export class CategoryService {
     }
   }
 
-  async deleteCategory(categoryId: string): Promise<boolean> {
+  async deleteCategory(orgId: string, categoryId: string): Promise<boolean> {
     try {
       const categoryIsBeingUsed =
-        await this.productRepository.categoryIsBeingUsed(categoryId);
+        await this.productRepository.categoryIsBeingUsed(categoryId, orgId);
 
       if (categoryIsBeingUsed) {
         throw new BadRequestException(

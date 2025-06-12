@@ -30,13 +30,15 @@ import { ProductService } from './product.service';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get('')
+  @Get(':orgId')
   @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListProductDto, 'products'),
   )
-  async listProducts(): Promise<OutPutListProductDto> {
-    const products = await this.productService.listProduct();
+  async listProducts(
+    @Param('orgId') orgId: string,
+  ): Promise<OutPutListProductDto> {
+    const products = await this.productService.listProduct(orgId);
     return {
       products: products.map((product) => {
         return {
@@ -74,16 +76,19 @@ export class ProductController {
     return await this.productService.createProduct(productData);
   }
 
-  @Get('categorie/:categoryId')
+  @Get('categorie/:categoryId/:orgId')
   @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListProductByCategorieDto, 'products'),
   )
   async listProductsByCategorie(
-    @Param('categoryId') categoryId: string,
+    @Param() params: { categoryId: string; orgId: string },
   ): Promise<OutPutListProductByCategorieDto> {
-    const products =
-      await this.productService.listProductByCategory(categoryId);
+    const { categoryId, orgId } = params;
+    const products = await this.productService.listProductByCategory(
+      orgId,
+      categoryId,
+    );
     return {
       products: products.map((product) => {
         return {
@@ -155,13 +160,15 @@ export class ProductController {
     };
   }
 
-  @Get('/discount/products')
+  @Get('/discount/products/:orgId')
   @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutDiscountProductDto, 'products'),
   )
-  async getDiscountProducts(): Promise<OutPutDiscountProductDto> {
-    const products = await this.productService.getAllDiscountProducts();
+  async getDiscountProducts(
+    @Param('orgId') orgId: string,
+  ): Promise<OutPutDiscountProductDto> {
+    const products = await this.productService.getAllDiscountProducts(orgId);
     return {
       products: products.map((product) => {
         return {

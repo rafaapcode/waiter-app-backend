@@ -82,14 +82,15 @@ export class CategoryController {
     };
   }
 
-  @Delete('/:categoryId')
+  @Delete('/:categoryId/:orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
   async deleteCategory(
-    @Param('categoryId') categoryId: string,
+    @Param() params: { categoryId: string; orgId: string },
   ): Promise<OutPutMessageDto> {
-    await this.categoryService.deleteCategory(categoryId);
+    const { categoryId, orgId } = params;
+    await this.categoryService.deleteCategory(orgId, categoryId);
     return {
       message: 'Categoria deletada com sucesso !',
     };
