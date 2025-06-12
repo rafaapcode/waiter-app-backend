@@ -240,7 +240,6 @@ class listProductByCategorieDto {
   price: number;
 
   @IsArray({ message: 'ingredients deve ser um array' })
-  @ValidateNested({ each: true })
   @IsMongoId({ each: true })
   ingredients: string[];
 

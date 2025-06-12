@@ -126,10 +126,15 @@ export class ProductRepository {
       });
 
       return products.map((p) => ({
-        ...p,
         _id: p._id.toString(),
         category: p.category.toString(),
         ingredients: p.ingredients.map((id) => id.toString()),
+        description: p.description,
+        discount: p.discount,
+        imageUrl: p.imageUrl,
+        name: p.name,
+        price: p.price,
+        priceInDiscount: p.priceInDiscount,
       }));
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -275,10 +280,15 @@ export class ProductRepository {
         org: orgId,
       });
       return products.map((p) => ({
-        ...p,
         _id: p._id.toString(),
         category: p.category.toString(),
         ingredients: p.ingredients.map((id) => id.toString()),
+        description: p.description,
+        discount: p.discount,
+        imageUrl: p.imageUrl,
+        name: p.name,
+        price: p.price,
+        priceInDiscount: p.priceInDiscount,
       }));
     } catch (error) {
       if (error instanceof BadRequestException) {
