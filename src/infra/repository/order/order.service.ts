@@ -90,10 +90,10 @@ export class OrderRepository {
     }
   }
 
-  async listOrders(): Promise<Order[]> {
+  async listOrders(orgId: string): Promise<Order[]> {
     try {
       const orders = await this.orderModel
-        .find({ deletedAt: null })
+        .find({ deletedAt: null, org: orgId })
         .sort({ createdAt: -1 })
         .populate('products.product', '_id name description imageUrl category')
         .select('_id table status products createdAt');
@@ -113,7 +113,7 @@ export class OrderRepository {
     }
   }
 
-  async restartDay(): Promise<boolean> {
+  async restartDay(orgId: string): Promise<boolean> {
     try {
       const { start, end } = getTodayRange();
 
@@ -121,7 +121,7 @@ export class OrderRepository {
         {
           $and: [
             { createdAt: { $gte: start, $lte: end } },
-            { deletedAt: null },
+            { deletedAt: null, org: orgId },
           ],
         },
         { deletedAt: new Date() },
@@ -147,6 +147,7 @@ export class OrderRepository {
   }
 
   async historyOfOrders(
+    orgId: string,
     page?: number,
   ): Promise<{ total_pages: number; orders: Order[] }> {
     try {
@@ -157,7 +158,7 @@ export class OrderRepository {
       const countDocs = await this.orderModel.countDocuments();
 
       const orders = await this.orderModel
-        .find()
+        .find({ org: orgId })
         .skip(skip)
         .limit(limit)
         .populate({
@@ -189,6 +190,7 @@ export class OrderRepository {
   }
 
   async historyOfOrdersWithFilters(
+    orgId: string,
     filters: { to: Date; from: Date },
     page?: number,
   ): Promise<{ total_pages: number; orders: Order[] }> {
@@ -198,6 +200,7 @@ export class OrderRepository {
       const skip = (pageNumber - 1) * limit;
 
       const countDocs = await this.orderModel.countDocuments({
+        org: orgId,
         createdAt: {
           $gte: filters.from,
           $lte: subHours(endOfDay(filters.to), 3),
@@ -206,6 +209,7 @@ export class OrderRepository {
 
       const orders = await this.orderModel
         .find({
+          org: orgId,
           createdAt: {
             $gte: filters.from,
             $lte: subHours(endOfDay(filters.to), 3),

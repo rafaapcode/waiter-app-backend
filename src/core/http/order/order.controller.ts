@@ -6,7 +6,6 @@ import {
   Get,
   HttpCode,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -32,44 +31,51 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Get('history/:page')
+  @Get('history/:page/:orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptorNew(OutPutHistoryOrderDto))
   async historyOfOrders(
-    @Param('page', ParseIntPipe) page: number,
+    @Param() params: { page: string; orgId: string },
   ): Promise<OutPutHistoryOrderDto> {
-    const orders = await this.orderService.historyPage(page);
+    const { orgId, page } = params;
+    const pageParsed = parseInt(page);
+    const orders = await this.orderService.historyPage(orgId, pageParsed);
     return orders;
   }
 
-  @Get('history/filter/:page')
+  @Get('history/filter/:page/:orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptorNew(OutPutHistoryOrderDto))
   async historyOfOrdersFiltered(
-    @Param('page', ParseIntPipe) page: number,
+    @Param() params: { page: string; orgId: string },
     @Query() filters: { to: Date; from: Date },
   ): Promise<OutPutHistoryOrderDto> {
     if (!filters.to || !filters.from) {
       throw new BadRequestException('Os filtros de data são obrigatórios');
     }
+    const { orgId, page } = params;
+    const pageParsed = parseInt(page);
     const orders = await this.orderService.historyFilterPage(
+      orgId,
       {
         from: new Date(filters.from),
         to: new Date(filters.to),
       },
-      page,
+      pageParsed,
     );
     return orders;
   }
 
-  @Get('')
+  @Get(':orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptorArray(OutPutListOrdersDto, 'orders'))
-  async listOrders(): Promise<OutPutListOrdersDto> {
-    const orders = await this.orderService.listOrders();
+  async listOrders(
+    @Param('orgId') orgId: string,
+  ): Promise<OutPutListOrdersDto> {
+    const orders = await this.orderService.listOrders(orgId);
     return {
       orders: orders.map((order) => ({
         _id: order.id,
@@ -142,13 +148,13 @@ export class OrderController {
     };
   }
 
-  @Patch('')
+  @Patch('/restart/:orgId')
   @HttpCode(200)
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
-  async restartDay(): Promise<OutPutMessageDto> {
-    await this.orderService.restartDay();
+  async restartDay(@Param('orgId') orgId: string): Promise<OutPutMessageDto> {
+    await this.orderService.restartDay(orgId);
     return {
       message: 'Dia reiniciado com sucesso !',
     };

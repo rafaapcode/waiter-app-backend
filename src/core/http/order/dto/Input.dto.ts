@@ -31,6 +31,11 @@ export class CreateOrderDto {
   @MinLength(2, { message: 'Nome da mesa deve ter ao menos 1 caractere' })
   table: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
+  org: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => OrderDto)

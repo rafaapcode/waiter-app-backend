@@ -64,6 +64,7 @@ export class OrderService {
       const newOrder: INewOrder = {
         table: createOrderData.table,
         products: [],
+        org: createOrderData.org,
       };
 
       for (const productInfo of allProductsExists) {
@@ -123,9 +124,9 @@ export class OrderService {
     }
   }
 
-  async listOrders(): Promise<Order[]> {
+  async listOrders(orgId: string): Promise<Order[]> {
     try {
-      const orders = await this.orderRepository.listOrders();
+      const orders = await this.orderRepository.listOrders(orgId);
       if (!orders) {
         throw new InternalServerErrorException('Erro ao listar os pedidos');
       }
@@ -152,9 +153,9 @@ export class OrderService {
     }
   }
 
-  async restartDay(): Promise<boolean> {
+  async restartDay(orgId: string): Promise<boolean> {
     try {
-      const orders = await this.orderRepository.restartDay();
+      const orders = await this.orderRepository.restartDay(orgId);
 
       if (orders) {
         this.orderWs.server.emit('orders@restart_day');
@@ -179,11 +180,12 @@ export class OrderService {
   }
 
   async historyPage(
+    orgId: string,
     page: number,
   ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
     try {
       const { total_pages, orders } =
-        await this.orderRepository.historyOfOrders(page);
+        await this.orderRepository.historyOfOrders(orgId, page);
 
       if (orders && orders.length === 0) {
         throw new NotFoundException('Nenhum pedido encontrado!');
@@ -211,12 +213,17 @@ export class OrderService {
   }
 
   async historyFilterPage(
+    orgId: string,
     filters: { to: Date; from: Date },
     page: number,
   ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
     try {
       const { total_pages, orders } =
-        await this.orderRepository.historyOfOrdersWithFilters(filters, page);
+        await this.orderRepository.historyOfOrdersWithFilters(
+          orgId,
+          filters,
+          page,
+        );
 
       if (orders && orders.length === 0) {
         throw new NotFoundException('Nenhum pedido encontrado!');
