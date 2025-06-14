@@ -1,7 +1,6 @@
 import { UserRepository } from '@infra/repository/user/user.service';
 import {
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -46,17 +45,13 @@ export class AuthenticationService {
     email: string,
     role: string,
   ): Promise<string> {
-    try {
-      return await this.jwtService.signAsync(
-        { id, email, role },
-        {
-          expiresIn: '1d',
-          secret: env.JWT_SECRET,
-        },
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    return await this.jwtService.signAsync(
+      { id, email, role },
+      {
+        expiresIn: '1d',
+        secret: env.JWT_SECRET,
+      },
+    );
   }
 
   async verifyToken(
