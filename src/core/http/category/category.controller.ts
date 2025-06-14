@@ -9,8 +9,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
-import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -48,7 +48,7 @@ export class CategoryController {
   @Post('/categories')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateCategoryDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutCreateCategoryDto))
   async createCategory(
     @Body() categoryData: CreateCategoryDto,
   ): Promise<OutPutCreateCategoryDto> {
@@ -65,7 +65,7 @@ export class CategoryController {
   @Put('/categories/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async editCategory(
     @Param('id') id: string,
     @Body() editData: EditCategoryDto,
@@ -85,7 +85,7 @@ export class CategoryController {
   @Delete('/:categoryId/:orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteCategory(
     @Param() params: { categoryId: string; orgId: string },
   ): Promise<OutPutMessageDto> {

@@ -6,7 +6,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { AuthenticationService } from './authentication.service';
 import { SignInUserDto } from './dto/Input.dto';
 import { OutputUserDto } from './dto/OutPut.dto';
@@ -17,7 +17,7 @@ export class AuthenticationController {
 
   @Post('signin')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(new ResponseInterceptorNew(OutputUserDto))
+  @UseInterceptors(new ResponseInterceptor(OutputUserDto))
   async login(@Body() signInUser: SignInUserDto): Promise<OutputUserDto> {
     const data = await this.authenticationService.signInUser(signInUser);
 

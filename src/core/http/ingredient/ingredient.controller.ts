@@ -8,7 +8,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';
 import {
   OutPutCreateIngredientDto,
@@ -23,13 +23,13 @@ export class IngredientController {
   constructor(private ingredientsService: IngredientService) {}
 
   @Get()
-  @UseInterceptors(new ResponseInterceptorNew(OutPutGetAllIngredientsDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutGetAllIngredientsDto))
   async getAll(): Promise<OutPutGetAllIngredientsDto> {
     return await this.ingredientsService.getAllIngredients();
   }
 
   @Post()
-  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateIngredientDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutCreateIngredientDto))
   async createIngredient(
     @Body() data: CreateIngredientDto,
   ): Promise<OutPutCreateIngredientDto> {
@@ -38,7 +38,7 @@ export class IngredientController {
 
   @Post('verify')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutVerifyIngredientsDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutVerifyIngredientsDto))
   async verifyIngredients(
     @Body() data: { ingredients: string[] },
   ): Promise<OutPutVerifyIngredientsDto> {
@@ -47,7 +47,7 @@ export class IngredientController {
 
   @Post('create-many')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateManyIngredientsDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutCreateManyIngredientsDto))
   async createManyIngredients(
     @Body() data: CreateManyIngredientDto,
   ): Promise<OutPutCreateManyIngredientsDto> {

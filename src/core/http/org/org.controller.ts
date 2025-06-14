@@ -10,8 +10,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
-import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { JwtPayload } from '@shared/types/express';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
@@ -34,7 +34,7 @@ export class OrgController {
   @Delete('/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteOrg(@Param('id') id: string): Promise<OutPutMessageDto> {
     const deleted = await this.orgService.deleteOrg(id);
     if (!deleted) {
@@ -46,7 +46,7 @@ export class OrgController {
   @Put('/:id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateOrgDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutUpdateOrgDto))
   async updateOrg(
     @Param('id') id: string,
     @Body() orgData: UpdateOrgDTO,
@@ -57,7 +57,7 @@ export class OrgController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateOrgDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutCreateOrgDto))
   async createOrg(@Body() orgData: CreateOrgDTO): Promise<OutPutCreateOrgDto> {
     return await this.orgService.createOrg(orgData);
   }
@@ -78,7 +78,7 @@ export class OrgController {
   @Get('/:orgid')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutGetOrgDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutGetOrgDto))
   async getOrg(@Param('orgid') orgid: string): Promise<OutPutGetOrgDto> {
     return await this.orgService.getOrgId(orgid);
   }

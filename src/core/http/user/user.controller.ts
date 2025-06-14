@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { JwtPayload } from '@shared/types/express';
 import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
 import { Roles } from '../authentication/decorators/role.decorator';
@@ -41,7 +41,7 @@ export class UserController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateUserDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutCreateUserDto))
   async createUser(
     @Body() userPayload: CreateUserDto,
   ): Promise<OutPutCreateUserDto> {
@@ -51,7 +51,7 @@ export class UserController {
   @Put('current')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateCurrentUserDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutUpdateCurrentUserDto))
   async updateCurrentUser(
     @CurrentUser() user: JwtPayload,
     @Body() userPayload: UpdateCurrentUserDto,
@@ -68,7 +68,7 @@ export class UserController {
   @Put(':id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateUserDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutUpdateUserDto))
   async updateUser(
     @Param('id') id: string,
     @Body() userPayload: UpdateUserDto,
@@ -83,7 +83,7 @@ export class UserController {
   @Delete(':id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteUser(@Param('id') id: string): Promise<OutPutMessageDto> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
@@ -95,7 +95,7 @@ export class UserController {
   @Get('all/:page')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutGetAllUsersDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutGetAllUsersDto))
   async getAllUser(
     @CurrentUser() user: JwtPayload,
     @Param('page', ParseIntPipe) page: number,
@@ -106,7 +106,7 @@ export class UserController {
   @Get('current')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutGetCurrentUserDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutGetCurrentUserDto))
   async getCurrentUser(
     @CurrentUser() user: JwtPayload,
   ): Promise<OutPutGetCurrentUserDto> {
@@ -121,7 +121,7 @@ export class UserController {
   @Get(':id')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutGetUserDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutGetUserDto))
   async getUser(@Param('id') id: string): Promise<OutPutGetUserDto> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');

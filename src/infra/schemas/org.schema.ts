@@ -14,8 +14,6 @@ export const OrgSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
-    index: true,
     validate: {
       validator: function (value: string) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);

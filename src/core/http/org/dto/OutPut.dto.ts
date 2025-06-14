@@ -57,8 +57,8 @@ class orgDto {
     },
     { message: 'imageUrl deve ser uma URL válida' },
   )
-  @IsNotEmpty({ message: 'imageUrl é obrigatório' })
-  imageUrl: string;
+  @IsOptional()
+  imageUrl?: string;
 
   @IsString({ message: 'description deve ser uma string' })
   @IsNotEmpty({ message: 'description é obrigatório' })

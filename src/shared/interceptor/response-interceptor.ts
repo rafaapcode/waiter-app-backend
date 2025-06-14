@@ -10,7 +10,7 @@ import { validateSync } from 'class-validator';
 import { Observable, switchMap } from 'rxjs';
 
 @Injectable()
-export class ResponseInterceptorNew<T extends object, TClass extends object>
+export class ResponseInterceptor<T extends object, TClass extends object>
   implements NestInterceptor<any, T>
 {
   constructor(private readonly validator: ClassConstructor<TClass>) {}
@@ -18,7 +18,6 @@ export class ResponseInterceptorNew<T extends object, TClass extends object>
   intercept(context: ExecutionContext, next: CallHandler): Observable<T> {
     return next.handle().pipe(
       switchMap(async (data) => {
-        console.log(data);
         const objectToValidate = plainToInstance(this.validator, data, {
           enableCircularCheck: true,
         });

@@ -12,8 +12,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
-import { ResponseInterceptorNew } from '@shared/interceptor/response-interceptor-new';
 import { Roles } from '../authentication/decorators/role.decorator';
 import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
@@ -34,7 +34,7 @@ export class OrderController {
   @Get('history/:page/:orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutHistoryOrderDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrders(
     @Param() params: { page: string; orgId: string },
   ): Promise<OutPutHistoryOrderDto> {
@@ -47,7 +47,7 @@ export class OrderController {
   @Get('history/filter/:page/:orgId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutHistoryOrderDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrdersFiltered(
     @Param() params: { page: string; orgId: string },
     @Query() filters: { to: Date; from: Date },
@@ -90,7 +90,7 @@ export class OrderController {
   @Post('')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER, Role.CLIENT)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutCreateOrdersDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutCreateOrdersDto))
   async createOrder(
     @Body() orderData: CreateOrderDto,
   ): Promise<OutPutCreateOrdersDto> {
@@ -105,7 +105,7 @@ export class OrderController {
   @Patch('/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutUpdateOrderDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutUpdateOrderDto))
   async changeStatusOrder(
     @Param('orderId') orderId: string,
     @Body() newStatus: ChangeOrderDto,
@@ -125,7 +125,7 @@ export class OrderController {
   @Delete('/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteOrder(
     @Param('orderId') orderId: string,
   ): Promise<OutPutMessageDto> {
@@ -138,7 +138,7 @@ export class OrderController {
   @Delete('history/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteHistoryOrder(
     @Param('orderId') orderId: string,
   ): Promise<OutPutMessageDto> {
@@ -152,7 +152,7 @@ export class OrderController {
   @HttpCode(200)
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptorNew(OutPutMessageDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async restartDay(@Param('orgId') orgId: string): Promise<OutPutMessageDto> {
     await this.orderService.restartDay(orgId);
     return {
