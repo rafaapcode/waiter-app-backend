@@ -13,6 +13,11 @@ export class OutputUserDto {
   @IsJWT()
   access_token: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @IsJWT()
+  refresh_token: string;
+
   @IsNotEmpty()
   @IsEnum(UserRoles)
   role: UserRoles;
@@ -21,4 +26,16 @@ export class OutputUserDto {
   @IsNotEmpty()
   @IsMongoId()
   id: string;
+}
+
+export class OutPutRefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsJWT()
+  refresh_token: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsJWT()
+  access_token: string;
 }

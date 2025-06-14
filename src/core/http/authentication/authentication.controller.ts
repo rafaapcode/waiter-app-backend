@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { AuthenticationService } from './authentication.service';
-import { SignInUserDto } from './dto/Input.dto';
-import { OutputUserDto } from './dto/OutPut.dto';
+import { RefreshTokenDto, SignInUserDto } from './dto/Input.dto';
+import { OutPutRefreshTokenDto, OutputUserDto } from './dto/OutPut.dto';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -20,6 +20,17 @@ export class AuthenticationController {
   @UseInterceptors(new ResponseInterceptor(OutputUserDto))
   async login(@Body() signInUser: SignInUserDto): Promise<OutputUserDto> {
     const data = await this.authenticationService.signInUser(signInUser);
+
+    return data;
+  }
+
+  @Post('refresh_token')
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(new ResponseInterceptor(OutPutRefreshTokenDto))
+  async refreshToken(
+    @Body() refreshtoken: RefreshTokenDto,
+  ): Promise<OutPutRefreshTokenDto> {
+    const data = await this.authenticationService.refreshToken(refreshtoken);
 
     return data;
   }

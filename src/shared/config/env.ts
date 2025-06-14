@@ -13,6 +13,11 @@ class Env {
   @MinLength(10)
   JWT_SECRET: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(10)
+  REFRESH_JWT_SECRET: string;
+
   @IsNumberString()
   @IsNotEmpty()
   PORT: string;
@@ -24,6 +29,7 @@ class Env {
 
 export const env = plainToInstance(Env, {
   JWT_SECRET: process.env.JWT_SECRET,
+  REFRESH_JWT_SECRET: process.env.REFRESH_JWT_SECRET,
   PORT: process.env.PORT,
   DATABASE_URI: process.env.DATABASE_URI,
 });
