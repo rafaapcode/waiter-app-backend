@@ -8,6 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrgType } from '@shared/types/Org.type';
+import mongoose from 'mongoose';
 import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 
 @Injectable()
@@ -51,16 +52,25 @@ export class OrgService {
     if (!orgExists) {
       throw new NotFoundException('Organização não encontrada');
     }
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        const deleteCategory =
+          this.categoryRepository.deleteAllCategoryOfOrg(orgId);
+        const deleteOrder = this.orderRepository.deleteAllOrdersOfOrg(orgId);
+        const deleteProduct =
+          this.productRepository.deleteAllProductsOfOrg(orgId);
 
-    const deleteCategory =
-      this.categoryRepository.deleteAllCategoryOfOrg(orgId);
-    const deleteOrder = this.orderRepository.deleteAllOrdersOfOrg(orgId);
-    const deleteProduct = this.productRepository.deleteAllProductsOfOrg(orgId);
-
-    await Promise.all([deleteCategory, deleteOrder, deleteProduct]);
-    await this.orgRepository.deleteOrgById(orgId);
-
-    return true;
+        await Promise.all([deleteCategory, deleteOrder, deleteProduct]);
+        await this.orgRepository.deleteOrgById(orgId);
+      });
+      await session.commitTransaction();
+      return true;
+    } catch (error) {
+      console.log(error);
+      await session.abortTransaction();
+      return false;
+    }
   }
 
   async getOrgId(orgId: string): Promise<OrgType> {

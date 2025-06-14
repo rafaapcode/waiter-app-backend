@@ -1,9 +1,9 @@
 import {
-  BadGatewayException,
   Body,
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   Post,
   Put,
@@ -38,7 +38,9 @@ export class OrgController {
   async deleteOrg(@Param('id') id: string): Promise<OutPutMessageDto> {
     const deleted = await this.orgService.deleteOrg(id);
     if (!deleted) {
-      throw new BadGatewayException('Erro ao deletar a organização');
+      throw new InternalServerErrorException(
+        'Erro ao deletar a organizção , entre em contato com o suporte',
+      );
     }
     return { message: 'Organização deletada !' };
   }
