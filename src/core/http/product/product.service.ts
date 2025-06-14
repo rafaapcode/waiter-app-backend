@@ -20,39 +20,26 @@ export class ProductService {
   async createProduct(
     productData: CreateProductDto,
   ): Promise<ProductType<string, string>> {
-    try {
-      const productExists = await this.productRepository.productExists(
-        productData.name,
-        productData.org,
+    const productExists = await this.productRepository.productExists(
+      productData.name,
+      productData.org,
+    );
+    if (productExists) {
+      throw new BadRequestException(
+        `${productData.name} já existe, crie um produto com nome diferente.`,
       );
-      if (productExists) {
-        throw new BadRequestException(
-          `${productData.name} já existe, crie um produto com nome diferente.`,
-        );
-      }
-      const product = await this.productRepository.createProduct({
-        ...productData,
-        imageUrl:
-          productData.imageUrl ||
-          'https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg',
-      });
-
-      if (!product) {
-        throw new InternalServerErrorException('Erro ao criar o produto');
-      }
-      return product;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
     }
+    const product = await this.productRepository.createProduct({
+      ...productData,
+      imageUrl:
+        productData.imageUrl ||
+        'https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg',
+    });
+
+    if (!product) {
+      throw new InternalServerErrorException('Erro ao criar o produto');
+    }
+    return product;
   }
 
   async listProduct(orgId: string): Promise<
@@ -69,223 +56,123 @@ export class ProductService {
       }
     >[]
   > {
-    try {
-      const products = await this.productRepository.listProducts(orgId);
+    const products = await this.productRepository.listProducts(orgId);
 
-      if (!products) {
-        throw new NotFoundException('Nenhum produto encontrado');
-      }
-
-      if (products.length === 0) {
-        throw new HttpException(null, 204);
-      }
-
-      return products;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!products) {
+      throw new NotFoundException('Nenhum produto encontrado');
     }
+
+    if (products.length === 0) {
+      throw new HttpException(null, 204);
+    }
+
+    return products;
   }
 
   async listProductByCategory(
     orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
-    try {
-      const products = await this.productRepository.listProductsByCategorie(
-        orgId,
-        categoryId,
-      );
+    const products = await this.productRepository.listProductsByCategorie(
+      orgId,
+      categoryId,
+    );
 
-      if (!products) {
-        throw new NotFoundException(
-          'Nenhum produto encontrado nessa categoria',
-        );
-      }
-
-      if (products.length === 0) {
-        throw new HttpException(null, 204);
-      }
-
-      return products;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!products) {
+      throw new NotFoundException('Nenhum produto encontrado nessa categoria');
     }
+
+    if (products.length === 0) {
+      throw new HttpException(null, 204);
+    }
+
+    return products;
   }
 
   async deleteProduct(productId: string): Promise<boolean> {
-    try {
-      const productIsAlreadyBeingUsed =
-        await this.orderRepository.productIsBeingUsed(productId);
+    const productIsAlreadyBeingUsed =
+      await this.orderRepository.productIsBeingUsed(productId);
 
-      if (productIsAlreadyBeingUsed) {
-        throw new BadRequestException(
-          'Produto está sendo usado em algum PEDIDO.',
-        );
-      }
-
-      const productDeleted =
-        await this.productRepository.deleteProduct(productId);
-
-      if (!productDeleted) {
-        throw new NotFoundException('Produto não encontrado !');
-      }
-
-      return true;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (productIsAlreadyBeingUsed) {
+      throw new BadRequestException(
+        'Produto está sendo usado em algum PEDIDO.',
+      );
     }
+
+    const productDeleted =
+      await this.productRepository.deleteProduct(productId);
+
+    if (!productDeleted) {
+      throw new NotFoundException('Produto não encontrado !');
+    }
+
+    return true;
   }
 
   async updateProduct(
     productId: string,
     data: UpdateProductDto,
   ): Promise<Product> {
-    try {
-      const updatedProduct = await this.productRepository.updateProduct(
-        productId,
-        data,
-      );
+    const updatedProduct = await this.productRepository.updateProduct(
+      productId,
+      data,
+    );
 
-      if (!updatedProduct) {
-        throw new NotFoundException('Nenhum produto encontrado !');
-      }
-
-      return updatedProduct;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!updatedProduct) {
+      throw new NotFoundException('Nenhum produto encontrado !');
     }
+
+    return updatedProduct;
   }
 
   async productInDiscount(
     productId: string,
     newPrice: number,
   ): Promise<Product> {
-    try {
-      if (!newPrice) {
-        throw new BadRequestException('Um preço novo é obrigatório');
-      }
-
-      if (newPrice <= 0) {
-        throw new BadRequestException(
-          'Por favor, adicione um valor válido para o produto',
-        );
-      }
-
-      const productInDiscount =
-        await this.productRepository.putProductInDiscount(productId, newPrice);
-
-      if (!productInDiscount) {
-        throw new NotFoundException('Produto não encontrado');
-      }
-
-      return productInDiscount;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!newPrice) {
+      throw new BadRequestException('Um preço novo é obrigatório');
     }
+
+    if (newPrice <= 0) {
+      throw new BadRequestException(
+        'Por favor, adicione um valor válido para o produto',
+      );
+    }
+
+    const productInDiscount = await this.productRepository.putProductInDiscount(
+      productId,
+      newPrice,
+    );
+
+    if (!productInDiscount) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    return productInDiscount;
   }
 
   async removeDiscountOfProduct(productId: string): Promise<Product> {
-    try {
-      const productWithoutDiscount =
-        await this.productRepository.removeDiscountOfProduct(productId);
+    const productWithoutDiscount =
+      await this.productRepository.removeDiscountOfProduct(productId);
 
-      if (!productWithoutDiscount) {
-        throw new NotFoundException('Produto não encontrado');
-      }
-
-      return productWithoutDiscount;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!productWithoutDiscount) {
+      throw new NotFoundException('Produto não encontrado');
     }
+
+    return productWithoutDiscount;
   }
 
   async getAllDiscountProducts(
     orgId: string,
   ): Promise<ProductType<string, string>[]> {
-    try {
-      const products =
-        await this.productRepository.returnAllDiscountProducts(orgId);
+    const products =
+      await this.productRepository.returnAllDiscountProducts(orgId);
 
-      if (products.length === 0) {
-        throw new HttpException(null, 204);
-      }
-
-      return products;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (products.length === 0) {
+      throw new HttpException(null, 204);
     }
+
+    return products;
   }
 
   async getProduct(productId: string): Promise<
@@ -302,28 +189,12 @@ export class ProductService {
       }
     >
   > {
-    try {
-      const product = await this.productRepository.getProduct(productId);
+    const product = await this.productRepository.getProduct(productId);
 
-      if (!product) {
-        throw new NotFoundException('Product não encontrado');
-      }
-
-      return product;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!product) {
+      throw new NotFoundException('Product não encontrado');
     }
+
+    return product;
   }
 }

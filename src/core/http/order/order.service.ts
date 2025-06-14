@@ -2,7 +2,6 @@ import { OrderGateway } from '@core/websocket/gateway/gateway';
 import { OrderRepository } from '@infra/repository/order/order.service';
 import { ProductRepository } from '@infra/repository/product/product.service';
 import {
-  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -27,189 +26,104 @@ export class OrderService {
     orderId: string,
     newStatus: ChangeOrderDto,
   ): Promise<Order> {
-    try {
-      const order = await this.orderRepository.changeOrderStatus(
-        orderId,
-        newStatus,
-      );
+    const order = await this.orderRepository.changeOrderStatus(
+      orderId,
+      newStatus,
+    );
 
-      if (!order) {
-        throw new NotFoundException('Pedido não encontrado!');
-      }
-
-      return order;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado!');
     }
+
+    return order;
   }
 
   async createOrder(createOrderData: CreateOrderDto): Promise<Order> {
-    try {
-      const productsIds = createOrderData.products.map(
-        (product) => product.product,
-      );
+    const productsIds = createOrderData.products.map(
+      (product) => product.product,
+    );
 
-      const allProductsExists =
-        await this.productRepository.allProductsExists(productsIds);
+    const allProductsExists =
+      await this.productRepository.allProductsExists(productsIds);
 
-      const newOrder: INewOrder = {
-        table: createOrderData.table,
-        products: [],
-        org: createOrderData.org,
-      };
+    const newOrder: INewOrder = {
+      table: createOrderData.table,
+      products: [],
+      org: createOrderData.org,
+    };
 
-      for (const productInfo of allProductsExists) {
-        const { id, price, priceInDiscount, discount } = productInfo;
-        const orderProducts = createOrderData.products
-          .filter((p) => p.product === id)
-          .map((p) => ({
-            ...p,
-            price: discount ? priceInDiscount : price,
-            discount,
-          }));
+    for (const productInfo of allProductsExists) {
+      const { id, price, priceInDiscount, discount } = productInfo;
+      const orderProducts = createOrderData.products
+        .filter((p) => p.product === id)
+        .map((p) => ({
+          ...p,
+          price: discount ? priceInDiscount : price,
+          discount,
+        }));
 
-        newOrder.products.push(...orderProducts);
-      }
-
-      const order = await this.orderRepository.createOrder(newOrder);
-      if (!order) {
-        throw new InternalServerErrorException('Erro ao criar novo pedidod');
-      }
-
-      this.orderWs.server.emit('orders@new', order);
-
-      return order;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+      newOrder.products.push(...orderProducts);
     }
+
+    const order = await this.orderRepository.createOrder(newOrder);
+    if (!order) {
+      throw new InternalServerErrorException('Erro ao criar novo pedidod');
+    }
+
+    this.orderWs.server.emit('orders@new', order);
+
+    return order;
   }
 
   async deleteOrder(orderId: string): Promise<boolean> {
-    try {
-      const orderDeleted = await this.orderRepository.deleteOrder(orderId);
-      if (!orderDeleted) {
-        throw new NotFoundException('Pedido não encontrado!');
-      }
-
-      return orderDeleted;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    const orderDeleted = await this.orderRepository.deleteOrder(orderId);
+    if (!orderDeleted) {
+      throw new NotFoundException('Pedido não encontrado!');
     }
+
+    return orderDeleted;
   }
 
   async listOrders(orgId: string): Promise<Order[]> {
-    try {
-      const orders = await this.orderRepository.listOrders(orgId);
-      if (!orders) {
-        throw new InternalServerErrorException('Erro ao listar os pedidos');
-      }
-
-      if (orders.length === 0) {
-        throw new HttpException(null, 204);
-      }
-
-      return orders;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    const orders = await this.orderRepository.listOrders(orgId);
+    if (!orders) {
+      throw new InternalServerErrorException('Erro ao listar os pedidos');
     }
+
+    if (orders.length === 0) {
+      throw new HttpException(null, 204);
+    }
+
+    return orders;
   }
 
   async restartDay(orgId: string): Promise<boolean> {
-    try {
-      const orders = await this.orderRepository.restartDay(orgId);
+    const orders = await this.orderRepository.restartDay(orgId);
 
-      if (orders) {
-        this.orderWs.server.emit('orders@restart_day');
-      }
-
-      return orders;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (orders) {
+      this.orderWs.server.emit('orders@restart_day');
     }
+
+    return orders;
   }
 
   async historyPage(
     orgId: string,
     page: number,
   ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
-    try {
-      const { total_pages, orders } =
-        await this.orderRepository.historyOfOrders(orgId, page);
+    const { total_pages, orders } = await this.orderRepository.historyOfOrders(
+      orgId,
+      page,
+    );
 
-      if (orders && orders.length === 0) {
-        throw new NotFoundException('Nenhum pedido encontrado!');
-      }
-
-      if (!orders) {
-        throw new NotFoundException('Nenhum pedido encontrado!');
-      }
-      return { total_pages, history: this.toHistoryOrder(orders) };
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (orders && orders.length === 0) {
+      throw new NotFoundException('Nenhum pedido encontrado!');
     }
+
+    if (!orders) {
+      throw new NotFoundException('Nenhum pedido encontrado!');
+    }
+    return { total_pages, history: this.toHistoryOrder(orders) };
   }
 
   async historyFilterPage(
@@ -217,59 +131,27 @@ export class OrderService {
     filters: { to: Date; from: Date },
     page: number,
   ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
-    try {
-      const { total_pages, orders } =
-        await this.orderRepository.historyOfOrdersWithFilters(
-          orgId,
-          filters,
-          page,
-        );
+    const { total_pages, orders } =
+      await this.orderRepository.historyOfOrdersWithFilters(
+        orgId,
+        filters,
+        page,
+      );
 
-      if (orders && orders.length === 0) {
-        throw new NotFoundException('Nenhum pedido encontrado!');
-      }
-
-      if (!orders) {
-        throw new NotFoundException('Nenhum pedido encontrado!');
-      }
-
-      return { total_pages, history: this.toHistoryOrder(orders) };
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (orders && orders.length === 0) {
+      throw new NotFoundException('Nenhum pedido encontrado!');
     }
+
+    if (!orders) {
+      throw new NotFoundException('Nenhum pedido encontrado!');
+    }
+
+    return { total_pages, history: this.toHistoryOrder(orders) };
   }
 
   async deleteHistoryOrder(oderId: string): Promise<boolean> {
-    try {
-      const orders = await this.orderRepository.deleteOrderHistory(oderId);
-      return orders;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof HttpException) {
-        throw new HttpException(error.getResponse(), error.getStatus());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    const orders = await this.orderRepository.deleteOrderHistory(oderId);
+    return orders;
   }
 
   private toHistoryOrder(orders: Order[]): HistoryOrder[] {
