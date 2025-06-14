@@ -45,10 +45,6 @@ export class ProductService {
   async listProduct(orgId: string): Promise<ListProductsType[]> {
     const products = await this.productRepository.listProducts(orgId);
 
-    if (!products) {
-      throw new NotFoundException('Nenhum produto encontrado');
-    }
-
     if (products.length === 0) {
       throw new HttpException(null, 204);
     }

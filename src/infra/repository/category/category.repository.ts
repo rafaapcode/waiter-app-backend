@@ -35,6 +35,10 @@ export class CategoryRepository {
   ): Promise<Pick<CategoryType<string>, 'id' | 'icon' | 'name'>[]> {
     const categories = await this.categoryModel.find({ org: orgId });
 
+    if (!categories) {
+      throw new NotFoundException('Categoria não encontrada');
+    }
+
     return categories.map((c) => ({
       id: c.id,
       icon: c.icon,

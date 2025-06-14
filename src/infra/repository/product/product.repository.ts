@@ -199,6 +199,7 @@ export class ProductRepository {
       discount: true,
       org: orgId,
     });
+
     return products.map((p) => ({
       _id: p._id.toString(),
       category: p.category.toString(),

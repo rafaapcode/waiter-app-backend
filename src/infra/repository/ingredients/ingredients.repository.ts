@@ -2,7 +2,7 @@ import {
   CreateIngredientDto,
   CreateManyIngredientDto,
 } from '@core/http/ingredient/dto/Input.dto';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Ingredient, IngredientType } from '@shared/types/Ingredient.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
@@ -31,6 +31,10 @@ export class IngredientRepository {
   async getAllIngredients(): Promise<{ data: IngredientType[] }> {
     const allIngredients = await this.ingredientModel.find();
 
+    if (!allIngredients) {
+      throw new NotFoundException('Nenhum ingrediente encontrado');
+    }
+
     return {
       data: allIngredients.map((data) => ({
         id: data.id,
@@ -46,6 +50,10 @@ export class IngredientRepository {
     const allIngredients = await this.ingredientModel.find({
       name: { $in: ingredients },
     });
+
+    if (!allIngredients) {
+      throw new NotFoundException('Nenhum ingrediente encontrado');
+    }
 
     return {
       data: allIngredients.map((ing) => ({
