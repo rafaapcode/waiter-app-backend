@@ -1,5 +1,5 @@
 import { CategoryRepository } from '@infra/repository/category/category.repository';
-import { OrderRepository } from '@infra/repository/order/order.service';
+import { OrderRepository } from '@infra/repository/order/order.repository';
 import { OrgRepository } from '@infra/repository/org/org.service';
 import { ProductRepository } from '@infra/repository/product/product.service';
 import {

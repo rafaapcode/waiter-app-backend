@@ -5,7 +5,7 @@ import { CategoryRepository } from './category/category.repository';
 import { ingredientProvider } from './ingredients/ingredient.provider';
 import { IngredientRepository } from './ingredients/ingredients.repository';
 import { orderProviders } from './order/order.provider';
-import { OrderRepository } from './order/order.service';
+import { OrderRepository } from './order/order.repository';
 import { orgProvider } from './org/org.provider';
 import { OrgRepository } from './org/org.service';
 import { productProviders } from './product/product.provider';

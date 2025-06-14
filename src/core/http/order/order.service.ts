@@ -1,5 +1,5 @@
 import { OrderGateway } from '@core/websocket/gateway/gateway';
-import { OrderRepository } from '@infra/repository/order/order.service';
+import { OrderRepository } from '@infra/repository/order/order.repository';
 import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   HttpException,
@@ -8,8 +8,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Category } from '@shared/types/Category.type';
-import { HistoryOrder, Order } from '@shared/types/Order.type';
-import { Product } from '@shared/types/Product.type';
+import {
+  HistoryOrder,
+  HistoryOrdersType,
+  ListOrderType,
+  OrderType,
+} from '@shared/types/Order.type';
+import { Product, ProductType } from '@shared/types/Product.type';
 import { formatCurrency } from '@shared/utils/formatCurrency';
 import { ChangeOrderDto, CreateOrderDto } from './dto/Input.dto';
 import { INewOrder } from './types/neworder.type';
@@ -25,20 +30,19 @@ export class OrderService {
   async changeOrderStatus(
     orderId: string,
     newStatus: ChangeOrderDto,
-  ): Promise<Order> {
-    const order = await this.orderRepository.changeOrderStatus(
-      orderId,
-      newStatus,
-    );
+  ): Promise<void> {
+    const orderExists = await this.orderRepository.orderExists(orderId);
 
-    if (!order) {
+    if (!orderExists) {
       throw new NotFoundException('Pedido não encontrado!');
     }
 
-    return order;
+    await this.orderRepository.changeOrderStatus(orderId, newStatus);
   }
 
-  async createOrder(createOrderData: CreateOrderDto): Promise<Order> {
+  async createOrder(
+    createOrderData: CreateOrderDto,
+  ): Promise<OrderType<ProductType>> {
     const productsIds = createOrderData.products.map(
       (product) => product.product,
     );
@@ -84,7 +88,7 @@ export class OrderService {
     return orderDeleted;
   }
 
-  async listOrders(orgId: string): Promise<Order[]> {
+  async listOrders(orgId: string): Promise<ListOrderType[]> {
     const orders = await this.orderRepository.listOrders(orgId);
     if (!orders) {
       throw new InternalServerErrorException('Erro ao listar os pedidos');
@@ -154,7 +158,7 @@ export class OrderService {
     return orders;
   }
 
-  private toHistoryOrder(orders: Order[]): HistoryOrder[] {
+  private toHistoryOrder(orders: HistoryOrdersType[]): HistoryOrder[] {
     const formatOrders: HistoryOrder[] = orders.map((order) => {
       if (!order) throw new NotFoundException('Pedido não encontrado !');
       const filteredProducts = order.products.filter((p) => p.product);
@@ -165,7 +169,7 @@ export class OrderService {
         filteredProducts.length === 0
       ) {
         return {
-          id: order._id.toString(),
+          id: order.id,
           table: order.table,
           data: order.createdAt,
           totalPrice: formatCurrency(0),
@@ -203,7 +207,7 @@ export class OrderService {
       const product = filteredProducts[0].product as Product;
       const category = product.category as Category;
       return {
-        id: order._id.toString(),
+        id: order.id,
         table: order.table,
         data: order.createdAt,
         totalPrice: formatCurrency(namesAndPrice.totalPrice),

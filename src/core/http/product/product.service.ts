@@ -1,4 +1,4 @@
-import { OrderRepository } from '@infra/repository/order/order.service';
+import { OrderRepository } from '@infra/repository/order/order.repository';
 import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadRequestException,

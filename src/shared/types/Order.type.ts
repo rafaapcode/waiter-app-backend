@@ -1,6 +1,7 @@
 import { Document, Schema } from 'mongoose';
+import { CategoryType } from './Category.type';
 import { Org } from './Org.type';
-import { Product } from './Product.type';
+import { Product, ProductType } from './Product.type';
 
 export enum STATUS {
   WAITING = 'WAITING',
@@ -49,3 +50,40 @@ export type HistoryOrder = {
     id: string;
   }[];
 };
+
+export type OrderType<TProduct = ProductPropertie> = {
+  id: string;
+  table: string;
+  status: STATUS;
+  createdAt: Date;
+  deletedAt?: Date;
+  products: {
+    product: TProduct;
+    quantity: number;
+    price: number;
+    discount: boolean;
+  }[];
+};
+
+export type ListOrderType = {
+  _id: string;
+  table: string;
+  status: STATUS;
+  createdAt: Date;
+  products: {
+    product: Pick<
+      ProductType,
+      '_id' | 'name' | 'description' | 'imageUrl' | 'category'
+    >;
+    quantity: number;
+    price: number;
+    discount: boolean;
+  }[];
+};
+
+export type HistoryOrdersType = OrderType<
+  Pick<
+    ProductType<Pick<CategoryType, 'name' | 'icon'>>,
+    '_id' | 'name' | 'imageUrl' | 'category'
+  >
+>;

@@ -1,7 +1,14 @@
 import { ChangeOrderDto } from '@core/http/order/dto/Input.dto';
 import { INewOrder } from '@core/http/order/types/neworder.type';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Order } from '@shared/types/Order.type';
+import { CategoryType } from '@shared/types/Category.type';
+import {
+  HistoryOrdersType,
+  ListOrderType,
+  Order,
+  OrderType,
+} from '@shared/types/Order.type';
+import { ProductType } from '@shared/types/Product.type';
 import { getTodayRange } from '@shared/utils/getTodayrange';
 import { endOfDay, subHours } from 'date-fns';
 import { Model } from 'mongoose';
@@ -17,22 +24,36 @@ export class OrderRepository {
   async changeOrderStatus(
     orderId: string,
     newStatus: ChangeOrderDto,
-  ): Promise<Order> {
-    const order = await this.orderModel.findByIdAndUpdate(
+  ): Promise<void> {
+    await this.orderModel.findByIdAndUpdate(
       orderId,
       { status: newStatus.status },
       { new: true },
     );
-
-    return order;
   }
 
-  async createOrder(newOrder: INewOrder): Promise<Order> {
+  async createOrder(newOrder: INewOrder): Promise<OrderType<ProductType>> {
     const order = (await this.orderModel.create(newOrder)).populate(
       'products.product',
     );
 
-    return await order;
+    const orderCreated = await order;
+
+    return {
+      id: orderCreated.id,
+      createdAt: orderCreated.createdAt,
+      status: orderCreated.status,
+      table: orderCreated.table,
+      products: orderCreated.products.map((p) => {
+        const productTyped = p.product as ProductType;
+        return {
+          discount: p.discount,
+          price: p.price,
+          quantity: p.quantity,
+          product: productTyped,
+        };
+      }),
+    };
   }
 
   async deleteOrder(orderId: string): Promise<boolean> {
@@ -45,14 +66,34 @@ export class OrderRepository {
     return true;
   }
 
-  async listOrders(orgId: string): Promise<Order[]> {
+  async listOrders(orgId: string): Promise<ListOrderType[]> {
     const orders = await this.orderModel
       .find({ deletedAt: null, org: orgId })
       .sort({ createdAt: -1 })
       .populate('products.product', '_id name description imageUrl category')
       .select('_id table status products createdAt');
 
-    return orders;
+    return orders.map((order) => {
+      return {
+        _id: order.id,
+        createdAt: order.createdAt,
+        status: order.status,
+        table: order.table,
+        products: order.products.map((p) => {
+          const product = p.product as Pick<
+            ProductType,
+            '_id' | 'name' | 'description' | 'imageUrl' | 'category'
+          >;
+
+          return {
+            product,
+            quantity: p.quantity,
+            price: p.price,
+            discount: p.discount,
+          };
+        }),
+      };
+    });
   }
 
   async restartDay(orgId: string): Promise<boolean> {
@@ -78,14 +119,17 @@ export class OrderRepository {
   async historyOfOrders(
     orgId: string,
     page?: number,
-  ): Promise<{ total_pages: number; orders: Order[] }> {
+  ): Promise<{
+    total_pages: number;
+    orders: HistoryOrdersType[];
+  }> {
     const pageNumber = page && page !== 0 ? page : 1;
     const limit = 6;
     const skip = (pageNumber - 1) * limit;
 
     const countDocs = await this.orderModel.countDocuments();
 
-    const orders = await this.orderModel
+    const ordersResult = await this.orderModel
       .find({ org: orgId })
       .skip(skip)
       .limit(limit)
@@ -99,9 +143,33 @@ export class OrderRepository {
       })
       .sort({ createdAt: -1 });
 
-    if (!orders) {
+    if (!ordersResult) {
       throw new NotFoundException('Nenhum pedido encontrado');
     }
+
+    const orders = ordersResult.map((order) => {
+      return {
+        id: order.id,
+        table: order.table,
+        status: order.status,
+        createdAt: order.createdAt,
+        deletedAt: order.deletedAt,
+        products: order.products.map((p) => {
+          const product = p.product as Pick<
+            ProductType<Pick<CategoryType, 'name' | 'icon'>>,
+            '_id' | 'name' | 'imageUrl' | 'category'
+          >;
+
+          return {
+            quantity: p.quantity,
+            price: p.price,
+            discount: p.discount,
+            product: product,
+          };
+        }),
+      };
+    });
+
     return { total_pages: Math.ceil(countDocs / limit), orders };
   }
 
@@ -109,7 +177,7 @@ export class OrderRepository {
     orgId: string,
     filters: { to: Date; from: Date },
     page?: number,
-  ): Promise<{ total_pages: number; orders: Order[] }> {
+  ): Promise<{ total_pages: number; orders: HistoryOrdersType[] }> {
     const pageNumber = page && page !== 0 ? page : 1;
     const limit = 6;
     const skip = (pageNumber - 1) * limit;
@@ -122,7 +190,7 @@ export class OrderRepository {
       },
     });
 
-    const orders = await this.orderModel
+    const ordersResult = await this.orderModel
       .find({
         org: orgId,
         createdAt: {
@@ -142,9 +210,32 @@ export class OrderRepository {
       })
       .sort({ createdAt: -1 });
 
-    if (!orders) {
+    if (!ordersResult) {
       throw new NotFoundException('Nenhum pedido encontrado');
     }
+
+    const orders = ordersResult.map((order) => {
+      return {
+        id: order.id,
+        table: order.table,
+        status: order.status,
+        createdAt: order.createdAt,
+        deletedAt: order.deletedAt,
+        products: order.products.map((p) => {
+          const product = p.product as Pick<
+            ProductType<Pick<CategoryType, 'name' | 'icon'>>,
+            '_id' | 'name' | 'imageUrl' | 'category'
+          >;
+
+          return {
+            quantity: p.quantity,
+            price: p.price,
+            discount: p.discount,
+            product: product,
+          };
+        }),
+      };
+    });
     return { total_pages: Math.ceil(countDocs / limit), orders };
   }
 
@@ -175,6 +266,16 @@ export class OrderRepository {
     await this.orderModel.deleteMany({
       org: orgId,
     });
+
+    return true;
+  }
+
+  async orderExists(orderId: string): Promise<boolean> {
+    const order = await this.orderModel.findById(orderId);
+
+    if (!order) {
+      return false;
+    }
 
     return true;
   }
