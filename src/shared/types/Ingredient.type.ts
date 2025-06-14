@@ -5,7 +5,7 @@ export interface Ingredient extends Document {
   readonly icon: string;
 }
 export type IngredientType = {
-  _id?: string;
+  id: string;
   name: string;
   icon: string;
 };

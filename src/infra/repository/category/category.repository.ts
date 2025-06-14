@@ -50,6 +50,16 @@ export class CategoryRepository {
     return true;
   }
 
+  async findCategoryById(categoryId: string): Promise<boolean> {
+    const category = await this.categoryModel.findById(categoryId);
+
+    if (!category) {
+      return false;
+    }
+
+    return true;
+  }
+
   async editCategory(id: string, data: EditCategoryDto): Promise<boolean> {
     const category = await this.categoryModel.findByIdAndUpdate(id, {
       ...(data.icon && { icon: data.icon }),

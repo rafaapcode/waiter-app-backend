@@ -41,12 +41,25 @@ export class CategoryService {
   }
 
   async editCategory(id: string, data: EditCategoryDto): Promise<boolean> {
+    const categorieExist = await this.categoryRepository.findCategoryById(id);
+
+    if (!categorieExist) {
+      throw new NotFoundException('Categoria não encontrada !');
+    }
+
     const categories = await this.categoryRepository.editCategory(id, data);
 
     return categories;
   }
 
   async deleteCategory(orgId: string, categoryId: string): Promise<boolean> {
+    const categorieExist =
+      await this.categoryRepository.findCategoryById(categoryId);
+
+    if (!categorieExist) {
+      throw new NotFoundException('Categoria não encontrada !');
+    }
+
     const categoryIsBeingUsed =
       await this.productRepository.categoryIsBeingUsed(categoryId, orgId);
 
@@ -56,11 +69,7 @@ export class CategoryService {
       );
     }
 
-    const categorydeleted =
-      await this.categoryRepository.deleteCategory(categoryId);
-    if (!categorydeleted) {
-      throw new NotFoundException('Categoria não existe');
-    }
+    await this.categoryRepository.deleteCategory(categoryId);
     return true;
   }
 }

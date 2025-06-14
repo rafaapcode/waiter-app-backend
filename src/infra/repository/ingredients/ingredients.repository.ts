@@ -2,7 +2,7 @@ import {
   CreateIngredientDto,
   CreateManyIngredientDto,
 } from '@core/http/ingredient/dto/Input.dto';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Ingredient, IngredientType } from '@shared/types/Ingredient.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
@@ -14,24 +14,14 @@ export class IngredientRepository {
     private ingredientModel: Model<Ingredient>,
   ) {}
 
-  async createIngredient(dataIngredient: CreateIngredientDto): Promise<{
-    message: string;
-    data?: IngredientType;
-  }> {
-    const ingredientAlreadyExists = await this.ingredientModel.findOne({
-      name: dataIngredient.name,
-    });
-
-    if (ingredientAlreadyExists) {
-      throw new BadRequestException('Ingrediente já existe');
-    }
-
+  async createIngredient(
+    dataIngredient: CreateIngredientDto,
+  ): Promise<{ data: IngredientType }> {
     const ingredient = await this.ingredientModel.create(dataIngredient);
 
     return {
-      message: 'Ingredient criado com sucesso !',
       data: {
-        _id: ingredient.id,
+        id: ingredient.id,
         name: ingredient.name,
         icon: ingredient.icon,
       },
@@ -43,7 +33,7 @@ export class IngredientRepository {
 
     return {
       data: allIngredients.map((data) => ({
-        _id: data.id,
+        id: data.id,
         name: data.name,
         icon: data.icon,
       })),
@@ -52,7 +42,7 @@ export class IngredientRepository {
 
   async verfifyIngredients(
     ingredients: string[],
-  ): Promise<{ data: { id: string; name: string }[] }> {
+  ): Promise<{ data: Pick<IngredientType, 'id' | 'name'>[] }> {
     const allIngredients = await this.ingredientModel.find({
       name: { $in: ingredients },
     });
@@ -65,8 +55,20 @@ export class IngredientRepository {
     };
   }
 
+  async ingredientExist(ingredientName: string): Promise<boolean> {
+    const ingredients = await this.ingredientModel.findOne({
+      name: ingredientName,
+    });
+
+    if (!ingredients) {
+      return false;
+    }
+
+    return true;
+  }
+
   async createMany({ ingredients }: CreateManyIngredientDto): Promise<{
-    data: { name: string; id: string }[];
+    data: Pick<IngredientType, 'id' | 'name'>[];
   }> {
     const ingredientsAdded = await this.ingredientModel.insertMany(ingredients);
     return {
