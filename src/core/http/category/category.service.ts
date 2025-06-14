@@ -1,13 +1,12 @@
-import { CategoryRepository } from '@infra/repository/category/category.service';
+import { CategoryRepository } from '@infra/repository/category/category.repository';
 import { ProductRepository } from '@infra/repository/product/product.service';
 import {
   BadRequestException,
-  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Category } from '@shared/types/Category.type';
+import { CategoryType } from '@shared/types/Category.type';
 import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class CategoryService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async createCategory(data: CreateCategoryDto): Promise<Category> {
+  async createCategory(data: CreateCategoryDto): Promise<CategoryType<string>> {
     const categoryExist = await this.categoryRepository.findCategoryByName(
       data.name,
       data.org,
@@ -34,13 +33,10 @@ export class CategoryService {
     return category;
   }
 
-  async listCategory(orgId: string): Promise<Category[]> {
+  async listCategory(
+    orgId: string,
+  ): Promise<Pick<CategoryType<string>, 'icon' | 'name'>[]> {
     const categories = await this.categoryRepository.listCategory(orgId);
-
-    if (categories.length === 0) {
-      throw new HttpException(null, 204);
-    }
-
     return categories;
   }
 

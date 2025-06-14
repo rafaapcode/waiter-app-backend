@@ -1,4 +1,4 @@
-import { IngredientRepository } from '@infra/repository/ingredients/user.service';
+import { IngredientRepository } from '@infra/repository/ingredients/ingredients.service';
 import { Injectable } from '@nestjs/common';
 import { IngredientType } from '@shared/types/Ingredient.type';
 import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';

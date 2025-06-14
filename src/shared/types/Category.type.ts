@@ -8,3 +8,9 @@ export interface Category<TOrg = OrgPropertie> extends Document {
   readonly icon: string;
   readonly org: TOrg;
 }
+
+export interface CategoryType<TOrg = OrgPropertie> {
+  name: string;
+  icon: string;
+  org: TOrg;
+}

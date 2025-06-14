@@ -1,4 +1,4 @@
-import { CategoryRepository } from '@infra/repository/category/category.service';
+import { CategoryRepository } from '@infra/repository/category/category.repository';
 import { OrderRepository } from '@infra/repository/order/order.service';
 import { OrgRepository } from '@infra/repository/org/org.service';
 import { ProductRepository } from '@infra/repository/product/product.service';

@@ -3,7 +3,7 @@ import {
   EditCategoryDto,
 } from '@core/http/category/dto/Input.dto';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Category } from '@shared/types/Category.type';
+import { Category, CategoryType } from '@shared/types/Category.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -14,19 +14,30 @@ export class CategoryRepository {
     private categoryModel: Model<Category>,
   ) {}
 
-  async createCategory(categoryData: CreateCategoryDto): Promise<Category> {
+  async createCategory(
+    categoryData: CreateCategoryDto,
+  ): Promise<CategoryType<string>> {
     const categorie = await this.categoryModel.create({
       ...categoryData,
       icon: categoryData.icon || '',
     });
 
-    return categorie;
+    return {
+      icon: categorie.icon,
+      name: categorie.name,
+      org: categorie.org.toString(),
+    };
   }
 
-  async listCategory(orgId: string): Promise<Category[]> {
+  async listCategory(
+    orgId: string,
+  ): Promise<Pick<CategoryType<string>, 'icon' | 'name'>[]> {
     const categories = await this.categoryModel.find({ org: orgId });
 
-    return categories;
+    return categories.map((c) => ({
+      icon: c.icon,
+      name: c.name,
+    }));
   }
 
   async findCategoryByName(name: string, orgId: string): Promise<boolean> {
