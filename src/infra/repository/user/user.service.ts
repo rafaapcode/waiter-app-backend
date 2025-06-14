@@ -108,7 +108,7 @@ export class UserRepository {
 
   async getUserByEmail(
     userEmail: string,
-  ): Promise<{ name: string; email: string }> {
+  ): Promise<Pick<UserType, 'name' | 'email'>> {
     const user = await this.userModel.findOne({ email: userEmail });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');

@@ -1,5 +1,5 @@
 import { CategoryRepository } from '@infra/repository/category/category.repository';
-import { ProductRepository } from '@infra/repository/product/product.service';
+import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   BadRequestException,
   Injectable,

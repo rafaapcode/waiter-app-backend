@@ -26,9 +26,9 @@ class listCategoryDto {
   icon?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
-  _id: string;
+  _id?: string;
 }
 
 export class OutPutListCategoryDto {
@@ -50,7 +50,7 @@ export class OutPutCreateCategoryDto {
   icon: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
-  _id: string;
+  _id?: string;
 }

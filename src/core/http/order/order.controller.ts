@@ -23,7 +23,6 @@ import {
   OutPutHistoryOrderDto,
   OutPutListOrdersDto,
   OutPutMessageDto,
-  OutPutUpdateOrderDto,
 } from './dto/OutPut.dto';
 import { OrderService } from './order.service';
 
@@ -78,7 +77,6 @@ export class OrderController {
     const orders = await this.orderService.listOrders(orgId);
     return {
       orders: orders.map((order) => ({
-        _id: order.id,
         createdAt: order.createdAt,
         table: order.table,
         status: order.status,
@@ -105,20 +103,14 @@ export class OrderController {
   @Patch('/:orderId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(OutPutUpdateOrderDto))
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async changeStatusOrder(
     @Param('orderId') orderId: string,
     @Body() newStatus: ChangeOrderDto,
-  ): Promise<OutPutUpdateOrderDto> {
-    const orderUpdated = await this.orderService.changeOrderStatus(
-      orderId,
-      newStatus,
-    );
+  ): Promise<OutPutMessageDto> {
+    await this.orderService.changeOrderStatus(orderId, newStatus);
     return {
-      _id: orderUpdated._id.toString(),
-      table: orderUpdated.table,
-      status: orderUpdated.status,
-      products: orderUpdated.products,
+      message: 'Pedido atualizado com sucesso !',
     };
   }
 

@@ -7,9 +7,9 @@ import { IngredientRepository } from './ingredients/ingredients.repository';
 import { orderProviders } from './order/order.provider';
 import { OrderRepository } from './order/order.repository';
 import { orgProvider } from './org/org.provider';
-import { OrgRepository } from './org/org.service';
+import { OrgRepository } from './org/org.repository';
 import { productProviders } from './product/product.provider';
-import { ProductRepository } from './product/product.service';
+import { ProductRepository } from './product/product.repository';
 import { userProvider } from './user/user.provider';
 import { UserRepository } from './user/user.service';
 

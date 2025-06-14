@@ -38,7 +38,6 @@ export class CategoryController {
 
     return {
       categories: categories.map((cat) => ({
-        _id: cat.id,
         name: cat.name,
         icon: cat.icon,
       })),
@@ -58,7 +57,6 @@ export class CategoryController {
     return {
       name: categoryCreated.name,
       icon: categoryCreated.icon,
-      _id: categoryCreated.id,
     };
   }
 

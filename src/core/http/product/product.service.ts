@@ -1,5 +1,5 @@
 import { OrderRepository } from '@infra/repository/order/order.repository';
-import { ProductRepository } from '@infra/repository/product/product.service';
+import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   BadRequestException,
   HttpException,
@@ -7,7 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Product, ProductType } from '@shared/types/Product.type';
+import { ListProductsType, ProductType } from '@shared/types/Product.type';
 import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 
 @Injectable()
@@ -42,20 +42,7 @@ export class ProductService {
     return product;
   }
 
-  async listProduct(orgId: string): Promise<
-    ProductType<
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      },
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      }
-    >[]
-  > {
+  async listProduct(orgId: string): Promise<ListProductsType[]> {
     const products = await this.productRepository.listProducts(orgId);
 
     if (!products) {
@@ -112,7 +99,7 @@ export class ProductService {
   async updateProduct(
     productId: string,
     data: UpdateProductDto,
-  ): Promise<Product> {
+  ): Promise<ProductType<string, string>> {
     const updatedProduct = await this.productRepository.updateProduct(
       productId,
       data,
@@ -128,7 +115,7 @@ export class ProductService {
   async productInDiscount(
     productId: string,
     newPrice: number,
-  ): Promise<Product> {
+  ): Promise<ProductType<string, string>> {
     if (!newPrice) {
       throw new BadRequestException('Um preço novo é obrigatório');
     }
@@ -151,7 +138,9 @@ export class ProductService {
     return productInDiscount;
   }
 
-  async removeDiscountOfProduct(productId: string): Promise<Product> {
+  async removeDiscountOfProduct(
+    productId: string,
+  ): Promise<ProductType<string, string>> {
     const productWithoutDiscount =
       await this.productRepository.removeDiscountOfProduct(productId);
 
@@ -175,20 +164,7 @@ export class ProductService {
     return products;
   }
 
-  async getProduct(productId: string): Promise<
-    ProductType<
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      },
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      }
-    >
-  > {
+  async getProduct(productId: string): Promise<ListProductsType> {
     const product = await this.productRepository.getProduct(productId);
 
     if (!product) {

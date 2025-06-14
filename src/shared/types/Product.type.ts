@@ -41,3 +41,16 @@ export type ProductType<
   discount: boolean;
   priceInDiscount: number;
 };
+
+export type ListProductsType = ProductType<
+  {
+    _id: string;
+    name: string;
+    icon: string;
+  },
+  {
+    _id: string;
+    name: string;
+    icon: string;
+  }
+>;

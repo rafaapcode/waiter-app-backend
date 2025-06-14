@@ -73,10 +73,6 @@ export class OutPutCreateManyIngredientsDto {
 }
 
 export class OutPutCreateIngredientDto {
-  @IsString()
-  @IsNotEmpty()
-  message: string;
-
   @Type(() => createIngredientDto)
   @IsOptional()
   data?: createIngredientDto;

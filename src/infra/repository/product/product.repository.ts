@@ -3,7 +3,11 @@ import {
   UpdateProductDto,
 } from '@core/http/product/dto/Input.dto';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Product, ProductType } from '@shared/types/Product.type';
+import {
+  ListProductsType,
+  Product,
+  ProductType,
+} from '@shared/types/Product.type';
 import { Model, Schema } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -32,20 +36,7 @@ export class ProductRepository {
     };
   }
 
-  async listProducts(orgId: string): Promise<
-    ProductType<
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      },
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      }
-    >[]
-  > {
+  async listProducts(orgId: string): Promise<ListProductsType[]> {
     const products = await this.productModel
       .find({ org: orgId })
       .populate('ingredients', '_id name icon')
@@ -125,7 +116,7 @@ export class ProductRepository {
   async updateProduct(
     productId: string,
     data: UpdateProductDto,
-  ): Promise<Product> {
+  ): Promise<ProductType<string, string>> {
     const updatedProduct = await this.productModel.findByIdAndUpdate(
       productId,
       {
@@ -134,30 +125,64 @@ export class ProductRepository {
       { new: true },
     );
 
-    return updatedProduct;
+    return {
+      _id: updatedProduct.id,
+      category: updatedProduct.category.toString(),
+      description: updatedProduct.description,
+      discount: updatedProduct.discount,
+      imageUrl: updatedProduct.imageUrl,
+      ingredients: updatedProduct.ingredients.map((ing) => ing.toString()),
+      name: updatedProduct.name,
+      price: updatedProduct.price,
+      priceInDiscount: updatedProduct.priceInDiscount,
+    };
   }
 
   async putProductInDiscount(
     productId: string,
     discountPrice: number,
-  ): Promise<Product> {
+  ): Promise<ProductType<string, string>> {
     const productInDiscount = await this.productModel.findByIdAndUpdate(
       productId,
       { discount: true, priceInDiscount: discountPrice },
       { new: true },
     );
 
-    return productInDiscount;
+    return {
+      _id: productInDiscount.id,
+      category: productInDiscount.category.toString(),
+      description: productInDiscount.description,
+      discount: productInDiscount.discount,
+      imageUrl: productInDiscount.imageUrl,
+      ingredients: productInDiscount.ingredients.map((ing) => ing.toString()),
+      name: productInDiscount.name,
+      price: productInDiscount.price,
+      priceInDiscount: productInDiscount.priceInDiscount,
+    };
   }
 
-  async removeDiscountOfProduct(productId: string): Promise<Product> {
+  async removeDiscountOfProduct(
+    productId: string,
+  ): Promise<ProductType<string, string>> {
     const productWithoutDiscount = await this.productModel.findByIdAndUpdate(
       productId,
       { discount: false, priceInDiscount: 0 },
       { new: true },
     );
 
-    return productWithoutDiscount;
+    return {
+      _id: productWithoutDiscount.id,
+      category: productWithoutDiscount.category.toString(),
+      description: productWithoutDiscount.description,
+      discount: productWithoutDiscount.discount,
+      imageUrl: productWithoutDiscount.imageUrl,
+      ingredients: productWithoutDiscount.ingredients.map((ing) =>
+        ing.toString(),
+      ),
+      name: productWithoutDiscount.name,
+      price: productWithoutDiscount.price,
+      priceInDiscount: productWithoutDiscount.priceInDiscount,
+    };
   }
 
   async returnAllDiscountProducts(
@@ -180,20 +205,7 @@ export class ProductRepository {
     }));
   }
 
-  async getProduct(productId: string): Promise<
-    ProductType<
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      },
-      {
-        _id: string;
-        name: string;
-        icon: string;
-      }
-    >
-  > {
+  async getProduct(productId: string): Promise<ListProductsType> {
     const product = await this.productModel
       .findById(productId)
       .populate('ingredients', '_id name icon')
@@ -222,14 +234,28 @@ export class ProductRepository {
     };
   }
 
-  async allProductsExists(productsIds: string[]): Promise<Product[]> {
+  async allProductsExists(
+    productsIds: string[],
+  ): Promise<ProductType<string, string>[]> {
     const allProductsExists = await this.productModel.find({
       _id: { $in: productsIds },
     });
     if (!allProductsExists) {
       throw new NotFoundException('Um ou mais produtos não existe');
     }
-    return allProductsExists;
+    return allProductsExists.map((p) => {
+      return {
+        _id: p.id,
+        category: p.category.toString(),
+        description: p.description,
+        discount: p.discount,
+        imageUrl: p.imageUrl,
+        ingredients: p.ingredients.map((ing) => ing.toString()),
+        name: p.name,
+        price: p.price,
+        priceInDiscount: p.priceInDiscount,
+      };
+    });
   }
 
   async categoryIsBeingUsed(

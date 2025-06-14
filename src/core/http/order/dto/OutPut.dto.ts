@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { STATUS } from '@shared/types/Order.type';
 import { Type } from 'class-transformer';
 import {
@@ -9,6 +8,7 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUrl,
@@ -109,9 +109,9 @@ export class OutPutCreateOrdersDto {
 
 class listOrdersDto {
   @IsString({ message: '_id deve ser uma string' })
-  @IsNotEmpty({ message: '_id é obrigatório' })
+  @IsOptional()
   @IsMongoId()
-  _id: string;
+  _id?: string;
 
   @IsString({ message: 'table deve ser uma string' })
   @IsNotEmpty({ message: 'table é obrigatório' })
@@ -131,11 +131,4 @@ class listOrdersDto {
 export class OutPutListOrdersDto {
   @Type(() => listOrdersDto)
   orders: listOrdersDto[];
-}
-
-export class OutPutUpdateOrderDto extends PartialType(OutPutCreateOrdersDto) {
-  @IsString()
-  @IsNotEmpty()
-  @IsMongoId()
-  _id: string;
 }

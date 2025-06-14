@@ -1,6 +1,6 @@
 import { OrderGateway } from '@core/websocket/gateway/gateway';
 import { OrderRepository } from '@infra/repository/order/order.repository';
-import { ProductRepository } from '@infra/repository/product/product.service';
+import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   HttpException,
   Injectable,
@@ -57,9 +57,9 @@ export class OrderService {
     };
 
     for (const productInfo of allProductsExists) {
-      const { id, price, priceInDiscount, discount } = productInfo;
+      const { _id, price, priceInDiscount, discount } = productInfo;
       const orderProducts = createOrderData.products
-        .filter((p) => p.product === id)
+        .filter((p) => p.product === _id)
         .map((p) => ({
           ...p,
           price: discount ? priceInDiscount : price,
