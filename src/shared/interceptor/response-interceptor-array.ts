@@ -21,7 +21,9 @@ export class ResponseInterceptorArray<T extends object, TClass extends object>
   intercept(context: ExecutionContext, next: CallHandler): Observable<T> {
     return next.handle().pipe(
       switchMap(async (data) => {
-        const objectToValidate = plainToInstance(this.validator, data);
+        const objectToValidate = plainToInstance(this.validator, data, {
+          enableCircularCheck: true,
+        });
         const validation = validateSync(objectToValidate);
         if (validation.length > 0) {
           console.log(JSON.stringify(validation, null, 2));

@@ -115,7 +115,7 @@ export class OrderController {
       newStatus,
     );
     return {
-      _id: orderUpdated.id,
+      _id: orderUpdated._id.toString(),
       table: orderUpdated.table,
       status: orderUpdated.status,
       products: orderUpdated.products,

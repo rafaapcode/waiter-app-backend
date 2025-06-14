@@ -129,8 +129,6 @@ class listOrdersDto {
 }
 
 export class OutPutListOrdersDto {
-  @IsArray()
-  @ValidateNested({ each: true })
   @Type(() => listOrdersDto)
   orders: listOrdersDto[];
 }
