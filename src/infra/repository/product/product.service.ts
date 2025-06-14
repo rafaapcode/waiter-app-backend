@@ -2,13 +2,7 @@ import {
   CreateProductDto,
   UpdateProductDto,
 } from '@core/http/product/dto/Input.dto';
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Product, ProductType } from '@shared/types/Product.type';
 import { Model, Schema } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
@@ -23,32 +17,19 @@ export class ProductRepository {
   async createProduct(
     productData: CreateProductDto,
   ): Promise<ProductType<string, string>> {
-    try {
-      const product = await this.productModel.create(productData);
-      const ingredients = product.ingredients.map((id) => id.toString());
-      return {
-        _id: product.id,
-        ingredients,
-        category: product.category.toString(),
-        description: product.description,
-        discount: product.discount,
-        imageUrl: product.imageUrl,
-        name: product.name,
-        price: product.price,
-        priceInDiscount: product.priceInDiscount,
-      };
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    const product = await this.productModel.create(productData);
+    const ingredients = product.ingredients.map((id) => id.toString());
+    return {
+      _id: product.id,
+      ingredients,
+      category: product.category.toString(),
+      description: product.description,
+      discount: product.discount,
+      imageUrl: product.imageUrl,
+      name: product.name,
+      price: product.price,
+      priceInDiscount: product.priceInDiscount,
+    };
   }
 
   async listProducts(orgId: string): Promise<
@@ -65,243 +46,138 @@ export class ProductRepository {
       }
     >[]
   > {
-    try {
-      const products = await this.productModel
-        .find({ org: orgId })
-        .populate('ingredients', '_id name icon')
-        .populate('category', '_id name icon');
+    const products = await this.productModel
+      .find({ org: orgId })
+      .populate('ingredients', '_id name icon')
+      .populate('category', '_id name icon');
 
-      return products.map((p) => {
-        const cat = p.category as {
-          _id: Schema.Types.ObjectId;
-          name: string;
-          icon: string;
-        };
-        const categorie = {
-          _id: cat._id.toString(),
-          name: cat.name,
-          icon: cat.icon,
-        };
+    return products.map((p) => {
+      const cat = p.category as {
+        _id: Schema.Types.ObjectId;
+        name: string;
+        icon: string;
+      };
+      const categorie = {
+        _id: cat._id.toString(),
+        name: cat.name,
+        icon: cat.icon,
+      };
 
-        const ingredients = p.ingredients.map((ing) => ({
-          _id: ing._id.toString(),
-          name: ing.name,
-          icon: ing.icon,
-        }));
+      const ingredients = p.ingredients.map((ing) => ({
+        _id: ing._id.toString(),
+        name: ing.name,
+        icon: ing.icon,
+      }));
 
-        return {
-          _id: p._id.toString(),
-          category: categorie,
-          ingredients,
-          description: p.description,
-          discount: p.discount,
-          imageUrl: p.imageUrl,
-          name: p.name,
-          price: p.price,
-          priceInDiscount: p.priceInDiscount,
-        };
-      });
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+      return {
+        _id: p._id.toString(),
+        category: categorie,
+        ingredients,
+        description: p.description,
+        discount: p.discount,
+        imageUrl: p.imageUrl,
+        name: p.name,
+        price: p.price,
+        priceInDiscount: p.priceInDiscount,
+      };
+    });
   }
 
   async listProductsByCategorie(
     orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
-    try {
-      const products = await this.productModel.find({
-        org: orgId,
-        category: categoryId,
-      });
+    const products = await this.productModel.find({
+      org: orgId,
+      category: categoryId,
+    });
 
-      return products.map((p) => ({
-        _id: p._id.toString(),
-        category: p.category.toString(),
-        ingredients: p.ingredients.map((id) => id.toString()),
-        description: p.description,
-        discount: p.discount,
-        imageUrl: p.imageUrl,
-        name: p.name,
-        price: p.price,
-        priceInDiscount: p.priceInDiscount,
-      }));
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return products.map((p) => ({
+      _id: p._id.toString(),
+      category: p.category.toString(),
+      ingredients: p.ingredients.map((id) => id.toString()),
+      description: p.description,
+      discount: p.discount,
+      imageUrl: p.imageUrl,
+      name: p.name,
+      price: p.price,
+      priceInDiscount: p.priceInDiscount,
+    }));
   }
 
   async productExists(name: string, orgId: string): Promise<boolean> {
-    try {
-      const product = await this.productModel.findOne({ name, org: orgId });
-      if (!product) {
-        return false;
-      }
-      return true;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    const product = await this.productModel.findOne({ name, org: orgId });
+    if (!product) {
+      return false;
     }
+    return true;
   }
 
   async deleteProduct(productId: string): Promise<boolean> {
-    try {
-      const productDeleted =
-        await this.productModel.findByIdAndDelete(productId);
+    const productDeleted = await this.productModel.findByIdAndDelete(productId);
 
-      if (!productDeleted) {
-        return false;
-      }
-      return true;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!productDeleted) {
+      return false;
     }
+    return true;
   }
 
   async updateProduct(
     productId: string,
     data: UpdateProductDto,
   ): Promise<Product> {
-    try {
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
-        productId,
-        {
-          ...data,
-        },
-        { new: true },
-      );
+    const updatedProduct = await this.productModel.findByIdAndUpdate(
+      productId,
+      {
+        ...data,
+      },
+      { new: true },
+    );
 
-      return updatedProduct;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return updatedProduct;
   }
 
   async putProductInDiscount(
     productId: string,
     discountPrice: number,
   ): Promise<Product> {
-    try {
-      const productInDiscount = await this.productModel.findByIdAndUpdate(
-        productId,
-        { discount: true, priceInDiscount: discountPrice },
-        { new: true },
-      );
+    const productInDiscount = await this.productModel.findByIdAndUpdate(
+      productId,
+      { discount: true, priceInDiscount: discountPrice },
+      { new: true },
+    );
 
-      return productInDiscount;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return productInDiscount;
   }
 
   async removeDiscountOfProduct(productId: string): Promise<Product> {
-    try {
-      const productWithoutDiscount = await this.productModel.findByIdAndUpdate(
-        productId,
-        { discount: false, priceInDiscount: 0 },
-        { new: true },
-      );
+    const productWithoutDiscount = await this.productModel.findByIdAndUpdate(
+      productId,
+      { discount: false, priceInDiscount: 0 },
+      { new: true },
+    );
 
-      return productWithoutDiscount;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return productWithoutDiscount;
   }
 
   async returnAllDiscountProducts(
     orgId: string,
   ): Promise<ProductType<string, string>[]> {
-    try {
-      const products = await this.productModel.find({
-        discount: true,
-        org: orgId,
-      });
-      return products.map((p) => ({
-        _id: p._id.toString(),
-        category: p.category.toString(),
-        ingredients: p.ingredients.map((id) => id.toString()),
-        description: p.description,
-        discount: p.discount,
-        imageUrl: p.imageUrl,
-        name: p.name,
-        price: p.price,
-        priceInDiscount: p.priceInDiscount,
-      }));
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    const products = await this.productModel.find({
+      discount: true,
+      org: orgId,
+    });
+    return products.map((p) => ({
+      _id: p._id.toString(),
+      category: p.category.toString(),
+      ingredients: p.ingredients.map((id) => id.toString()),
+      description: p.description,
+      discount: p.discount,
+      imageUrl: p.imageUrl,
+      name: p.name,
+      price: p.price,
+      priceInDiscount: p.priceInDiscount,
+    }));
   }
 
   async getProduct(productId: string): Promise<
@@ -318,45 +194,32 @@ export class ProductRepository {
       }
     >
   > {
-    try {
-      const product = await this.productModel
-        .findById(productId)
-        .populate('ingredients', '_id name icon')
-        .populate('category', '_id name icon');
+    const product = await this.productModel
+      .findById(productId)
+      .populate('ingredients', '_id name icon')
+      .populate('category', '_id name icon');
 
-      const cat = product.category as {
-        _id: Schema.Types.ObjectId;
-        name: string;
-        icon: string;
-      };
-      const categorie = {
-        ...cat,
-        _id: cat._id.toString(),
-      };
+    const cat = product.category as {
+      _id: Schema.Types.ObjectId;
+      name: string;
+      icon: string;
+    };
+    const categorie = {
+      ...cat,
+      _id: cat._id.toString(),
+    };
 
-      const ingredients = product.ingredients.map((ing) => ({
-        ...ing,
-        _id: ing._id.toString(),
-      }));
+    const ingredients = product.ingredients.map((ing) => ({
+      ...ing,
+      _id: ing._id.toString(),
+    }));
 
-      return {
-        ...product,
-        _id: product._id.toString(),
-        category: categorie,
-        ingredients,
-      };
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.getResponse());
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return {
+      ...product,
+      _id: product._id.toString(),
+      category: categorie,
+      ingredients,
+    };
   }
 
   async allProductsExists(productsIds: string[]): Promise<Product[]> {
@@ -386,15 +249,10 @@ export class ProductRepository {
   }
 
   async deleteAllProductsOfOrg(orgId: string): Promise<boolean> {
-    try {
-      await this.productModel.deleteMany({
-        org: orgId,
-      });
+    await this.productModel.deleteMany({
+      org: orgId,
+    });
 
-      return true;
-    } catch (error) {
-      console.log(error.message);
-      return false;
-    }
+    return true;
   }
 }

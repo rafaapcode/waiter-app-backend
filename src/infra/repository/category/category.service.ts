@@ -2,13 +2,7 @@ import {
   CreateCategoryDto,
   EditCategoryDto,
 } from '@core/http/category/dto/Input.dto';
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Category } from '@shared/types/Category.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
@@ -21,113 +15,58 @@ export class CategoryRepository {
   ) {}
 
   async createCategory(categoryData: CreateCategoryDto): Promise<Category> {
-    try {
-      const categorie = await this.categoryModel.create({
-        ...categoryData,
-        icon: categoryData.icon || '',
-      });
+    const categorie = await this.categoryModel.create({
+      ...categoryData,
+      icon: categoryData.icon || '',
+    });
 
-      return categorie;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return categorie;
   }
 
   async listCategory(orgId: string): Promise<Category[]> {
-    try {
-      const categories = await this.categoryModel.find({ org: orgId });
+    const categories = await this.categoryModel.find({ org: orgId });
 
-      return categories;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
-    }
+    return categories;
   }
 
   async findCategoryByName(name: string, orgId: string): Promise<boolean> {
-    try {
-      const category = await this.categoryModel.findOne({ name, org: orgId });
+    const category = await this.categoryModel.findOne({ name, org: orgId });
 
-      if (!category) {
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!category) {
+      return false;
     }
+
+    return true;
   }
 
   async editCategory(id: string, data: EditCategoryDto): Promise<boolean> {
-    try {
-      const category = await this.categoryModel.findByIdAndUpdate(id, {
-        ...(data.icon && { icon: data.icon }),
-        ...(data.name && { name: data.name }),
-      });
+    const category = await this.categoryModel.findByIdAndUpdate(id, {
+      ...(data.icon && { icon: data.icon }),
+      ...(data.name && { name: data.name }),
+    });
 
-      if (!category) {
-        throw new NotFoundException('Categoria não encontrada');
-      }
-
-      return true;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!category) {
+      throw new NotFoundException('Categoria não encontrada');
     }
+
+    return true;
   }
 
   async deleteCategory(categoryId: string): Promise<boolean> {
-    try {
-      const categoryDeleted =
-        await this.categoryModel.findByIdAndDelete(categoryId);
+    const categoryDeleted =
+      await this.categoryModel.findByIdAndDelete(categoryId);
 
-      if (!categoryDeleted) {
-        return false;
-      }
-      return true;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.getResponse());
-      }
-      if (error instanceof InternalServerErrorException) {
-        throw new InternalServerErrorException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
+    if (!categoryDeleted) {
+      return false;
     }
+    return true;
   }
 
   async deleteAllCategoryOfOrg(orgId: string): Promise<boolean> {
-    try {
-      await this.categoryModel.deleteMany({
-        org: orgId,
-      });
+    await this.categoryModel.deleteMany({
+      org: orgId,
+    });
 
-      return true;
-    } catch (error) {
-      console.log(error.message);
-      return false;
-    }
+    return true;
   }
 }

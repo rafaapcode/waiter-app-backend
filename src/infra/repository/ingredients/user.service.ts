@@ -68,15 +68,9 @@ export class IngredientRepository {
   async createMany({ ingredients }: CreateManyIngredientDto): Promise<{
     data: { name: string; id: string }[];
   }> {
-    try {
-      const ingredientsAdded =
-        await this.ingredientModel.insertMany(ingredients);
-      return {
-        data: ingredientsAdded.map((ing) => ({ id: ing.id, name: ing.name })),
-      };
-    } catch (error: any) {
-      console.log(error.message);
-      return { data: [] };
-    }
+    const ingredientsAdded = await this.ingredientModel.insertMany(ingredients);
+    return {
+      data: ingredientsAdded.map((ing) => ({ id: ing.id, name: ing.name })),
+    };
   }
 }
