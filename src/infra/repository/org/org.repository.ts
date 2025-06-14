@@ -123,4 +123,12 @@ export class OrgRepository {
 
     return true;
   }
+
+  async orgExists(orgId: string): Promise<void> {
+    const org = await this.orgModel.findById(orgId);
+
+    if (!org) {
+      throw new NotFoundException('Organização não existe');
+    }
+  }
 }

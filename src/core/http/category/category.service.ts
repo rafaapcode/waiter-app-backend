@@ -1,4 +1,5 @@
 import { CategoryRepository } from '@infra/repository/category/category.repository';
+import { OrgRepository } from '@infra/repository/org/org.repository';
 import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   BadRequestException,
@@ -14,9 +15,12 @@ export class CategoryService {
   constructor(
     private readonly categoryRepository: CategoryRepository,
     private readonly productRepository: ProductRepository,
+    private readonly orgRepository: OrgRepository,
   ) {}
 
   async createCategory(data: CreateCategoryDto): Promise<CategoryType<string>> {
+    await this.orgRepository.orgExists(data.org);
+
     const categoryExist = await this.categoryRepository.findCategoryByName(
       data.name,
       data.org,
@@ -36,6 +40,7 @@ export class CategoryService {
   async listCategory(
     orgId: string,
   ): Promise<Pick<CategoryType<string>, 'id' | 'icon' | 'name'>[]> {
+    await this.orgRepository.orgExists(orgId);
     const categories = await this.categoryRepository.listCategory(orgId);
     return categories;
   }
@@ -53,6 +58,7 @@ export class CategoryService {
   }
 
   async deleteCategory(orgId: string, categoryId: string): Promise<boolean> {
+    await this.orgRepository.orgExists(orgId);
     const categorieExist =
       await this.categoryRepository.findCategoryById(categoryId);
 

@@ -1,4 +1,7 @@
+import { CategoryRepository } from '@infra/repository/category/category.repository';
+import { IngredientRepository } from '@infra/repository/ingredients/ingredients.repository';
 import { OrderRepository } from '@infra/repository/order/order.repository';
+import { OrgRepository } from '@infra/repository/org/org.repository';
 import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   BadRequestException,
@@ -15,11 +18,34 @@ export class ProductService {
   constructor(
     private readonly productRepository: ProductRepository,
     private readonly orderRepository: OrderRepository,
+    private readonly orgRepository: OrgRepository,
+    private readonly categoryRepository: CategoryRepository,
+    private readonly ingredientRepository: IngredientRepository,
   ) {}
 
   async createProduct(
     productData: CreateProductDto,
   ): Promise<ProductType<string, string>> {
+    await this.orgRepository.orgExists(productData.org);
+
+    const categoryExists = await this.categoryRepository.findCategoryById(
+      productData.category,
+    );
+
+    if (!categoryExists) {
+      throw new NotFoundException(
+        'Categoria não encontrada, escolha outra ou crie uma.',
+      );
+    }
+
+    const ingredientExists = await this.ingredientRepository.verfifyIngredients(
+      productData.ingredients,
+    );
+
+    if (ingredientExists.data.length !== productData.ingredients.length) {
+      throw new NotFoundException('Um ou mais ingredientes não existem');
+    }
+
     const productExists = await this.productRepository.productExists(
       productData.name,
       productData.org,
@@ -43,6 +69,7 @@ export class ProductService {
   }
 
   async listProduct(orgId: string): Promise<ListProductsType[]> {
+    await this.orgRepository.orgExists(orgId);
     const products = await this.productRepository.listProducts(orgId);
 
     if (products.length === 0) {
@@ -56,6 +83,7 @@ export class ProductService {
     orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
+    await this.orgRepository.orgExists(orgId);
     const products = await this.productRepository.listProductsByCategorie(
       orgId,
       categoryId,
@@ -95,6 +123,27 @@ export class ProductService {
     data: UpdateProductDto,
   ): Promise<ProductType<string, string>> {
     await this.productRepository.getProduct(productId);
+
+    if (data.ingredients) {
+      const ingredientExists =
+        await this.ingredientRepository.verfifyIngredients(data.ingredients);
+
+      if (ingredientExists.data.length !== data.ingredients.length) {
+        throw new NotFoundException('Um ou mais ingredientes não existem');
+      }
+    }
+
+    if (data.category) {
+      const categoryExists = await this.categoryRepository.findCategoryById(
+        data.category,
+      );
+
+      if (!categoryExists) {
+        throw new NotFoundException(
+          'Categoria não encontrada, escolha outra ou crie uma.',
+        );
+      }
+    }
 
     const updatedProduct = await this.productRepository.updateProduct(
       productId,
@@ -142,6 +191,7 @@ export class ProductService {
   async getAllDiscountProducts(
     orgId: string,
   ): Promise<ProductType<string, string>[]> {
+    await this.orgRepository.orgExists(orgId);
     const products =
       await this.productRepository.returnAllDiscountProducts(orgId);
 

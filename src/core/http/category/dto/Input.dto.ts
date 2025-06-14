@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { IsMongoId, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateCategoryDto {
@@ -17,4 +16,13 @@ export class CreateCategoryDto {
   org: string;
 }
 
-export class EditCategoryDto extends PartialType(CreateCategoryDto) {}
+export class EditCategoryDto {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2, { message: 'Nome deve ter ao menos 2 caracteres' })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  icon: string;
+}

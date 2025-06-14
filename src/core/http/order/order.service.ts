@@ -1,5 +1,6 @@
 import { OrderGateway } from '@core/websocket/gateway/gateway';
 import { OrderRepository } from '@infra/repository/order/order.repository';
+import { OrgRepository } from '@infra/repository/org/org.repository';
 import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   HttpException,
@@ -24,6 +25,7 @@ export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly productRepository: ProductRepository,
+    private readonly orgRepository: OrgRepository,
     private readonly orderWs: OrderGateway,
   ) {}
 
@@ -43,6 +45,8 @@ export class OrderService {
   async createOrder(
     createOrderData: CreateOrderDto,
   ): Promise<OrderType<ProductType>> {
+    await this.orgRepository.orgExists(createOrderData.org);
+
     const productsIds = createOrderData.products.map(
       (product) => product.product,
     );
@@ -89,6 +93,7 @@ export class OrderService {
   }
 
   async listOrders(orgId: string): Promise<ListOrderType[]> {
+    await this.orgRepository.orgExists(orgId);
     const orders = await this.orderRepository.listOrders(orgId);
     if (!orders) {
       throw new InternalServerErrorException('Erro ao listar os pedidos');
@@ -102,6 +107,7 @@ export class OrderService {
   }
 
   async restartDay(orgId: string): Promise<boolean> {
+    await this.orgRepository.orgExists(orgId);
     const orders = await this.orderRepository.restartDay(orgId);
 
     if (orders) {
@@ -115,6 +121,7 @@ export class OrderService {
     orgId: string,
     page: number,
   ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
+    await this.orgRepository.orgExists(orgId);
     const { total_pages, orders } = await this.orderRepository.historyOfOrders(
       orgId,
       page,
@@ -135,6 +142,7 @@ export class OrderService {
     filters: { to: Date; from: Date },
     page: number,
   ): Promise<{ total_pages: number; history: HistoryOrder[] }> {
+    await this.orgRepository.orgExists(orgId);
     const { total_pages, orders } =
       await this.orderRepository.historyOfOrdersWithFilters(
         orgId,
