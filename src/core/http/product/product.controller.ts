@@ -56,7 +56,7 @@ export class ProductController {
     };
   }
 
-  @Get('/:productId')
+  @Get('search/:productId')
   @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(OutPutGetProductDto))
   async getProduct(
@@ -106,7 +106,7 @@ export class ProductController {
     };
   }
 
-  @Delete('/:productId')
+  @Delete(':productId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
@@ -119,7 +119,7 @@ export class ProductController {
     };
   }
 
-  @Put('/:productId')
+  @Put(':productId')
   @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))

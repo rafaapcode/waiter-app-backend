@@ -77,6 +77,7 @@ export class OrderController {
     const orders = await this.orderService.listOrders(orgId);
     return {
       orders: orders.map((order) => ({
+        _id: order._id,
         createdAt: order.createdAt,
         table: order.table,
         status: order.status,
@@ -94,6 +95,7 @@ export class OrderController {
   ): Promise<OutPutCreateOrdersDto> {
     const orderCreated = await this.orderService.createOrder(orderData);
     return {
+      _id: orderCreated.id,
       table: orderCreated.table,
       status: orderCreated.status,
       products: orderCreated.products,

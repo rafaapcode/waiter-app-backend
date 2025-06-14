@@ -42,6 +42,10 @@ export class ProductRepository {
       .populate('ingredients', '_id name icon')
       .populate('category', '_id name icon');
 
+    if (!products) {
+      throw new NotFoundException('Nenhum produto encontrado');
+    }
+
     return products.map((p) => {
       const cat = p.category as {
         _id: Schema.Types.ObjectId;
@@ -59,7 +63,6 @@ export class ProductRepository {
         name: ing.name,
         icon: ing.icon,
       }));
-
       return {
         _id: p._id.toString(),
         category: categorie,
@@ -82,6 +85,10 @@ export class ProductRepository {
       org: orgId,
       category: categoryId,
     });
+
+    if (!products) {
+      throw new NotFoundException('Nenhum produto encontrado nessa categoria');
+    }
 
     return products.map((p) => ({
       _id: p._id.toString(),
@@ -211,26 +218,37 @@ export class ProductRepository {
       .populate('ingredients', '_id name icon')
       .populate('category', '_id name icon');
 
+    if (!product) {
+      throw new NotFoundException('Nenhum produto encontrado');
+    }
+
     const cat = product.category as {
       _id: Schema.Types.ObjectId;
       name: string;
       icon: string;
     };
     const categorie = {
-      ...cat,
       _id: cat._id.toString(),
+      name: cat.name,
+      icon: cat.icon,
     };
 
     const ingredients = product.ingredients.map((ing) => ({
-      ...ing,
       _id: ing._id.toString(),
+      name: ing.name,
+      icon: ing.icon,
     }));
 
     return {
-      ...product,
       _id: product._id.toString(),
       category: categorie,
       ingredients,
+      description: product.description,
+      discount: product.discount,
+      imageUrl: product.imageUrl,
+      price: product.price,
+      name: product.name,
+      priceInDiscount: product.priceInDiscount,
     };
   }
 

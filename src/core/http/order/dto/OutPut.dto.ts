@@ -8,7 +8,6 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsPositive,
   IsString,
   IsUrl,
@@ -95,6 +94,11 @@ export class OutPutHistoryOrderDto {
 }
 
 export class OutPutCreateOrdersDto {
+  @IsString({ message: '_id deve ser uma string' })
+  @IsNotEmpty()
+  @IsMongoId()
+  _id: string;
+
   @IsString()
   @IsNotEmpty()
   table: string;
@@ -109,9 +113,9 @@ export class OutPutCreateOrdersDto {
 
 class listOrdersDto {
   @IsString({ message: '_id deve ser uma string' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsMongoId()
-  _id?: string;
+  _id: string;
 
   @IsString({ message: 'table deve ser uma string' })
   @IsNotEmpty({ message: 'table é obrigatório' })

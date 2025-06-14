@@ -35,7 +35,7 @@ export class CategoryService {
 
   async listCategory(
     orgId: string,
-  ): Promise<Pick<CategoryType<string>, 'icon' | 'name'>[]> {
+  ): Promise<Pick<CategoryType<string>, 'id' | 'icon' | 'name'>[]> {
     const categories = await this.categoryRepository.listCategory(orgId);
     return categories;
   }

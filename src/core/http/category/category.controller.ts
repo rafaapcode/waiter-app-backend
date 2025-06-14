@@ -38,6 +38,7 @@ export class CategoryController {
 
     return {
       categories: categories.map((cat) => ({
+        _id: cat.id,
         name: cat.name,
         icon: cat.icon,
       })),
@@ -55,6 +56,7 @@ export class CategoryController {
       await this.categoryService.createCategory(categoryData);
 
     return {
+      _id: categoryCreated.id,
       name: categoryCreated.name,
       icon: categoryCreated.icon,
     };

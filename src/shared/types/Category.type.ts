@@ -10,6 +10,7 @@ export interface Category<TOrg = OrgPropertie> extends Document {
 }
 
 export interface CategoryType<TOrg = OrgPropertie> {
+  id: string;
   name: string;
   icon: string;
   org: TOrg;

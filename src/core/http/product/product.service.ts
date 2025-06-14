@@ -65,10 +65,6 @@ export class ProductService {
       categoryId,
     );
 
-    if (!products) {
-      throw new NotFoundException('Nenhum produto encontrado nessa categoria');
-    }
-
     if (products.length === 0) {
       throw new HttpException(null, 204);
     }
@@ -77,6 +73,8 @@ export class ProductService {
   }
 
   async deleteProduct(productId: string): Promise<boolean> {
+    await this.productRepository.getProduct(productId);
+
     const productIsAlreadyBeingUsed =
       await this.orderRepository.productIsBeingUsed(productId);
 
@@ -100,14 +98,12 @@ export class ProductService {
     productId: string,
     data: UpdateProductDto,
   ): Promise<ProductType<string, string>> {
+    await this.productRepository.getProduct(productId);
+
     const updatedProduct = await this.productRepository.updateProduct(
       productId,
       data,
     );
-
-    if (!updatedProduct) {
-      throw new NotFoundException('Nenhum produto encontrado !');
-    }
 
     return updatedProduct;
   }
@@ -126,14 +122,12 @@ export class ProductService {
       );
     }
 
+    await this.productRepository.getProduct(productId);
+
     const productInDiscount = await this.productRepository.putProductInDiscount(
       productId,
       newPrice,
     );
-
-    if (!productInDiscount) {
-      throw new NotFoundException('Produto não encontrado');
-    }
 
     return productInDiscount;
   }
@@ -141,12 +135,10 @@ export class ProductService {
   async removeDiscountOfProduct(
     productId: string,
   ): Promise<ProductType<string, string>> {
+    await this.productRepository.getProduct(productId);
+
     const productWithoutDiscount =
       await this.productRepository.removeDiscountOfProduct(productId);
-
-    if (!productWithoutDiscount) {
-      throw new NotFoundException('Produto não encontrado');
-    }
 
     return productWithoutDiscount;
   }
@@ -166,11 +158,6 @@ export class ProductService {
 
   async getProduct(productId: string): Promise<ListProductsType> {
     const product = await this.productRepository.getProduct(productId);
-
-    if (!product) {
-      throw new NotFoundException('Product não encontrado');
-    }
-
     return product;
   }
 }

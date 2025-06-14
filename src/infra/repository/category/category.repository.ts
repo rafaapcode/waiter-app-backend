@@ -23,6 +23,7 @@ export class CategoryRepository {
     });
 
     return {
+      id: categorie.id,
       icon: categorie.icon,
       name: categorie.name,
       org: categorie.org.toString(),
@@ -31,10 +32,11 @@ export class CategoryRepository {
 
   async listCategory(
     orgId: string,
-  ): Promise<Pick<CategoryType<string>, 'icon' | 'name'>[]> {
+  ): Promise<Pick<CategoryType<string>, 'id' | 'icon' | 'name'>[]> {
     const categories = await this.categoryModel.find({ org: orgId });
 
     return categories.map((c) => ({
+      id: c.id,
       icon: c.icon,
       name: c.name,
     }));
