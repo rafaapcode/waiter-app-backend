@@ -7,9 +7,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { OrgType } from '@shared/types/Org.type';
 import mongoose from 'mongoose';
-import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
+import { UpdateOrgDTO } from './dto/Input.dto';
+import { OrgEntity } from './entity/org.entity';
 
 @Injectable()
 export class OrgService {
@@ -20,7 +20,7 @@ export class OrgService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async createOrg(orgData: CreateOrgDTO): Promise<OrgType> {
+  async createOrg(orgData: OrgEntity): Promise<OrgEntity> {
     const orgExists = await this.orgRepository.getOrgByName(
       orgData.name,
       orgData.user,
@@ -35,7 +35,7 @@ export class OrgService {
     return org;
   }
 
-  async updateOrg(orgId: string, orgData: UpdateOrgDTO): Promise<OrgType> {
+  async updateOrg(orgId: string, orgData: UpdateOrgDTO): Promise<OrgEntity> {
     const orgExists = await this.orgRepository.getOrgById(orgId);
 
     if (!orgExists) {
@@ -73,11 +73,11 @@ export class OrgService {
     }
   }
 
-  async getOrgId(orgId: string): Promise<OrgType> {
+  async getOrgId(orgId: string): Promise<OrgEntity> {
     return await this.orgRepository.getOrgById(orgId);
   }
 
-  async getAllOrgsOfUser(userid: string): Promise<OrgType[]> {
+  async getAllOrgsOfUser(userid: string): Promise<OrgEntity[]> {
     return await this.orgRepository.getAllOrgsOfUser(userid);
   }
 }

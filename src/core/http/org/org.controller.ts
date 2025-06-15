@@ -25,6 +25,7 @@ import {
   OutPutMessageDto,
   OutPutUpdateOrgDto,
 } from './dto/OutPut.dto';
+import { OrgEntity } from './entity/org.entity';
 import { OrgService } from './org.service';
 
 @Controller('org')
@@ -53,7 +54,9 @@ export class OrgController {
     @Param('id') id: string,
     @Body() orgData: UpdateOrgDTO,
   ): Promise<OutPutUpdateOrgDto> {
-    return await this.orgService.updateOrg(id, orgData);
+    const org = OrgEntity.toUpdate(orgData);
+    const orgUpdated = await this.orgService.updateOrg(id, org);
+    return orgUpdated.httpUpdateResponse();
   }
 
   @Post('')
@@ -61,7 +64,10 @@ export class OrgController {
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateOrgDto))
   async createOrg(@Body() orgData: CreateOrgDTO): Promise<OutPutCreateOrgDto> {
-    return await this.orgService.createOrg(orgData);
+    const newOrg = OrgEntity.newOrg(orgData);
+    const org = await this.orgService.createOrg(newOrg);
+
+    return org.httpCreateResponse();
   }
 
   @Get('user')
@@ -73,7 +79,7 @@ export class OrgController {
   ): Promise<OutPutListOrgsOfUser> {
     const orgs = await this.orgService.getAllOrgsOfUser(user.id);
     return {
-      orgs,
+      orgs: OrgEntity.httpGetAllOrgsResponse(orgs),
     };
   }
 
@@ -82,6 +88,7 @@ export class OrgController {
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutGetOrgDto))
   async getOrg(@Param('orgid') orgid: string): Promise<OutPutGetOrgDto> {
-    return await this.orgService.getOrgId(orgid);
+    const org = await this.orgService.getOrgId(orgid);
+    return org.httpGetOrgResponse();
   }
 }

@@ -1,6 +1,7 @@
-import { CreateOrgDTO, UpdateOrgDTO } from '@core/http/org/dto/Input.dto';
+import { UpdateOrgDTO } from '@core/http/org/dto/Input.dto';
+import { OrgEntity } from '@core/http/org/entity/org.entity';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Org, OrgType } from '@shared/types/Org.type';
+import { Org } from '@shared/types/Org.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -11,9 +12,16 @@ export class OrgRepository {
     private orgModel: Model<Org>,
   ) {}
 
-  async createOrg(org: CreateOrgDTO): Promise<OrgType> {
-    const newOrg = await this.orgModel.create(org);
-    return {
+  async createOrg(org: OrgEntity): Promise<OrgEntity> {
+    const orgPayload = org.toCreate();
+    const newOrg = await this.orgModel.create({
+      ...orgPayload,
+      location: {
+        type: 'Point',
+        coordinates: orgPayload.location ? orgPayload.location : [0, 0],
+      },
+    });
+    return OrgEntity.toEntity({
       description: newOrg.description,
       email: newOrg.email,
       imageUrl: newOrg.imageUrl,
@@ -27,10 +35,10 @@ export class OrgRepository {
       name: newOrg.name,
       user: newOrg.user.toString(),
       _id: newOrg.id,
-    };
+    });
   }
 
-  async updateOrg(orgId: string, org: UpdateOrgDTO): Promise<OrgType> {
+  async updateOrg(orgId: string, org: UpdateOrgDTO): Promise<OrgEntity> {
     const newOrg = await this.orgModel.findByIdAndUpdate(
       orgId,
       { ...org },
@@ -41,7 +49,7 @@ export class OrgRepository {
       throw new NotFoundException('Organização não encontrada');
     }
 
-    return {
+    return OrgEntity.toEntity({
       description: newOrg.description,
       email: newOrg.email,
       imageUrl: newOrg.imageUrl,
@@ -55,16 +63,16 @@ export class OrgRepository {
       name: newOrg.name,
       user: newOrg.user.toString(),
       _id: newOrg.id,
-    };
+    });
   }
 
-  async getOrgById(orgId: string): Promise<OrgType> {
+  async getOrgById(orgId: string): Promise<OrgEntity> {
     const orgById = await this.orgModel.findById(orgId);
 
     if (!orgById) {
       throw new NotFoundException('Organização não encontrada');
     }
-    return {
+    return OrgEntity.toEntity({
       description: orgById.description,
       email: orgById.email,
       imageUrl: orgById.imageUrl,
@@ -78,7 +86,7 @@ export class OrgRepository {
       name: orgById.name,
       user: orgById.user.toString(),
       _id: orgById.id,
-    };
+    });
   }
 
   async getOrgByName(orgName: string, userid: string): Promise<boolean> {
@@ -92,13 +100,12 @@ export class OrgRepository {
     return false;
   }
 
-  async getAllOrgsOfUser(userId: string): Promise<OrgType[]> {
+  async getAllOrgsOfUser(userId: string): Promise<OrgEntity[]> {
     const allOrgs = await this.orgModel.find({
       user: userId,
     });
-
     return allOrgs.map((org) => {
-      return {
+      return OrgEntity.toEntity({
         description: org.description,
         email: org.email,
         imageUrl: org.imageUrl,
@@ -112,7 +119,7 @@ export class OrgRepository {
         name: org.name,
         user: org.user.toString(),
         _id: org.id,
-      };
+      });
     });
   }
 

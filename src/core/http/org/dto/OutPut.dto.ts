@@ -6,7 +6,6 @@ import {
   IsEmail,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -27,10 +26,6 @@ class location {
   type?: string;
 
   @IsArray({ message: 'coordinates deve ser um array' })
-  @IsNumber(
-    {},
-    { each: true, message: 'coordinates deve conter apenas números' },
-  )
   @ArrayMaxSize(2, { message: 'coordinates deve ter exatamente 2 elementos' })
   @IsOptional()
   coordinates?: [number, number];

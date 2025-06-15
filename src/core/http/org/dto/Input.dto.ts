@@ -89,8 +89,8 @@ export class CreateOrgDTO {
   street: string;
 
   @IsArray()
-  @IsNotEmpty()
-  location: number[];
+  @IsOptional()
+  location?: number[];
 
   @IsString()
   @IsNotEmpty()
