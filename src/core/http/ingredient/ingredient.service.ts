@@ -1,15 +1,17 @@
 import { IngredientRepository } from '@infra/repository/ingredients/ingredients.repository';
-import { ConflictException, Injectable } from '@nestjs/common';
-import { IngredientType } from '@shared/types/Ingredient.type';
-import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateManyIngredientDto } from './dto/Input.dto';
+import { IngredientEntity } from './entity/ingredient.entity';
 
 @Injectable()
 export class IngredientService {
   constructor(private readonly ingredientRepository: IngredientRepository) {}
 
-  async createIngredient(
-    data: CreateIngredientDto,
-  ): Promise<{ data: IngredientType }> {
+  async createIngredient(data: IngredientEntity): Promise<IngredientEntity> {
     const ingredientExist = await this.ingredientRepository.ingredientExist(
       data.name,
     );
@@ -21,33 +23,35 @@ export class IngredientService {
     return await this.ingredientRepository.createIngredient(data);
   }
 
-  async getAllIngredients(): Promise<{ data: IngredientType[] }> {
+  async getAllIngredients(): Promise<IngredientEntity[]> {
     return await this.ingredientRepository.getAllIngredients();
   }
 
-  async verifyIngredients(
-    ingredients: string[],
-  ): Promise<{ data: Pick<IngredientType, 'id' | 'name'>[] }> {
-    return await this.ingredientRepository.verfifyIngredients(ingredients);
+  async verifyIngredients(ingredients: string[]): Promise<IngredientEntity[]> {
+    const ings =
+      await this.ingredientRepository.verfifyIngredients(ingredients);
+    if (ings.length === 0) {
+      throw new NotFoundException('Ingredientes não existem');
+    }
+    return ings;
   }
 
-  async createManyIngredients(ingredients: CreateManyIngredientDto): Promise<{
-    data: Pick<IngredientType, 'id' | 'name'>[];
-  }> {
+  async createManyIngredients(
+    ingredients: CreateManyIngredientDto,
+  ): Promise<IngredientEntity[]> {
     const ingredientsThatAlreadyExists =
       await this.ingredientRepository.verfifyIngredients(
         ingredients.ingredients.map((ing) => ing.name),
       );
 
     if (
-      ingredientsThatAlreadyExists.data.length ===
-      ingredients.ingredients.length
+      ingredientsThatAlreadyExists.length === ingredients.ingredients.length
     ) {
       throw new ConflictException('Todos os ingredientes já existem');
     }
 
     const ingredientsAlreadyExists = new Set(
-      ingredientsThatAlreadyExists.data.map((ing) => ing.name),
+      ingredientsThatAlreadyExists.map((ing) => ing.name),
     );
     const ingredientsToBeAdd = new Set(
       ingredients.ingredients.map((ing) => ing.name),

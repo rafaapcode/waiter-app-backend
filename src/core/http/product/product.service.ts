@@ -42,7 +42,7 @@ export class ProductService {
       productData.ingredients,
     );
 
-    if (ingredientExists.data.length !== productData.ingredients.length) {
+    if (ingredientExists.length !== productData.ingredients.length) {
       throw new NotFoundException('Um ou mais ingredientes não existem');
     }
 
@@ -128,7 +128,7 @@ export class ProductService {
       const ingredientExists =
         await this.ingredientRepository.verfifyIngredients(data.ingredients);
 
-      if (ingredientExists.data.length !== data.ingredients.length) {
+      if (ingredientExists.length !== data.ingredients.length) {
         throw new NotFoundException('Um ou mais ingredientes não existem');
       }
     }

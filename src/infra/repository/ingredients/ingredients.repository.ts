@@ -1,9 +1,7 @@
-import {
-  CreateIngredientDto,
-  CreateManyIngredientDto,
-} from '@core/http/ingredient/dto/Input.dto';
+import { CreateManyIngredientDto } from '@core/http/ingredient/dto/Input.dto';
+import { IngredientEntity } from '@core/http/ingredient/entity/ingredient.entity';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Ingredient, IngredientType } from '@shared/types/Ingredient.type';
+import { Ingredient } from '@shared/types/Ingredient.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -15,38 +13,32 @@ export class IngredientRepository {
   ) {}
 
   async createIngredient(
-    dataIngredient: CreateIngredientDto,
-  ): Promise<{ data: IngredientType }> {
-    const ingredient = await this.ingredientModel.create(dataIngredient);
+    dataIngredient: IngredientEntity,
+  ): Promise<IngredientEntity> {
+    const ingredient = await this.ingredientModel.create(
+      dataIngredient.toCreate(),
+    );
 
-    return {
-      data: {
-        id: ingredient.id,
-        name: ingredient.name,
-        icon: ingredient.icon,
-      },
-    };
+    return IngredientEntity.toEntity({
+      icon: ingredient.icon,
+      id: ingredient.id,
+      name: ingredient.name,
+    });
   }
 
-  async getAllIngredients(): Promise<{ data: IngredientType[] }> {
+  async getAllIngredients(): Promise<IngredientEntity[]> {
     const allIngredients = await this.ingredientModel.find();
 
     if (!allIngredients) {
       throw new NotFoundException('Nenhum ingrediente encontrado');
     }
 
-    return {
-      data: allIngredients.map((data) => ({
-        id: data.id,
-        name: data.name,
-        icon: data.icon,
-      })),
-    };
+    return allIngredients.map(
+      (data) => new IngredientEntity(data.name, data.icon, data.id),
+    );
   }
 
-  async verfifyIngredients(
-    ingredients: string[],
-  ): Promise<{ data: Pick<IngredientType, 'id' | 'name'>[] }> {
+  async verfifyIngredients(ingredients: string[]): Promise<IngredientEntity[]> {
     const allIngredients = await this.ingredientModel.find({
       name: { $in: ingredients },
     });
@@ -55,12 +47,9 @@ export class IngredientRepository {
       throw new NotFoundException('Nenhum ingrediente encontrado');
     }
 
-    return {
-      data: allIngredients.map((ing) => ({
-        id: ing.id,
-        name: ing.name,
-      })),
-    };
+    return allIngredients.map(
+      (ing) => new IngredientEntity(ing.name, ing.icon, ing.id),
+    );
   }
 
   async ingredientExist(ingredientName: string): Promise<boolean> {
@@ -75,12 +64,12 @@ export class IngredientRepository {
     return true;
   }
 
-  async createMany({ ingredients }: CreateManyIngredientDto): Promise<{
-    data: Pick<IngredientType, 'id' | 'name'>[];
-  }> {
+  async createMany({
+    ingredients,
+  }: CreateManyIngredientDto): Promise<IngredientEntity[]> {
     const ingredientsAdded = await this.ingredientModel.insertMany(ingredients);
-    return {
-      data: ingredientsAdded.map((ing) => ({ id: ing.id, name: ing.name })),
-    };
+    return ingredientsAdded.map(
+      (ing) => new IngredientEntity(ing.name, ing.icon, ing.id),
+    );
   }
 }

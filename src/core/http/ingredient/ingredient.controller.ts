@@ -16,6 +16,7 @@ import {
   OutPutGetAllIngredientsDto,
   OutPutVerifyIngredientsDto,
 } from './dto/OutPut.dto';
+import { IngredientEntity } from './entity/ingredient.entity';
 import { IngredientService } from './ingredient.service';
 
 @Controller('ingredient')
@@ -25,7 +26,10 @@ export class IngredientController {
   @Get()
   @UseInterceptors(new ResponseInterceptor(OutPutGetAllIngredientsDto))
   async getAll(): Promise<OutPutGetAllIngredientsDto> {
-    return await this.ingredientsService.getAllIngredients();
+    const ingredients = await this.ingredientsService.getAllIngredients();
+    return {
+      data: IngredientEntity.httpGetAllResponse(ingredients),
+    };
   }
 
   @Post()
@@ -33,7 +37,14 @@ export class IngredientController {
   async createIngredient(
     @Body() data: CreateIngredientDto,
   ): Promise<OutPutCreateIngredientDto> {
-    return await this.ingredientsService.createIngredient(data);
+    const newIngredient = IngredientEntity.newIngredient(data);
+
+    const ingredient =
+      await this.ingredientsService.createIngredient(newIngredient);
+
+    return {
+      data: ingredient.httpCreateResponse(),
+    };
   }
 
   @Post('verify')
@@ -42,7 +53,12 @@ export class IngredientController {
   async verifyIngredients(
     @Body() data: { ingredients: string[] },
   ): Promise<OutPutVerifyIngredientsDto> {
-    return await this.ingredientsService.verifyIngredients(data.ingredients);
+    const ings = await this.ingredientsService.verifyIngredients(
+      data.ingredients,
+    );
+    return {
+      data: IngredientEntity.httpVerifyResponse(ings),
+    };
   }
 
   @Post('create-many')
@@ -53,10 +69,12 @@ export class IngredientController {
   ): Promise<OutPutCreateManyIngredientsDto> {
     const response = await this.ingredientsService.createManyIngredients(data);
 
-    if (response.data.length === 0) {
+    if (response.length === 0) {
       throw new BadRequestException('Erro ao criar os ingredientes');
     }
 
-    return response;
+    return {
+      data: IngredientEntity.httpCreateManyResponse(response),
+    };
   }
 }

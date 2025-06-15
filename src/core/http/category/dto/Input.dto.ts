@@ -1,4 +1,10 @@
-import { IsMongoId, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateCategoryDto {
   @IsString()
@@ -18,11 +24,11 @@ export class CreateCategoryDto {
 
 export class EditCategoryDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(2, { message: 'Nome deve ter ao menos 2 caracteres' })
-  name: string;
+  name?: string;
 
   @IsString()
-  @IsNotEmpty()
-  icon: string;
+  @IsOptional()
+  icon?: string;
 }
