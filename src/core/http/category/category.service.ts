@@ -7,8 +7,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CategoryType } from '@shared/types/Category.type';
-import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
+import { EditCategoryDto } from './dto/Input.dto';
+import { CategoryEntity } from './entity/category.entity';
 
 @Injectable()
 export class CategoryService {
@@ -18,7 +18,9 @@ export class CategoryService {
     private readonly orgRepository: OrgRepository,
   ) {}
 
-  async createCategory(data: CreateCategoryDto): Promise<CategoryType<string>> {
+  async createCategory(
+    data: CategoryEntity<string>,
+  ): Promise<CategoryEntity<string>> {
     await this.orgRepository.orgExists(data.org);
 
     const categoryExist = await this.categoryRepository.findCategoryByName(
@@ -37,9 +39,7 @@ export class CategoryService {
     return category;
   }
 
-  async listCategory(
-    orgId: string,
-  ): Promise<Pick<CategoryType<string>, 'id' | 'icon' | 'name'>[]> {
+  async listCategory(orgId: string): Promise<CategoryEntity<string>[]> {
     await this.orgRepository.orgExists(orgId);
     const categories = await this.categoryRepository.listCategory(orgId);
     return categories;

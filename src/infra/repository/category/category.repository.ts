@@ -1,9 +1,7 @@
-import {
-  CreateCategoryDto,
-  EditCategoryDto,
-} from '@core/http/category/dto/Input.dto';
+import { EditCategoryDto } from '@core/http/category/dto/Input.dto';
+import { CategoryEntity } from '@core/http/category/entity/category.entity';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Category, CategoryType } from '@shared/types/Category.type';
+import { Category } from '@shared/types/Category.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -15,35 +13,28 @@ export class CategoryRepository {
   ) {}
 
   async createCategory(
-    categoryData: CreateCategoryDto,
-  ): Promise<CategoryType<string>> {
-    const categorie = await this.categoryModel.create({
-      ...categoryData,
-      icon: categoryData.icon || '',
-    });
+    categoryData: CategoryEntity<string>,
+  ): Promise<CategoryEntity<string>> {
+    const categorie = await this.categoryModel.create(categoryData.toCreate());
 
-    return {
+    return CategoryEntity.toEntity({
       id: categorie.id,
       icon: categorie.icon,
       name: categorie.name,
       org: categorie.org.toString(),
-    };
+    });
   }
 
-  async listCategory(
-    orgId: string,
-  ): Promise<Pick<CategoryType<string>, 'id' | 'icon' | 'name'>[]> {
+  async listCategory(orgId: string): Promise<CategoryEntity<string>[]> {
     const categories = await this.categoryModel.find({ org: orgId });
 
     if (!categories) {
       throw new NotFoundException('Categoria não encontrada');
     }
 
-    return categories.map((c) => ({
-      id: c.id,
-      icon: c.icon,
-      name: c.name,
-    }));
+    return categories.map(
+      (c) => new CategoryEntity(c.name, c.icon, c.org.toString(), c.id),
+    );
   }
 
   async findCategoryByName(name: string, orgId: string): Promise<boolean> {

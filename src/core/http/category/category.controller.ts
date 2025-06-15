@@ -21,6 +21,7 @@ import {
   OutPutListCategoryDto,
   OutPutMessageDto,
 } from './dto/OutPut.dto';
+import { CategoryEntity } from './entity/category.entity';
 
 @Controller('category')
 export class CategoryController {
@@ -37,11 +38,7 @@ export class CategoryController {
     const categories = await this.categoryService.listCategory(orgId);
 
     return {
-      categories: categories.map((cat) => ({
-        _id: cat.id,
-        name: cat.name,
-        icon: cat.icon,
-      })),
+      categories: CategoryEntity.httpListResponse(categories),
     };
   }
 
@@ -52,14 +49,10 @@ export class CategoryController {
   async createCategory(
     @Body() categoryData: CreateCategoryDto,
   ): Promise<OutPutCreateCategoryDto> {
-    const categoryCreated =
-      await this.categoryService.createCategory(categoryData);
+    const category = CategoryEntity.newCategory(categoryData);
+    const categoryCreated = await this.categoryService.createCategory(category);
 
-    return {
-      _id: categoryCreated.id,
-      name: categoryCreated.name,
-      icon: categoryCreated.icon,
-    };
+    return categoryCreated.httpCreateResponse();
   }
 
   @Put('/categories/:id')
@@ -70,9 +63,10 @@ export class CategoryController {
     @Param('id') id: string,
     @Body() editData: EditCategoryDto,
   ): Promise<OutPutMessageDto> {
+    const category = CategoryEntity.toUpdate(editData);
     const categoryEdited = await this.categoryService.editCategory(
       id,
-      editData,
+      category,
     );
 
     return {
