@@ -21,7 +21,7 @@ export class OrderEntity<
   constructor(
     public readonly table: string,
     public readonly createdAt: Date,
-    public readonly products: {
+    public products: {
       product: TProduct | string;
       quantity: number;
       price: number;
@@ -69,6 +69,7 @@ export class OrderEntity<
   }
 
   toCreate(products: ProductType<string, string>[]): CreateOrderInternalDto {
+    const productsWithPrice = [];
     for (const productInfo of products) {
       const { _id, price, priceInDiscount, discount } = productInfo;
       const orderProducts = this.products
@@ -79,11 +80,11 @@ export class OrderEntity<
           discount,
         }));
 
-      this.products.push(...orderProducts);
+      productsWithPrice.push(...orderProducts);
     }
     return {
       org: this.org as string,
-      products: this.products.map((p) => ({
+      products: productsWithPrice.map((p) => ({
         ...p,
         product: p.product as string,
       })),
