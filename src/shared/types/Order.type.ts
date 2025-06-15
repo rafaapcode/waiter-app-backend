@@ -65,25 +65,12 @@ export type OrderType<TProduct = ProductPropertie> = {
   }[];
 };
 
-export type ListOrderType = {
-  _id: string;
-  table: string;
-  status: STATUS;
-  createdAt: Date;
-  products: {
-    product: Pick<
-      ProductType,
-      '_id' | 'name' | 'description' | 'imageUrl' | 'category'
-    >;
-    quantity: number;
-    price: number;
-    discount: boolean;
-  }[];
-};
+export type ListOrderType = Pick<
+  ProductType,
+  '_id' | 'name' | 'description' | 'imageUrl' | 'category'
+>;
 
-export type HistoryOrdersType = OrderType<
-  Pick<
-    ProductType<Pick<CategoryType, 'name' | 'icon'>>,
-    '_id' | 'name' | 'imageUrl' | 'category'
-  >
+export type HistoryOrdersType = Pick<
+  ProductType<Pick<CategoryType, 'name' | 'icon'>>,
+  '_id' | 'name' | 'imageUrl' | 'category'
 >;

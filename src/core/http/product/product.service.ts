@@ -41,7 +41,6 @@ export class ProductService {
     const ingredientExists = await this.ingredientRepository.verfifyIngredients(
       productData.ingredients,
     );
-
     if (ingredientExists.length !== productData.ingredients.length) {
       throw new NotFoundException('Um ou mais ingredientes não existem');
     }

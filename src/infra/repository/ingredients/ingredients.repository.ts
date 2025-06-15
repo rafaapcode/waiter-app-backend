@@ -40,7 +40,7 @@ export class IngredientRepository {
 
   async verfifyIngredients(ingredients: string[]): Promise<IngredientEntity[]> {
     const allIngredients = await this.ingredientModel.find({
-      name: { $in: ingredients },
+      _id: { $in: ingredients },
     });
 
     if (!allIngredients) {

@@ -24,6 +24,7 @@ import {
   OutPutListOrdersDto,
   OutPutMessageDto,
 } from './dto/OutPut.dto';
+import { OrderEntity } from './entity/order.entity';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -40,7 +41,10 @@ export class OrderController {
     const { orgId, page } = params;
     const pageParsed = parseInt(page);
     const orders = await this.orderService.historyPage(orgId, pageParsed);
-    return orders;
+    return {
+      total_pages: orders.total_pages,
+      history: OrderEntity.toHistoryOrder(orders.orders),
+    };
   }
 
   @Get('history/filter/:page/:orgId')
@@ -64,7 +68,10 @@ export class OrderController {
       },
       pageParsed,
     );
-    return orders;
+    return {
+      total_pages: orders.total_pages,
+      history: OrderEntity.toHistoryOrder(orders.orders),
+    };
   }
 
   @Get(':orgId')
@@ -75,15 +82,7 @@ export class OrderController {
     @Param('orgId') orgId: string,
   ): Promise<OutPutListOrdersDto> {
     const orders = await this.orderService.listOrders(orgId);
-    return {
-      orders: orders.map((order) => ({
-        _id: order._id,
-        createdAt: order.createdAt,
-        table: order.table,
-        status: order.status,
-        products: order.products,
-      })),
-    };
+    return OrderEntity.httpListOrdersResponse(orders);
   }
 
   @Post('')
@@ -93,13 +92,10 @@ export class OrderController {
   async createOrder(
     @Body() orderData: CreateOrderDto,
   ): Promise<OutPutCreateOrdersDto> {
-    const orderCreated = await this.orderService.createOrder(orderData);
-    return {
-      _id: orderCreated.id,
-      table: orderCreated.table,
-      status: orderCreated.status,
-      products: orderCreated.products,
-    };
+    const order = OrderEntity.newOrder(orderData);
+
+    const orderCreated = await this.orderService.createOrder(order);
+    return orderCreated.httpCreateResponse();
   }
 
   @Patch('/:orderId')

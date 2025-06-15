@@ -1,12 +1,13 @@
-import { ChangeOrderDto } from '@core/http/order/dto/Input.dto';
-import { INewOrder } from '@core/http/order/types/neworder.type';
+import {
+  ChangeOrderDto,
+  CreateOrderInternalDto,
+} from '@core/http/order/dto/Input.dto';
+import { OrderEntity } from '@core/http/order/entity/order.entity';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { CategoryType } from '@shared/types/Category.type';
 import {
   HistoryOrdersType,
   ListOrderType,
   Order,
-  OrderType,
 } from '@shared/types/Order.type';
 import { ProductType } from '@shared/types/Product.type';
 import { getTodayRange } from '@shared/utils/getTodayrange';
@@ -32,28 +33,30 @@ export class OrderRepository {
     );
   }
 
-  async createOrder(newOrder: INewOrder): Promise<OrderType<ProductType>> {
+  async createOrder(
+    newOrder: CreateOrderInternalDto,
+  ): Promise<OrderEntity<ProductType, string>> {
     const order = (await this.orderModel.create(newOrder)).populate(
       'products.product',
     );
 
     const orderCreated = await order;
-
-    return {
+    return OrderEntity.toEntity<ProductType, string>({
       id: orderCreated.id,
       createdAt: orderCreated.createdAt,
       status: orderCreated.status,
       table: orderCreated.table,
+      deletedAt: orderCreated.deletedAt,
       products: orderCreated.products.map((p) => {
         const productTyped = p.product as ProductType;
         return {
           discount: p.discount,
           price: p.price,
-          quantity: p.quantity,
           product: productTyped,
+          quantity: p.quantity,
         };
       }),
-    };
+    });
   }
 
   async deleteOrder(orderId: string): Promise<boolean> {
@@ -66,7 +69,7 @@ export class OrderRepository {
     return true;
   }
 
-  async listOrders(orgId: string): Promise<ListOrderType[]> {
+  async listOrders(orgId: string): Promise<OrderEntity<ListOrderType>[]> {
     const orders = await this.orderModel
       .find({ deletedAt: null, org: orgId })
       .sort({ createdAt: -1 })
@@ -74,8 +77,8 @@ export class OrderRepository {
       .select('_id table status products createdAt');
 
     return orders.map((order) => {
-      return {
-        _id: order.id,
+      return OrderEntity.toEntity({
+        id: order.id,
         createdAt: order.createdAt,
         status: order.status,
         table: order.table,
@@ -92,7 +95,7 @@ export class OrderRepository {
             discount: p.discount,
           };
         }),
-      };
+      });
     });
   }
 
@@ -121,7 +124,7 @@ export class OrderRepository {
     page?: number,
   ): Promise<{
     total_pages: number;
-    orders: HistoryOrdersType[];
+    orders: OrderEntity<HistoryOrdersType, string>[];
   }> {
     const pageNumber = page && page !== 0 ? page : 1;
     const limit = 6;
@@ -148,17 +151,14 @@ export class OrderRepository {
     }
 
     const orders = ordersResult.map((order) => {
-      return {
+      return OrderEntity.toEntity({
         id: order.id,
         table: order.table,
         status: order.status,
         createdAt: order.createdAt,
         deletedAt: order.deletedAt,
         products: order.products.map((p) => {
-          const product = p.product as Pick<
-            ProductType<Pick<CategoryType, 'name' | 'icon'>>,
-            '_id' | 'name' | 'imageUrl' | 'category'
-          >;
+          const product = p.product as HistoryOrdersType;
 
           return {
             quantity: p.quantity,
@@ -167,7 +167,7 @@ export class OrderRepository {
             product: product,
           };
         }),
-      };
+      });
     });
 
     return { total_pages: Math.ceil(countDocs / limit), orders };
@@ -177,7 +177,10 @@ export class OrderRepository {
     orgId: string,
     filters: { to: Date; from: Date },
     page?: number,
-  ): Promise<{ total_pages: number; orders: HistoryOrdersType[] }> {
+  ): Promise<{
+    total_pages: number;
+    orders: OrderEntity<HistoryOrdersType, string>[];
+  }> {
     const pageNumber = page && page !== 0 ? page : 1;
     const limit = 6;
     const skip = (pageNumber - 1) * limit;
@@ -215,17 +218,14 @@ export class OrderRepository {
     }
 
     const orders = ordersResult.map((order) => {
-      return {
+      return OrderEntity.toEntity({
         id: order.id,
         table: order.table,
         status: order.status,
         createdAt: order.createdAt,
         deletedAt: order.deletedAt,
         products: order.products.map((p) => {
-          const product = p.product as Pick<
-            ProductType<Pick<CategoryType, 'name' | 'icon'>>,
-            '_id' | 'name' | 'imageUrl' | 'category'
-          >;
+          const product = p.product as HistoryOrdersType;
 
           return {
             quantity: p.quantity,
@@ -234,7 +234,7 @@ export class OrderRepository {
             product: product,
           };
         }),
-      };
+      });
     });
     return { total_pages: Math.ceil(countDocs / limit), orders };
   }
