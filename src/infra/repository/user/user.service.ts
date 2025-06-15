@@ -1,3 +1,4 @@
+import { UserEntity } from '@core/http/user/entity/user.entity';
 import {
   BadRequestException,
   Inject,
@@ -15,24 +16,25 @@ export class UserRepository {
     private userModel: Model<User>,
   ) {}
 
-  async createUser(user: UserType): Promise<Omit<UserType, 'password'>> {
+  async createUser(user: UserEntity): Promise<UserEntity> {
     const userExists = await this.userModel.findOne({ email: user.email });
     if (userExists) {
       throw new BadRequestException('Usuário já existe');
     }
-    const newUser = await this.userModel.create(user);
-    return {
-      _id: newUser._id as string,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-    };
+    const newUser = await this.userModel.create(user.toCreate());
+    return new UserEntity(
+      newUser.name,
+      newUser.email,
+      newUser.password,
+      newUser.role,
+      newUser.id,
+    );
   }
 
   async updateUser(
     userId: string,
     user: Partial<UserType>,
-  ): Promise<Omit<UserType, 'password'>> {
+  ): Promise<UserEntity> {
     const newuser = await this.userModel.findByIdAndUpdate(
       userId,
       {
@@ -45,18 +47,19 @@ export class UserRepository {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return {
-      _id: newuser._id as string,
-      name: newuser.name,
+    return UserEntity.toEntity({
       email: newuser.email,
+      name: newuser.name,
+      password: newuser.password,
       role: newuser.role,
-    };
+      _id: newuser.id,
+    });
   }
 
   async updateCurrentUser(
     email: string,
     user: Partial<{ name: string; email: string; new_password: string }>,
-  ): Promise<Omit<UserType, 'password'>> {
+  ): Promise<UserEntity> {
     const userId = await this.userModel.findOne({ email });
 
     if (!userId) {
@@ -77,12 +80,13 @@ export class UserRepository {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return {
-      _id: newuser._id as string,
-      name: newuser.name,
+    return UserEntity.toEntity({
       email: newuser.email,
+      name: newuser.name,
+      password: newuser.password,
       role: newuser.role,
-    };
+      _id: newuser.id,
+    });
   }
 
   async deleteUser(userId: string): Promise<boolean> {
@@ -93,36 +97,38 @@ export class UserRepository {
     return true;
   }
 
-  async getUser(userId: string): Promise<Omit<UserType, 'password'>> {
+  async getUser(userId: string): Promise<UserEntity> {
     const user = await this.userModel.findById(userId);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    return {
-      _id: user._id as string,
+    return UserEntity.toEntity({
+      _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
-    };
+      password: user.password,
+    });
   }
 
-  async getUserByEmail(
-    userEmail: string,
-  ): Promise<Pick<UserType, 'name' | 'email'>> {
+  async getUserByEmail(userEmail: string): Promise<UserEntity> {
     const user = await this.userModel.findOne({ email: userEmail });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    return {
-      name: user.name,
+    return UserEntity.toEntity({
       email: user.email,
-    };
+      name: user.name,
+      password: user.password,
+      _id: user.id,
+      role: user.role,
+    });
   }
 
   async getAllUser(
     userId: string,
     page: number,
-  ): Promise<{ total_pages: number; users: Omit<UserType, 'password'>[] }> {
+  ): Promise<{ total_pages: number; users: UserEntity[] }> {
     const pageNumber = page && page !== 0 ? page : 1;
     const limit = 6;
     const skip = (pageNumber - 1) * limit;
@@ -143,12 +149,15 @@ export class UserRepository {
 
     return {
       total_pages: Math.ceil(countDocs / limit),
-      users: user.map((u) => ({
-        _id: u._id.toString(),
-        name: u.name,
-        email: u.email,
-        role: u.role,
-      })),
+      users: user.map((u) =>
+        UserEntity.toEntity({
+          email: u.email,
+          name: u.name,
+          password: u.password,
+          _id: u.id,
+          role: u.role,
+        }),
+      ),
     };
   }
 

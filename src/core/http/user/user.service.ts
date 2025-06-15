@@ -5,14 +5,10 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserType } from '@shared/types/User.type';
 import { verifyPassword } from '@shared/utils/verifyPassword';
 import { AuthenticationService } from '../authentication/authentication.service';
-import {
-  CreateUserDto,
-  UpdateCurrentUserDto,
-  UpdateUserDto,
-} from './dto/Input.dto';
+import { UpdateCurrentUserDto, UpdateUserDto } from './dto/Input.dto';
+import { UserEntity } from './entity/user.entity';
 
 @Injectable()
 export class UserService {
@@ -21,26 +17,13 @@ export class UserService {
     private authService: AuthenticationService,
   ) {}
 
-  async create({
-    email,
-    password,
-    name,
-    role,
-  }: CreateUserDto): Promise<Omit<UserType, 'password'>> {
-    const newUser = await this.userRepo.createUser({
-      email,
-      password,
-      name,
-      role,
-    });
+  async create(user: UserEntity): Promise<UserEntity> {
+    const newUser = await this.userRepo.createUser(user);
 
     return newUser;
   }
 
-  async updateUser(
-    id: string,
-    data: UpdateUserDto,
-  ): Promise<Omit<UserType, 'password'>> {
+  async updateUser(id: string, data: UpdateUserDto): Promise<UserEntity> {
     const newUser = await this.userRepo.updateUser(id, data);
 
     return newUser;
@@ -49,7 +32,7 @@ export class UserService {
   async updateCurrentUser(
     email: string,
     data: UpdateCurrentUserDto,
-  ): Promise<{ access_token?: string } & Omit<UserType, 'password'>> {
+  ): Promise<{ user: UserEntity; token?: string }> {
     if (data.new_password) {
       if (!data.current_password) {
         throw new BadRequestException(
@@ -85,10 +68,10 @@ export class UserService {
         newUser.email,
         newUser.role,
       );
-      return { ...newUser, access_token: token };
+      return { user: newUser, token: token };
     }
 
-    return newUser;
+    return { user: newUser };
   }
 
   async deleteUser(id: string): Promise<{ message: string }> {
@@ -101,7 +84,7 @@ export class UserService {
     return { message: 'Usuário deletado com sucesso !' };
   }
 
-  async getUser(id: string): Promise<Omit<UserType, 'password'>> {
+  async getUser(id: string): Promise<UserEntity> {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
     }
@@ -109,9 +92,7 @@ export class UserService {
     return await this.userRepo.getUser(id);
   }
 
-  async getUserByEmail(
-    email: string,
-  ): Promise<{ name: string; email: string }> {
+  async getUserByEmail(email: string): Promise<UserEntity> {
     if (!email) {
       throw new BadRequestException('Email do usuário é obrigatório');
     }
@@ -122,7 +103,7 @@ export class UserService {
   async getAllUsers(
     userId: string,
     page: number,
-  ): Promise<{ total_pages: number; users: Omit<UserType, 'password'>[] }> {
+  ): Promise<{ total_pages: number; users: UserEntity[] }> {
     const users = await this.userRepo.getAllUser(userId, page);
     return users;
   }

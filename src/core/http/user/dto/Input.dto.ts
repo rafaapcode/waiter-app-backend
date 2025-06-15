@@ -35,29 +35,29 @@ export class UpdateCurrentUserDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsNotEmpty()
   @IsEmail(undefined, { message: 'Email inválido' })
   @IsOptional()
-  email: string;
+  email?: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: 'Senha deve ter no mínimo 8 caracteres' })
   @IsOptional()
-  current_password: string;
+  current_password?: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: 'Senha deve ter no mínimo 8 caracteres' })
   @IsOptional()
-  new_password: string;
+  new_password?: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: 'Senha deve ter no mínimo 8 caracteres' })
   @IsOptional()
-  confirm_password: string;
+  confirm_password?: string;
 }

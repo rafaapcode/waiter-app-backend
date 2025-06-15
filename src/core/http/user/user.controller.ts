@@ -32,6 +32,7 @@ import {
   OutPutUpdateCurrentUserDto,
   OutPutUpdateUserDto,
 } from './dto/OutPut.dto';
+import { UserEntity } from './entity/user.entity';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -45,7 +46,9 @@ export class UserController {
   async createUser(
     @Body() userPayload: CreateUserDto,
   ): Promise<OutPutCreateUserDto> {
-    return await this.userService.create(userPayload);
+    const userEntity = UserEntity.newUser(userPayload);
+    const response = await this.userService.create(userEntity);
+    return response.httpCreateResponse();
   }
 
   @Put('current')
@@ -62,7 +65,11 @@ export class UserController {
       );
     }
 
-    return await this.userService.updateCurrentUser(user.email, userPayload);
+    const userEntitie = UserEntity.toUpdateCurrentUser(userPayload);
+    const { user: userCreated, token } =
+      await this.userService.updateCurrentUser(user.email, userEntitie);
+
+    return userCreated.httpUpdateCurrentUserResponse(token);
   }
 
   @Put(':id')
@@ -77,7 +84,10 @@ export class UserController {
       throw new BadRequestException('ID do usuário é obrigatório');
     }
 
-    return await this.userService.updateUser(id, userPayload);
+    const userEntitie = UserEntity.toUpdateUser(userPayload);
+    const user = await this.userService.updateUser(id, userEntitie);
+
+    return user.httpUpdateUserResponse();
   }
 
   @Delete(':id')
@@ -100,7 +110,8 @@ export class UserController {
     @CurrentUser() user: JwtPayload,
     @Param('page', ParseIntPipe) page: number,
   ): Promise<OutPutGetAllUsersDto> {
-    return await this.userService.getAllUsers(user.id, page);
+    const users = await this.userService.getAllUsers(user.id, page);
+    return UserEntity.httpGetAllUsersResponse(users.total_pages, users.users);
   }
 
   @Get('current')
@@ -115,7 +126,10 @@ export class UserController {
         'Usuário não encontrado na requisição',
       );
     }
-    return await this.userService.getUserByEmail(user.email);
+
+    const foundUser = await this.userService.getUserByEmail(user.email);
+
+    return foundUser.httpGetCurrentUserResponse();
   }
 
   @Get(':id')
@@ -126,6 +140,8 @@ export class UserController {
     if (!id) {
       throw new BadRequestException('ID do usuário é obrigatório');
     }
-    return await this.userService.getUser(id);
+
+    const user = await this.userService.getUser(id);
+    return user.httpGetUserResponse();
   }
 }
