@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { VerifyOrgOwnershipService } from '../org/services/verifyOrgOwnership.service';
 import { EditCategoryDto } from './dto/Input.dto';
 import { CategoryEntity } from './entity/category.entity';
 
@@ -16,6 +17,7 @@ export class CategoryService {
     private readonly categoryRepository: CategoryRepository,
     private readonly productRepository: ProductRepository,
     private readonly orgRepository: OrgRepository,
+    private readonly orgVerifyOwnershipService: VerifyOrgOwnershipService,
   ) {}
 
   async createCategory(
@@ -39,7 +41,12 @@ export class CategoryService {
     return category;
   }
 
-  async listCategory(orgId: string): Promise<CategoryEntity<string>[]> {
+  async listCategory(
+    userid: string,
+    orgId: string,
+  ): Promise<CategoryEntity<string>[]> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
+
     await this.orgRepository.orgExists(orgId);
     const categories = await this.categoryRepository.listCategory(orgId);
     return categories;
@@ -57,7 +64,13 @@ export class CategoryService {
     return categories;
   }
 
-  async deleteCategory(orgId: string, categoryId: string): Promise<boolean> {
+  async deleteCategory(
+    userid: string,
+    orgId: string,
+    categoryId: string,
+  ): Promise<boolean> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
+
     await this.orgRepository.orgExists(orgId);
     const categorieExist =
       await this.categoryRepository.findCategoryById(categoryId);

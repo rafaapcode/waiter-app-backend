@@ -8,8 +8,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import mongoose from 'mongoose';
-import { UpdateOrgDTO } from './dto/Input.dto';
-import { OrgEntity } from './entity/org.entity';
+import { UpdateOrgDTO } from '../dto/Input.dto';
+import { OrgEntity } from '../entity/org.entity';
+import { VerifyOrgOwnershipService } from './verifyOrgOwnership.service';
 
 @Injectable()
 export class OrgService {
@@ -17,6 +18,7 @@ export class OrgService {
     private readonly orgRepository: OrgRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly orderRepository: OrderRepository,
+    private readonly verifyOwnershipService: VerifyOrgOwnershipService,
     private readonly productRepository: ProductRepository,
   ) {}
 
@@ -35,7 +37,13 @@ export class OrgService {
     return org;
   }
 
-  async updateOrg(orgId: string, orgData: UpdateOrgDTO): Promise<OrgEntity> {
+  async updateOrg(
+    userid: string,
+    orgId: string,
+    orgData: UpdateOrgDTO,
+  ): Promise<OrgEntity> {
+    await this.verifyOwnershipService.verify(userid, orgId);
+
     const orgExists = await this.orgRepository.getOrgById(orgId);
 
     if (!orgExists) {
@@ -47,7 +55,9 @@ export class OrgService {
     return org;
   }
 
-  async deleteOrg(orgId: string): Promise<boolean> {
+  async deleteOrg(userid: string, orgId: string): Promise<boolean> {
+    await this.verifyOwnershipService.verify(userid, orgId);
+
     const orgExists = await this.orgRepository.getOrgById(orgId);
     if (!orgExists) {
       throw new NotFoundException('Organização não encontrada');
@@ -73,7 +83,8 @@ export class OrgService {
     }
   }
 
-  async getOrgId(orgId: string): Promise<OrgEntity> {
+  async getOrgId(userid: string, orgId: string): Promise<OrgEntity> {
+    await this.verifyOwnershipService.verify(userid, orgId);
     return await this.orgRepository.getOrgById(orgId);
   }
 

@@ -9,9 +9,11 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
 import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { JwtPayload } from '@shared/types/express';
 import { Role } from '../authentication/roles/role.enum';
 import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 import {
@@ -33,9 +35,10 @@ export class ProductController {
     new ResponseInterceptorArray(OutPutListProductDto, 'products'),
   )
   async listProducts(
+    @CurrentUser() user: JwtPayload,
     @Param('orgId') orgId: string,
   ): Promise<OutPutListProductDto> {
-    const products = await this.productService.listProduct(orgId);
+    const products = await this.productService.listProduct(user.id, orgId);
     return {
       products: products.map((product) => {
         return {
@@ -76,10 +79,12 @@ export class ProductController {
     new ResponseInterceptorArray(OutPutListProductByCategorieDto, 'products'),
   )
   async listProductsByCategorie(
+    @CurrentUser() user: JwtPayload,
     @Param() params: { categoryId: string; orgId: string },
   ): Promise<OutPutListProductByCategorieDto> {
     const { categoryId, orgId } = params;
     const products = await this.productService.listProductByCategory(
+      user.id,
       orgId,
       categoryId,
     );
@@ -155,9 +160,13 @@ export class ProductController {
     new ResponseInterceptorArray(OutPutDiscountProductDto, 'products'),
   )
   async getDiscountProducts(
+    @CurrentUser() user: JwtPayload,
     @Param('orgId') orgId: string,
   ): Promise<OutPutDiscountProductDto> {
-    const products = await this.productService.getAllDiscountProducts(orgId);
+    const products = await this.productService.getAllDiscountProducts(
+      user.id,
+      orgId,
+    );
     return {
       products: products.map((product) => {
         return {

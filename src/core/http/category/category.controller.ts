@@ -8,9 +8,11 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
 import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { JwtPayload } from '@shared/types/express';
 import { Role } from '../authentication/roles/role.enum';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
@@ -30,9 +32,10 @@ export class CategoryController {
     new ResponseInterceptorArray(OutPutListCategoryDto, 'categories'),
   )
   async listCategories(
+    @CurrentUser() user: JwtPayload,
     @Param('orgId') orgId: string,
   ): Promise<OutPutListCategoryDto> {
-    const categories = await this.categoryService.listCategory(orgId);
+    const categories = await this.categoryService.listCategory(user.id, orgId);
 
     return {
       categories: CategoryEntity.httpListResponse(categories),
@@ -75,10 +78,11 @@ export class CategoryController {
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteCategory(
+    @CurrentUser() user: JwtPayload,
     @Param() params: { categoryId: string; orgId: string },
   ): Promise<OutPutMessageDto> {
     const { categoryId, orgId } = params;
-    await this.categoryService.deleteCategory(orgId, categoryId);
+    await this.categoryService.deleteCategory(user.id, orgId, categoryId);
     return {
       message: 'Categoria deletada com sucesso !',
     };

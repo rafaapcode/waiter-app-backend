@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { HistoryOrdersType, ListOrderType } from '@shared/types/Order.type';
 import { ProductType } from '@shared/types/Product.type';
+import { VerifyOrgOwnershipService } from '../org/services/verifyOrgOwnership.service';
 import { ChangeOrderDto } from './dto/Input.dto';
 import { OrderEntity } from './entity/order.entity';
 
@@ -20,6 +21,7 @@ export class OrderService {
     private readonly productRepository: ProductRepository,
     private readonly orgRepository: OrgRepository,
     private readonly orderWs: OrderGateway,
+    private readonly orgVerifyOwnershipService: VerifyOrgOwnershipService,
   ) {}
 
   async changeOrderStatus(
@@ -68,7 +70,11 @@ export class OrderService {
     return orderDeleted;
   }
 
-  async listOrders(orgId: string): Promise<OrderEntity<ListOrderType>[]> {
+  async listOrders(
+    userid: string,
+    orgId: string,
+  ): Promise<OrderEntity<ListOrderType>[]> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
     await this.orgRepository.orgExists(orgId);
     const orders = await this.orderRepository.listOrders(orgId);
     if (!orders) {
@@ -82,7 +88,9 @@ export class OrderService {
     return orders;
   }
 
-  async restartDay(orgId: string): Promise<boolean> {
+  async restartDay(userid: string, orgId: string): Promise<boolean> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
+
     await this.orgRepository.orgExists(orgId);
     const orders = await this.orderRepository.restartDay(orgId);
 
@@ -94,12 +102,14 @@ export class OrderService {
   }
 
   async historyPage(
+    userid: string,
     orgId: string,
     page: number,
   ): Promise<{
     total_pages: number;
     orders: OrderEntity<HistoryOrdersType, string>[];
   }> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
     await this.orgRepository.orgExists(orgId);
     const { total_pages, orders } = await this.orderRepository.historyOfOrders(
       orgId,
@@ -117,6 +127,7 @@ export class OrderService {
   }
 
   async historyFilterPage(
+    userid: string,
     orgId: string,
     filters: { to: Date; from: Date },
     page: number,
@@ -124,6 +135,7 @@ export class OrderService {
     total_pages: number;
     orders: OrderEntity<HistoryOrdersType, string>[];
   }> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
     await this.orgRepository.orgExists(orgId);
     const { total_pages, orders } =
       await this.orderRepository.historyOfOrdersWithFilters(
@@ -143,8 +155,8 @@ export class OrderService {
     return { total_pages, orders };
   }
 
-  async deleteHistoryOrder(oderId: string): Promise<boolean> {
-    const orders = await this.orderRepository.deleteOrderHistory(oderId);
+  async deleteHistoryOrder(orderId: string): Promise<boolean> {
+    const orders = await this.orderRepository.deleteOrderHistory(orderId);
     return orders;
   }
 }

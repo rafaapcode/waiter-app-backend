@@ -11,6 +11,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ListProductsType, ProductType } from '@shared/types/Product.type';
+import { VerifyOrgOwnershipService } from '../org/services/verifyOrgOwnership.service';
 import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 
 @Injectable()
@@ -21,6 +22,7 @@ export class ProductService {
     private readonly orgRepository: OrgRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly ingredientRepository: IngredientRepository,
+    private readonly orgVerifyOwnershipService: VerifyOrgOwnershipService,
   ) {}
 
   async createProduct(
@@ -67,7 +69,11 @@ export class ProductService {
     return product;
   }
 
-  async listProduct(orgId: string): Promise<ListProductsType[]> {
+  async listProduct(
+    userid: string,
+    orgId: string,
+  ): Promise<ListProductsType[]> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
     await this.orgRepository.orgExists(orgId);
     const products = await this.productRepository.listProducts(orgId);
 
@@ -79,9 +85,11 @@ export class ProductService {
   }
 
   async listProductByCategory(
+    userid: string,
     orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
     await this.orgRepository.orgExists(orgId);
     const products = await this.productRepository.listProductsByCategorie(
       orgId,
@@ -188,8 +196,10 @@ export class ProductService {
   }
 
   async getAllDiscountProducts(
+    userid: string,
     orgId: string,
   ): Promise<ProductType<string, string>[]> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
     await this.orgRepository.orgExists(orgId);
     const products =
       await this.productRepository.returnAllDiscountProducts(orgId);

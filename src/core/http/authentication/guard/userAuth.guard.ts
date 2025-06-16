@@ -56,6 +56,11 @@ export class UserGuard implements CanActivate {
       throw new UnauthorizedException('Token inválido ou expirado');
     }
     if (!requiredRole) {
+      req.user = {
+        id: userData.id,
+        email: userData.email,
+        role: userData.role,
+      };
       return true;
     }
     if (!userData.role) {

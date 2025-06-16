@@ -138,4 +138,17 @@ export class OrgRepository {
       throw new NotFoundException('Organização não existe');
     }
   }
+
+  async verifyOrgOwnership(userid: string, orgId: string): Promise<boolean> {
+    const isOwner = await this.orgModel.findOne({
+      _id: orgId,
+      user: userid,
+    });
+
+    if (!isOwner) {
+      return false;
+    }
+
+    return true;
+  }
 }

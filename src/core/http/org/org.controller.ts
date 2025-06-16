@@ -24,7 +24,7 @@ import {
   OutPutUpdateOrgDto,
 } from './dto/OutPut.dto';
 import { OrgEntity } from './entity/org.entity';
-import { OrgService } from './org.service';
+import { OrgService } from './services/org.service';
 
 @Controller('org')
 export class OrgController {
@@ -33,8 +33,11 @@ export class OrgController {
   @Delete('/:id')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
-  async deleteOrg(@Param('id') id: string): Promise<OutPutMessageDto> {
-    const deleted = await this.orgService.deleteOrg(id);
+  async deleteOrg(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<OutPutMessageDto> {
+    const deleted = await this.orgService.deleteOrg(user.id, id);
     if (!deleted) {
       throw new InternalServerErrorException(
         'Erro ao deletar a organizção , entre em contato com o suporte',
@@ -47,11 +50,12 @@ export class OrgController {
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutUpdateOrgDto))
   async updateOrg(
+    @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
     @Body() orgData: UpdateOrgDTO,
   ): Promise<OutPutUpdateOrgDto> {
     const org = OrgEntity.toUpdate(orgData);
-    const orgUpdated = await this.orgService.updateOrg(id, org);
+    const orgUpdated = await this.orgService.updateOrg(user.id, id, org);
     return orgUpdated.httpUpdateResponse();
   }
 
@@ -80,8 +84,11 @@ export class OrgController {
   @Get('/:orgid')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutGetOrgDto))
-  async getOrg(@Param('orgid') orgid: string): Promise<OutPutGetOrgDto> {
-    const org = await this.orgService.getOrgId(orgid);
+  async getOrg(
+    @CurrentUser() user: JwtPayload,
+    @Param('orgid') orgid: string,
+  ): Promise<OutPutGetOrgDto> {
+    const org = await this.orgService.getOrgId(user.id, orgid);
     return org.httpGetOrgResponse();
   }
 }

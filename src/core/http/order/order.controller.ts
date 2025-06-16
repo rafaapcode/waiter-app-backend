@@ -11,9 +11,11 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
 import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
+import { JwtPayload } from '@shared/types/express';
 import { Role } from '../authentication/roles/role.enum';
 import { ChangeOrderDto, CreateOrderDto } from './dto/Input.dto';
 import {
@@ -33,11 +35,16 @@ export class OrderController {
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrders(
+    @CurrentUser() user: JwtPayload,
     @Param() params: { page: string; orgId: string },
   ): Promise<OutPutHistoryOrderDto> {
     const { orgId, page } = params;
     const pageParsed = parseInt(page);
-    const orders = await this.orderService.historyPage(orgId, pageParsed);
+    const orders = await this.orderService.historyPage(
+      user.id,
+      orgId,
+      pageParsed,
+    );
     return {
       total_pages: orders.total_pages,
       history: OrderEntity.toHistoryOrder(orders.orders),
@@ -48,6 +55,7 @@ export class OrderController {
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrdersFiltered(
+    @CurrentUser() user: JwtPayload,
     @Param() params: { page: string; orgId: string },
     @Query() filters: { to: Date; from: Date },
   ): Promise<OutPutHistoryOrderDto> {
@@ -57,6 +65,7 @@ export class OrderController {
     const { orgId, page } = params;
     const pageParsed = parseInt(page);
     const orders = await this.orderService.historyFilterPage(
+      user.id,
       orgId,
       {
         from: new Date(filters.from),
@@ -74,9 +83,10 @@ export class OrderController {
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptorArray(OutPutListOrdersDto, 'orders'))
   async listOrders(
+    @CurrentUser() user: JwtPayload,
     @Param('orgId') orgId: string,
   ): Promise<OutPutListOrdersDto> {
-    const orders = await this.orderService.listOrders(orgId);
+    const orders = await this.orderService.listOrders(user.id, orgId);
     return OrderEntity.httpListOrdersResponse(orders);
   }
 
@@ -133,8 +143,11 @@ export class OrderController {
   @HttpCode(200)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
-  async restartDay(@Param('orgId') orgId: string): Promise<OutPutMessageDto> {
-    await this.orderService.restartDay(orgId);
+  async restartDay(
+    @CurrentUser() user: JwtPayload,
+    @Param('orgId') orgId: string,
+  ): Promise<OutPutMessageDto> {
+    await this.orderService.restartDay(user.id, orgId);
     return {
       message: 'Dia reiniciado com sucesso !',
     };
