@@ -25,9 +25,13 @@ export class OrderService {
   ) {}
 
   async changeOrderStatus(
+    userid: string,
+    orgId: string,
     orderId: string,
     newStatus: ChangeOrderDto,
   ): Promise<void> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
+
     const orderExists = await this.orderRepository.orderExists(orderId);
 
     if (!orderExists) {
@@ -61,7 +65,13 @@ export class OrderService {
     return order;
   }
 
-  async deleteOrder(orderId: string): Promise<boolean> {
+  async deleteOrder(
+    userid: string,
+    orgId: string,
+    orderId: string,
+  ): Promise<boolean> {
+    await this.orgVerifyOwnershipService.verify(userid, orgId);
+
     const orderDeleted = await this.orderRepository.deleteOrder(orderId);
     if (!orderDeleted) {
       throw new NotFoundException('Pedido não encontrado!');
@@ -155,7 +165,12 @@ export class OrderService {
     return { total_pages, orders };
   }
 
-  async deleteHistoryOrder(orderId: string): Promise<boolean> {
+  async deleteHistoryOrder(
+    userid: string,
+    orgid: string,
+    orderId: string,
+  ): Promise<boolean> {
+    await this.orgVerifyOwnershipService.verify(userid, orgid);
     const orders = await this.orderRepository.deleteOrderHistory(orderId);
     return orders;
   }

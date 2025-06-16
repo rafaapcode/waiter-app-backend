@@ -102,38 +102,49 @@ export class OrderController {
     return orderCreated.httpCreateResponse();
   }
 
-  @Patch('/:orderId')
+  @Patch('/:orgId/:orderId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async changeStatusOrder(
-    @Param('orderId') orderId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { orgId: string; orderId: string },
     @Body() newStatus: ChangeOrderDto,
   ): Promise<OutPutMessageDto> {
-    await this.orderService.changeOrderStatus(orderId, newStatus);
+    const { orderId, orgId } = params;
+    await this.orderService.changeOrderStatus(
+      user.id,
+      orgId,
+      orderId,
+      newStatus,
+    );
     return {
       message: 'Pedido atualizado com sucesso !',
     };
   }
 
-  @Delete('/:orderId')
+  @Delete('/:orgId/:orderId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteOrder(
-    @Param('orderId') orderId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { orgId: string; orderId: string },
   ): Promise<OutPutMessageDto> {
-    await this.orderService.deleteOrder(orderId);
+    const { orderId, orgId } = params;
+    await this.orderService.deleteOrder(user.id, orgId, orderId);
     return {
       message: 'Ordem deletada com sucesso !',
     };
   }
 
-  @Delete('history/:orderId')
+  @Delete('history/:orgId/:orderId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteHistoryOrder(
-    @Param('orderId') orderId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { orgId: string; orderId: string },
   ): Promise<OutPutMessageDto> {
-    await this.orderService.deleteHistoryOrder(orderId);
+    const { orderId, orgId } = params;
+    await this.orderService.deleteHistoryOrder(user.id, orgId, orderId);
     return {
       message: 'Registro deletado com sucesso !',
     };

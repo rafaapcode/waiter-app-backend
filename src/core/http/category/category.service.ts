@@ -41,18 +41,20 @@ export class CategoryService {
     return category;
   }
 
-  async listCategory(
-    userid: string,
-    orgId: string,
-  ): Promise<CategoryEntity<string>[]> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
-
+  async listCategory(orgId: string): Promise<CategoryEntity<string>[]> {
     await this.orgRepository.orgExists(orgId);
     const categories = await this.categoryRepository.listCategory(orgId);
     return categories;
   }
 
-  async editCategory(id: string, data: EditCategoryDto): Promise<boolean> {
+  async editCategory(
+    userid: string,
+    orgid: string,
+    id: string,
+    data: EditCategoryDto,
+  ): Promise<boolean> {
+    await this.orgVerifyOwnershipService.verify(userid, orgid);
+
     const categorieExist = await this.categoryRepository.findCategoryById(id);
 
     if (!categorieExist) {

@@ -32,10 +32,9 @@ export class CategoryController {
     new ResponseInterceptorArray(OutPutListCategoryDto, 'categories'),
   )
   async listCategories(
-    @CurrentUser() user: JwtPayload,
     @Param('orgId') orgId: string,
   ): Promise<OutPutListCategoryDto> {
-    const categories = await this.categoryService.listCategory(user.id, orgId);
+    const categories = await this.categoryService.listCategory(orgId);
 
     return {
       categories: CategoryEntity.httpListResponse(categories),
@@ -54,16 +53,20 @@ export class CategoryController {
     return categoryCreated.httpCreateResponse();
   }
 
-  @Put('/categories/:id')
+  @Put('/categories/:orgId/:categoryId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async editCategory(
-    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { categoryId: string; orgId: string },
     @Body() editData: EditCategoryDto,
   ): Promise<OutPutMessageDto> {
+    const { categoryId, orgId } = params;
     const category = CategoryEntity.toUpdate(editData);
     const categoryEdited = await this.categoryService.editCategory(
-      id,
+      user.id,
+      orgId,
+      categoryId,
       category,
     );
 
@@ -74,7 +77,7 @@ export class CategoryController {
     };
   }
 
-  @Delete('/:categoryId/:orgId')
+  @Delete('/:orgId/:categoryId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteCategory(
