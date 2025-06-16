@@ -8,7 +8,9 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
+import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
+import { Role } from '../authentication/roles/role.enum';
 import { CreateIngredientDto, CreateManyIngredientDto } from './dto/Input.dto';
 import {
   OutPutCreateIngredientDto,
@@ -33,6 +35,7 @@ export class IngredientController {
   }
 
   @Post()
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateIngredientDto))
   async createIngredient(
     @Body() data: CreateIngredientDto,
@@ -49,6 +52,7 @@ export class IngredientController {
 
   @Post('verify')
   @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutVerifyIngredientsDto))
   async verifyIngredients(
     @Body() data: { ingredients: string[] },
@@ -63,6 +67,7 @@ export class IngredientController {
 
   @Post('create-many')
   @HttpCode(HttpStatus.CREATED)
+  @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateManyIngredientsDto))
   async createManyIngredients(
     @Body() data: CreateManyIngredientDto,

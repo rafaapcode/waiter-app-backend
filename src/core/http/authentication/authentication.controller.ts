@@ -6,11 +6,13 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
+import { IsPublic } from '@shared/decorators/isPublic';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { AuthenticationService } from './authentication.service';
 import { RefreshTokenDto, SignInUserDto } from './dto/Input.dto';
 import { OutPutRefreshTokenDto, OutputUserDto } from './dto/OutPut.dto';
 
+@IsPublic()
 @Controller('auth')
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
