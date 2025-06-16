@@ -9,13 +9,11 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
-import { Roles } from '../authentication/decorators/role.decorator';
-import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { ChangeOrderDto, CreateOrderDto } from './dto/Input.dto';
 import {
@@ -32,7 +30,6 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get('history/:page/:orgId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrders(
@@ -48,7 +45,6 @@ export class OrderController {
   }
 
   @Get('history/filter/:page/:orgId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrdersFiltered(
@@ -75,7 +71,6 @@ export class OrderController {
   }
 
   @Get(':orgId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptorArray(OutPutListOrdersDto, 'orders'))
   async listOrders(
@@ -86,7 +81,6 @@ export class OrderController {
   }
 
   @Post('')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN, Role.WAITER, Role.CLIENT)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateOrdersDto))
   async createOrder(
@@ -99,7 +93,6 @@ export class OrderController {
   }
 
   @Patch('/:orderId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async changeStatusOrder(
@@ -113,7 +106,6 @@ export class OrderController {
   }
 
   @Delete('/:orderId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteOrder(
@@ -126,7 +118,6 @@ export class OrderController {
   }
 
   @Delete('history/:orderId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteHistoryOrder(
@@ -140,7 +131,6 @@ export class OrderController {
 
   @Patch('/restart/:orgId')
   @HttpCode(200)
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async restartDay(@Param('orgId') orgId: string): Promise<OutPutMessageDto> {

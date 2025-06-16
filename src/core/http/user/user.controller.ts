@@ -9,14 +9,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
+import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { JwtPayload } from '@shared/types/express';
-import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
-import { Roles } from '../authentication/decorators/role.decorator';
-import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import {
   CreateUserDto,
@@ -40,7 +38,6 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateUserDto))
   async createUser(
@@ -52,7 +49,6 @@ export class UserController {
   }
 
   @Put('current')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutUpdateCurrentUserDto))
   async updateCurrentUser(
@@ -73,7 +69,6 @@ export class UserController {
   }
 
   @Put(':id')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutUpdateUserDto))
   async updateUser(
@@ -91,7 +86,6 @@ export class UserController {
   }
 
   @Delete(':id')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteUser(@Param('id') id: string): Promise<OutPutMessageDto> {
@@ -103,7 +97,6 @@ export class UserController {
   }
 
   @Get('all/:page')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutGetAllUsersDto))
   async getAllUser(
@@ -115,7 +108,6 @@ export class UserController {
   }
 
   @Get('current')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutGetCurrentUserDto))
   async getCurrentUser(
@@ -133,7 +125,6 @@ export class UserController {
   }
 
   @Get(':id')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutGetUserDto))
   async getUser(@Param('id') id: string): Promise<OutPutGetUserDto> {

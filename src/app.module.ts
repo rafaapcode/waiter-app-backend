@@ -1,4 +1,6 @@
+import { UserGuard } from '@core/http/authentication/guard/userAuth.guard';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AuthenticationModule } from './core/http/authentication/authentication.module';
 import { CategoryModule } from './core/http/category/category.module';
@@ -25,6 +27,11 @@ import { RepositoryModule } from './infra/repository/repository.module';
     AuthenticationModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: UserGuard,
+    },
+  ],
 })
 export class AppModule {}

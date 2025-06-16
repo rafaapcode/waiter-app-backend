@@ -6,13 +6,11 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
-import { Roles } from '../authentication/decorators/role.decorator';
-import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
@@ -28,7 +26,6 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get('/categories/:orgId')
-  @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListCategoryDto, 'categories'),
   )
@@ -43,7 +40,6 @@ export class CategoryController {
   }
 
   @Post('/categories')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateCategoryDto))
   async createCategory(
@@ -56,7 +52,6 @@ export class CategoryController {
   }
 
   @Put('/categories/:id')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async editCategory(
@@ -77,7 +72,6 @@ export class CategoryController {
   }
 
   @Delete('/:categoryId/:orgId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteCategory(

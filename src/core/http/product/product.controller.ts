@@ -7,13 +7,11 @@ import {
   Patch,
   Post,
   Put,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
-import { Roles } from '../authentication/decorators/role.decorator';
-import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
 import {
@@ -31,7 +29,6 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get(':orgId')
-  @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListProductDto, 'products'),
   )
@@ -57,7 +54,6 @@ export class ProductController {
   }
 
   @Get('search/:productId')
-  @UseGuards(UserGuard)
   @UseInterceptors(new ResponseInterceptor(OutPutGetProductDto))
   async getProduct(
     @Param('productId') productId: string,
@@ -67,7 +63,6 @@ export class ProductController {
   }
 
   @Post('')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateProductDto))
   async createProduct(
@@ -77,7 +72,6 @@ export class ProductController {
   }
 
   @Get('categorie/:categoryId/:orgId')
-  @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListProductByCategorieDto, 'products'),
   )
@@ -107,7 +101,6 @@ export class ProductController {
   }
 
   @Delete(':productId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteProduct(
@@ -120,7 +113,6 @@ export class ProductController {
   }
 
   @Put(':productId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async updateProduct(
@@ -134,7 +126,6 @@ export class ProductController {
   }
 
   @Patch('/discount/add/:productId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async putProductInDiscount(
@@ -148,7 +139,6 @@ export class ProductController {
   }
 
   @Patch('/discount/remove/:productId')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async removeProductInDiscount(
@@ -161,7 +151,6 @@ export class ProductController {
   }
 
   @Get('/discount/products/:orgId')
-  @UseGuards(UserGuard)
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutDiscountProductDto, 'products'),
   )

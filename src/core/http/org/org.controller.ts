@@ -7,15 +7,13 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
+import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
 import { JwtPayload } from '@shared/types/express';
-import { CurrentUser } from '../authentication/decorators/getCurrentUser.decorator';
-import { Roles } from '../authentication/decorators/role.decorator';
-import { UserGuard } from '../authentication/guard/userAuth.guard';
 import { Role } from '../authentication/roles/role.enum';
 import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 import {
@@ -33,7 +31,6 @@ export class OrgController {
   constructor(private orgService: OrgService) {}
 
   @Delete('/:id')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteOrg(@Param('id') id: string): Promise<OutPutMessageDto> {
@@ -47,7 +44,6 @@ export class OrgController {
   }
 
   @Put('/:id')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutUpdateOrgDto))
   async updateOrg(
@@ -60,7 +56,6 @@ export class OrgController {
   }
 
   @Post('')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateOrgDto))
   async createOrg(@Body() orgData: CreateOrgDTO): Promise<OutPutCreateOrgDto> {
@@ -71,7 +66,6 @@ export class OrgController {
   }
 
   @Get('user')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptorArray(OutPutListOrgsOfUser, 'orgs'))
   async getOrgOfUser(
@@ -84,7 +78,6 @@ export class OrgController {
   }
 
   @Get('/:orgid')
-  @UseGuards(UserGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutGetOrgDto))
   async getOrg(@Param('orgid') orgid: string): Promise<OutPutGetOrgDto> {
