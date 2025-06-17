@@ -63,7 +63,7 @@ export class OrderEntity<
         price: p.price,
       })),
       data.deletedAt,
-      STATUS.WAITING,
+      STATUS[data.status],
       data.id,
     );
   }

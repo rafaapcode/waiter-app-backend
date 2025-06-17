@@ -60,6 +60,11 @@ export class OutPutGetCurrentUserDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsOptional()
+  @IsMongoId()
+  id?: string;
 }
 
 export class OutPutUpdateCurrentUserDto extends userDto {

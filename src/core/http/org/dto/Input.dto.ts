@@ -2,7 +2,6 @@ import { PartialType } from '@nestjs/mapped-types';
 import {
   IsArray,
   IsEmail,
-  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -91,11 +90,6 @@ export class CreateOrgDTO {
   @IsArray()
   @IsOptional()
   location?: number[];
-
-  @IsString()
-  @IsNotEmpty()
-  @IsMongoId()
-  user: string;
 }
 
 export class UpdateOrgDTO extends PartialType(CreateOrgDTO) {}

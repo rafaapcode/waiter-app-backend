@@ -62,8 +62,14 @@ export class OrgController {
   @Post('')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutCreateOrgDto))
-  async createOrg(@Body() orgData: CreateOrgDTO): Promise<OutPutCreateOrgDto> {
-    const newOrg = OrgEntity.newOrg(orgData);
+  async createOrg(
+    @CurrentUser() user: JwtPayload,
+    @Body() orgData: CreateOrgDTO,
+  ): Promise<OutPutCreateOrgDto> {
+    const newOrg = OrgEntity.newOrg({
+      ...orgData,
+      user: user.id,
+    });
     const org = await this.orgService.createOrg(newOrg);
 
     return org.httpCreateResponse();

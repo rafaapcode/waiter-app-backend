@@ -27,7 +27,7 @@ export class OrgEntity {
     public readonly _id?: string,
   ) {}
 
-  static newOrg(data: CreateOrgDTO): OrgEntity {
+  static newOrg(data: CreateOrgDTO & { user: string }): OrgEntity {
     return new OrgEntity(
       data.name,
       data.email,
@@ -77,12 +77,11 @@ export class OrgEntity {
       ...(data.city && { city: data.city }),
       ...(data.neighborhood && { neighborhood: data.neighborhood }),
       ...(data.street && { street: data.street }),
-      ...(data.user && { user: data.user }),
       ...(data.location && { location: data.location }),
     };
   }
 
-  toCreate(): CreateOrgDTO {
+  toCreate(): CreateOrgDTO & { user: string } {
     return {
       cep: this.cep,
       city: this.city,

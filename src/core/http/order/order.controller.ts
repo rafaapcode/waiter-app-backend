@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
+import { IsPublic } from '@shared/decorators/isPublic';
 import { Roles } from '@shared/decorators/role.decorator';
 import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
@@ -91,13 +92,12 @@ export class OrderController {
   }
 
   @Post('')
-  @Roles(Role.ADMIN, Role.WAITER, Role.CLIENT)
+  @IsPublic()
   @UseInterceptors(new ResponseInterceptor(OutPutCreateOrdersDto))
   async createOrder(
     @Body() orderData: CreateOrderDto,
   ): Promise<OutPutCreateOrdersDto> {
     const order = OrderEntity.newOrder(orderData);
-
     const orderCreated = await this.orderService.createOrder(order);
     return orderCreated.httpCreateResponse();
   }
