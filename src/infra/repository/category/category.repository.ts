@@ -87,4 +87,20 @@ export class CategoryRepository {
 
     return true;
   }
+
+  async verifyCategoryOwnership(
+    orgid: string,
+    categoryId: string,
+  ): Promise<boolean> {
+    const category = await this.categoryModel.findOne({
+      _id: categoryId,
+      orgid,
+    });
+
+    if (!category) {
+      return false;
+    }
+
+    return true;
+  }
 }

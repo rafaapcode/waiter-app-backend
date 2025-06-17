@@ -25,7 +25,7 @@ import {
   OutPutMessageDto,
 } from './dto/OutPut.dto';
 import { OrderEntity } from './entity/order.entity';
-import { OrderService } from './order.service';
+import { OrderService } from './services/order.service';
 
 @Controller('order')
 export class OrderController {

@@ -7,9 +7,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { VerifyOrgOwnershipService } from '../org/services/verifyOrgOwnership.service';
-import { EditCategoryDto } from './dto/Input.dto';
-import { CategoryEntity } from './entity/category.entity';
+import { VerifyOrgOwnershipService } from '../../org/services/verifyOrgOwnership.service';
+import { EditCategoryDto } from '../dto/Input.dto';
+import { CategoryEntity } from '../entity/category.entity';
+import { VerifyCategoryOwnershipService } from './validateCategoryOwnership.service';
 
 @Injectable()
 export class CategoryService {
@@ -18,6 +19,7 @@ export class CategoryService {
     private readonly productRepository: ProductRepository,
     private readonly orgRepository: OrgRepository,
     private readonly orgVerifyOwnershipService: VerifyOrgOwnershipService,
+    private readonly categoryVerifyOwnershipService: VerifyCategoryOwnershipService,
   ) {}
 
   async createCategory(
@@ -47,13 +49,17 @@ export class CategoryService {
     return categories;
   }
 
-  async editCategory(
+  async updateCategory(
     userid: string,
     orgid: string,
     id: string,
     data: EditCategoryDto,
   ): Promise<boolean> {
-    await this.orgVerifyOwnershipService.verify(userid, orgid);
+    await this.validateEntities({
+      categoryId: id,
+      orgId: orgid,
+      userId: userid,
+    });
 
     const categorieExist = await this.categoryRepository.findCategoryById(id);
 
@@ -71,7 +77,11 @@ export class CategoryService {
     orgId: string,
     categoryId: string,
   ): Promise<boolean> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      categoryId,
+      orgId,
+      userId: userid,
+    });
 
     await this.orgRepository.orgExists(orgId);
     const categorieExist =
@@ -92,5 +102,20 @@ export class CategoryService {
 
     await this.categoryRepository.deleteCategory(categoryId);
     return true;
+  }
+
+  private async validateEntities({
+    categoryId,
+    orgId,
+    userId,
+  }: {
+    userId: string;
+    orgId: string;
+    categoryId: string;
+  }) {
+    await Promise.all([
+      this.orgVerifyOwnershipService.verify(userId, orgId),
+      this.categoryVerifyOwnershipService.verify(orgId, categoryId),
+    ]);
   }
 }

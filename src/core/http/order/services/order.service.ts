@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 import { HistoryOrdersType, ListOrderType } from '@shared/types/Order.type';
 import { ProductType } from '@shared/types/Product.type';
-import { VerifyOrgOwnershipService } from '../org/services/verifyOrgOwnership.service';
-import { ChangeOrderDto } from './dto/Input.dto';
-import { OrderEntity } from './entity/order.entity';
+import { VerifyOrgOwnershipService } from '../../org/services/verifyOrgOwnership.service';
+import { ChangeOrderDto } from '../dto/Input.dto';
+import { OrderEntity } from '../entity/order.entity';
+import { VerifyOrderOwnershipService } from './validateOrderOwnership.service';
 
 @Injectable()
 export class OrderService {
@@ -22,15 +23,20 @@ export class OrderService {
     private readonly orgRepository: OrgRepository,
     private readonly orderWs: OrderGateway,
     private readonly orgVerifyOwnershipService: VerifyOrgOwnershipService,
+    private readonly orderVerifyOwnershipService: VerifyOrderOwnershipService,
   ) {}
 
   async changeOrderStatus(
-    userid: string,
+    userId: string,
     orgId: string,
     orderId: string,
     newStatus: ChangeOrderDto,
   ): Promise<void> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orderId,
+      orgId,
+      userId,
+    });
 
     const orderExists = await this.orderRepository.orderExists(orderId);
 
@@ -66,11 +72,15 @@ export class OrderService {
   }
 
   async deleteOrder(
-    userid: string,
+    userId: string,
     orgId: string,
     orderId: string,
   ): Promise<boolean> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orderId,
+      orgId,
+      userId,
+    });
 
     const orderDeleted = await this.orderRepository.deleteOrder(orderId);
     if (!orderDeleted) {
@@ -81,10 +91,14 @@ export class OrderService {
   }
 
   async listOrders(
-    userid: string,
+    userId: string,
     orgId: string,
   ): Promise<OrderEntity<ListOrderType>[]> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orgId,
+      userId,
+    });
+
     await this.orgRepository.orgExists(orgId);
     const orders = await this.orderRepository.listOrders(orgId);
     if (!orders) {
@@ -98,8 +112,11 @@ export class OrderService {
     return orders;
   }
 
-  async restartDay(userid: string, orgId: string): Promise<boolean> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+  async restartDay(userId: string, orgId: string): Promise<boolean> {
+    await this.validateEntities({
+      orgId,
+      userId,
+    });
 
     await this.orgRepository.orgExists(orgId);
     const orders = await this.orderRepository.restartDay(orgId);
@@ -112,14 +129,18 @@ export class OrderService {
   }
 
   async historyPage(
-    userid: string,
+    userId: string,
     orgId: string,
     page: number,
   ): Promise<{
     total_pages: number;
     orders: OrderEntity<HistoryOrdersType, string>[];
   }> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orgId,
+      userId,
+    });
+
     await this.orgRepository.orgExists(orgId);
     const { total_pages, orders } = await this.orderRepository.historyOfOrders(
       orgId,
@@ -137,7 +158,7 @@ export class OrderService {
   }
 
   async historyFilterPage(
-    userid: string,
+    userId: string,
     orgId: string,
     filters: { to: Date; from: Date },
     page: number,
@@ -145,7 +166,10 @@ export class OrderService {
     total_pages: number;
     orders: OrderEntity<HistoryOrdersType, string>[];
   }> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orgId,
+      userId,
+    });
     await this.orgRepository.orgExists(orgId);
     const { total_pages, orders } =
       await this.orderRepository.historyOfOrdersWithFilters(
@@ -166,12 +190,31 @@ export class OrderService {
   }
 
   async deleteHistoryOrder(
-    userid: string,
-    orgid: string,
+    userId: string,
+    orgId: string,
     orderId: string,
   ): Promise<boolean> {
-    await this.orgVerifyOwnershipService.verify(userid, orgid);
+    await this.validateEntities({
+      orgId,
+      userId,
+      orderId,
+    });
     const orders = await this.orderRepository.deleteOrderHistory(orderId);
     return orders;
+  }
+
+  private async validateEntities({
+    orderId,
+    orgId,
+    userId,
+  }: {
+    userId: string;
+    orgId: string;
+    orderId?: string;
+  }) {
+    await Promise.all([
+      this.orgVerifyOwnershipService.verify(userId, orgId),
+      orderId && this.orderVerifyOwnershipService.verify(orgId, orderId),
+    ]);
   }
 }

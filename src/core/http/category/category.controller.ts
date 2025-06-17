@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
@@ -14,7 +14,6 @@ import { ResponseInterceptor } from '@shared/interceptor/response-interceptor';
 import { ResponseInterceptorArray } from '@shared/interceptor/response-interceptor-array';
 import { JwtPayload } from '@shared/types/express';
 import { Role } from '../authentication/roles/role.enum';
-import { CategoryService } from './category.service';
 import { CreateCategoryDto, EditCategoryDto } from './dto/Input.dto';
 import {
   OutPutCreateCategoryDto,
@@ -22,6 +21,7 @@ import {
   OutPutMessageDto,
 } from './dto/OutPut.dto';
 import { CategoryEntity } from './entity/category.entity';
+import { CategoryService } from './services/category.service';
 
 @Controller('category')
 export class CategoryController {
@@ -53,17 +53,17 @@ export class CategoryController {
     return categoryCreated.httpCreateResponse();
   }
 
-  @Put('/categories/:orgId/:categoryId')
+  @Patch('/categories/:orgId/:categoryId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
-  async editCategory(
+  async updateCategory(
     @CurrentUser() user: JwtPayload,
     @Param() params: { categoryId: string; orgId: string },
     @Body() editData: EditCategoryDto,
   ): Promise<OutPutMessageDto> {
     const { categoryId, orgId } = params;
     const category = CategoryEntity.toUpdate(editData);
-    const categoryEdited = await this.categoryService.editCategory(
+    const categoryEdited = await this.categoryService.updateCategory(
       user.id,
       orgId,
       categoryId,

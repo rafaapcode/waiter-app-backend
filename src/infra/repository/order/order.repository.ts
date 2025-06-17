@@ -279,4 +279,17 @@ export class OrderRepository {
 
     return true;
   }
+
+  async verifyOrderOwnership(orderId: string, orgId: string): Promise<boolean> {
+    const order = await this.orderModel.findOne({
+      _id: orderId,
+      org: orgId,
+    });
+
+    if (!order) {
+      return false;
+    }
+
+    return true;
+  }
 }
