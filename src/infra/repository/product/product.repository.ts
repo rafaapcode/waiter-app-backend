@@ -300,4 +300,16 @@ export class ProductRepository {
 
     return true;
   }
+
+  async verifyProductOwnership(
+    orgId: string,
+    productId: string,
+  ): Promise<boolean> {
+    await this.productModel.findOne({
+      org: orgId,
+      _id: productId,
+    });
+
+    return true;
+  }
 }

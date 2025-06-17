@@ -10,5 +10,6 @@ import { VerifyCategoryOwnershipService } from './services/validateCategoryOwner
   imports: [RepositoryModule, UserModule, OrgModule],
   providers: [CategoryService, VerifyCategoryOwnershipService],
   controllers: [CategoryController],
+  exports: [VerifyCategoryOwnershipService],
 })
 export class CategoryModule {}

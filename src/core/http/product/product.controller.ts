@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
@@ -24,7 +23,7 @@ import {
   OutPutListProductDto,
   OutPutMessageDto,
 } from './dto/OutPut.dto';
-import { ProductService } from './product.service';
+import { ProductService } from './services/product.service';
 
 @Controller('product')
 export class ProductController {
@@ -56,12 +55,18 @@ export class ProductController {
     };
   }
 
-  @Get('search/:productId')
+  @Get('search/:orgId/:productId')
   @UseInterceptors(new ResponseInterceptor(OutPutGetProductDto))
   async getProduct(
-    @Param('productId') productId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { productId: string; orgId: string },
   ): Promise<OutPutGetProductDto> {
-    const product = await this.productService.getProduct(productId);
+    const { orgId, productId } = params;
+    const product = await this.productService.getProduct(
+      user.id,
+      orgId,
+      productId,
+    );
     return product;
   }
 
@@ -74,7 +79,7 @@ export class ProductController {
     return await this.productService.createProduct(productData);
   }
 
-  @Get('categorie/:categoryId/:orgId')
+  @Get('categorie/:orgId/:categoryId')
   @UseInterceptors(
     new ResponseInterceptorArray(OutPutListProductByCategorieDto, 'products'),
   )
@@ -105,51 +110,73 @@ export class ProductController {
     };
   }
 
-  @Delete(':productId')
+  @Delete(':orgId/:productId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async deleteProduct(
-    @Param('productId') productId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { productId: string; orgId: string },
   ): Promise<OutPutMessageDto> {
-    await this.productService.deleteProduct(productId);
+    const { orgId, productId } = params;
+    await this.productService.deleteProduct(user.id, orgId, productId);
     return {
       message: 'Produto deletado com sucesso !',
     };
   }
 
-  @Put(':productId')
+  @Patch(':orgId/:productId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async updateProduct(
-    @Param('productId') productId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { productId: string; orgId: string },
     @Body() updateProduct: UpdateProductDto,
   ): Promise<OutPutMessageDto> {
-    await this.productService.updateProduct(productId, updateProduct);
+    const { orgId, productId } = params;
+    await this.productService.updateProduct(
+      user.id,
+      orgId,
+      productId,
+      updateProduct,
+    );
     return {
       message: 'Produto atualizado com sucesso !',
     };
   }
 
-  @Patch('/discount/add/:productId')
+  @Patch('/discount/add/:orgId/:productId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async putProductInDiscount(
-    @Param('productId') productId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { productId: string; orgId: string },
     @Body() newPrice: { newPrice: number },
   ): Promise<OutPutMessageDto> {
-    await this.productService.productInDiscount(productId, newPrice.newPrice);
+    const { orgId, productId } = params;
+    await this.productService.productInDiscount(
+      user.id,
+      orgId,
+      productId,
+      newPrice.newPrice,
+    );
     return {
       message: 'Desconto adicionado ao produto',
     };
   }
 
-  @Patch('/discount/remove/:productId')
+  @Patch('/discount/remove/:orgId/:productId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
   async removeProductInDiscount(
-    @Param('productId') productId: string,
+    @CurrentUser() user: JwtPayload,
+    @Param() params: { productId: string; orgId: string },
   ): Promise<OutPutMessageDto> {
-    await this.productService.removeDiscountOfProduct(productId);
+    const { orgId, productId } = params;
+    await this.productService.removeDiscountOfProduct(
+      user.id,
+      orgId,
+      productId,
+    );
     return {
       message: 'Desconto removido do produto',
     };

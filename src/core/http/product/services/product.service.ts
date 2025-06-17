@@ -1,3 +1,4 @@
+import { VerifyCategoryOwnershipService } from '@core/http/category/services/validateCategoryOwnership.service';
 import { CategoryRepository } from '@infra/repository/category/category.repository';
 import { IngredientRepository } from '@infra/repository/ingredients/ingredients.repository';
 import { OrderRepository } from '@infra/repository/order/order.repository';
@@ -11,8 +12,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ListProductsType, ProductType } from '@shared/types/Product.type';
-import { VerifyOrgOwnershipService } from '../org/services/verifyOrgOwnership.service';
-import { CreateProductDto, UpdateProductDto } from './dto/Input.dto';
+import { VerifyOrgOwnershipService } from '../../org/services/verifyOrgOwnership.service';
+import { CreateProductDto, UpdateProductDto } from '../dto/Input.dto';
+import { VerifyProductOwnershipService } from './validateProductOwnership.service';
 
 @Injectable()
 export class ProductService {
@@ -23,6 +25,8 @@ export class ProductService {
     private readonly categoryRepository: CategoryRepository,
     private readonly ingredientRepository: IngredientRepository,
     private readonly orgVerifyOwnershipService: VerifyOrgOwnershipService,
+    private readonly productVerifyOwnershipService: VerifyProductOwnershipService,
+    private readonly categoryVerifyOwnershipService: VerifyCategoryOwnershipService,
   ) {}
 
   async createProduct(
@@ -70,10 +74,14 @@ export class ProductService {
   }
 
   async listProduct(
-    userid: string,
+    userId: string,
     orgId: string,
   ): Promise<ListProductsType[]> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orgId,
+      userId,
+    });
+
     await this.orgRepository.orgExists(orgId);
     const products = await this.productRepository.listProducts(orgId);
 
@@ -85,11 +93,16 @@ export class ProductService {
   }
 
   async listProductByCategory(
-    userid: string,
+    userId: string,
     orgId: string,
     categoryId: string,
   ): Promise<ProductType<string, string>[]> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orgId,
+      userId,
+      categoryId,
+    });
+
     await this.orgRepository.orgExists(orgId);
     const products = await this.productRepository.listProductsByCategorie(
       orgId,
@@ -103,7 +116,17 @@ export class ProductService {
     return products;
   }
 
-  async deleteProduct(productId: string): Promise<boolean> {
+  async deleteProduct(
+    userId: string,
+    orgId: string,
+    productId: string,
+  ): Promise<boolean> {
+    await this.validateEntities({
+      orgId,
+      userId,
+      productId,
+    });
+
     await this.productRepository.getProduct(productId);
 
     const productIsAlreadyBeingUsed =
@@ -126,9 +149,17 @@ export class ProductService {
   }
 
   async updateProduct(
+    userId: string,
+    orgId: string,
     productId: string,
     data: UpdateProductDto,
   ): Promise<ProductType<string, string>> {
+    await this.validateEntities({
+      orgId,
+      userId,
+      productId,
+    });
+
     await this.productRepository.getProduct(productId);
 
     if (data.ingredients) {
@@ -161,6 +192,8 @@ export class ProductService {
   }
 
   async productInDiscount(
+    userId: string,
+    orgId: string,
     productId: string,
     newPrice: number,
   ): Promise<ProductType<string, string>> {
@@ -174,6 +207,12 @@ export class ProductService {
       );
     }
 
+    await this.validateEntities({
+      orgId,
+      userId,
+      productId,
+    });
+
     await this.productRepository.getProduct(productId);
 
     const productInDiscount = await this.productRepository.putProductInDiscount(
@@ -185,8 +224,16 @@ export class ProductService {
   }
 
   async removeDiscountOfProduct(
+    userId: string,
+    orgId: string,
     productId: string,
   ): Promise<ProductType<string, string>> {
+    await this.validateEntities({
+      orgId,
+      userId,
+      productId,
+    });
+
     await this.productRepository.getProduct(productId);
 
     const productWithoutDiscount =
@@ -196,10 +243,13 @@ export class ProductService {
   }
 
   async getAllDiscountProducts(
-    userid: string,
+    userId: string,
     orgId: string,
   ): Promise<ProductType<string, string>[]> {
-    await this.orgVerifyOwnershipService.verify(userid, orgId);
+    await this.validateEntities({
+      orgId,
+      userId,
+    });
     await this.orgRepository.orgExists(orgId);
     const products =
       await this.productRepository.returnAllDiscountProducts(orgId);
@@ -211,8 +261,36 @@ export class ProductService {
     return products;
   }
 
-  async getProduct(productId: string): Promise<ListProductsType> {
+  async getProduct(
+    userId: string,
+    orgId: string,
+    productId: string,
+  ): Promise<ListProductsType> {
+    await this.validateEntities({
+      orgId,
+      userId,
+      productId,
+    });
     const product = await this.productRepository.getProduct(productId);
     return product;
+  }
+
+  private async validateEntities({
+    productId,
+    orgId,
+    userId,
+    categoryId,
+  }: {
+    userId: string;
+    orgId: string;
+    productId?: string;
+    categoryId?: string;
+  }) {
+    await Promise.all([
+      this.orgVerifyOwnershipService.verify(userId, orgId),
+      productId && this.productVerifyOwnershipService.verify(orgId, productId),
+      categoryId &&
+        this.categoryVerifyOwnershipService.verify(orgId, categoryId),
+    ]);
   }
 }
