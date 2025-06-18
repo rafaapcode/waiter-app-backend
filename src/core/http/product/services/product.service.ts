@@ -11,9 +11,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ListProductsType, ProductType } from '@shared/types/Product.type';
+import { ListProductEntityType } from '@shared/types/Product.type';
 import { VerifyOrgOwnershipService } from '../../org/services/verifyOrgOwnership.service';
-import { CreateProductDto, UpdateProductDto } from '../dto/Input.dto';
+import { UpdateProductDto } from '../dto/Input.dto';
+import { ProductEntity } from '../entity/Product.entity';
 import { VerifyProductOwnershipService } from './validateProductOwnership.service';
 
 @Injectable()
@@ -30,8 +31,8 @@ export class ProductService {
   ) {}
 
   async createProduct(
-    productData: CreateProductDto,
-  ): Promise<ProductType<string, string>> {
+    productData: ProductEntity<string, string[], string>,
+  ): Promise<ProductEntity<string, string[], string>> {
     await this.orgRepository.orgExists(productData.org);
 
     const categoryExists = await this.categoryRepository.findCategoryById(
@@ -60,12 +61,7 @@ export class ProductService {
         `${productData.name} já existe, crie um produto com nome diferente.`,
       );
     }
-    const product = await this.productRepository.createProduct({
-      ...productData,
-      imageUrl:
-        productData.imageUrl ||
-        'https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg',
-    });
+    const product = await this.productRepository.createProduct(productData);
 
     if (!product) {
       throw new InternalServerErrorException('Erro ao criar o produto');
@@ -76,7 +72,7 @@ export class ProductService {
   async listProduct(
     userId: string,
     orgId: string,
-  ): Promise<ListProductsType[]> {
+  ): Promise<ListProductEntityType[]> {
     await this.validateEntities({
       orgId,
       userId,
@@ -96,7 +92,7 @@ export class ProductService {
     userId: string,
     orgId: string,
     categoryId: string,
-  ): Promise<ProductType<string, string>[]> {
+  ): Promise<ProductEntity<string, string[], string>[]> {
     await this.validateEntities({
       orgId,
       userId,
@@ -153,7 +149,7 @@ export class ProductService {
     orgId: string,
     productId: string,
     data: UpdateProductDto,
-  ): Promise<ProductType<string, string>> {
+  ): Promise<ProductEntity<string, string[], string>> {
     await this.validateEntities({
       orgId,
       userId,
@@ -196,7 +192,7 @@ export class ProductService {
     orgId: string,
     productId: string,
     newPrice: number,
-  ): Promise<ProductType<string, string>> {
+  ): Promise<ProductEntity<string, string[], string>> {
     if (!newPrice) {
       throw new BadRequestException('Um preço novo é obrigatório');
     }
@@ -227,7 +223,7 @@ export class ProductService {
     userId: string,
     orgId: string,
     productId: string,
-  ): Promise<ProductType<string, string>> {
+  ): Promise<ProductEntity<string, string[], string>> {
     await this.validateEntities({
       orgId,
       userId,
@@ -245,7 +241,7 @@ export class ProductService {
   async getAllDiscountProducts(
     userId: string,
     orgId: string,
-  ): Promise<ProductType<string, string>[]> {
+  ): Promise<ProductEntity<string, string[], string>[]> {
     await this.validateEntities({
       orgId,
       userId,
@@ -265,7 +261,7 @@ export class ProductService {
     userId: string,
     orgId: string,
     productId: string,
-  ): Promise<ListProductsType> {
+  ): Promise<ListProductEntityType> {
     await this.validateEntities({
       orgId,
       userId,

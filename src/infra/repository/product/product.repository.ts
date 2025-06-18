@@ -1,7 +1,11 @@
 import { UpdateProductDto } from '@core/http/product/dto/Input.dto';
 import { ProductEntity } from '@core/http/product/entity/Product.entity';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { ListProductEntityType, Product } from '@shared/types/Product.type';
+import {
+  ListProductEntityType,
+  Product,
+  ProductType,
+} from '@shared/types/Product.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
 
@@ -13,7 +17,7 @@ export class ProductRepository {
   ) {}
 
   async createProduct(
-    productData: ProductEntity,
+    productData: ProductEntity<string, string[], string>,
   ): Promise<ProductEntity<string, string[], string>> {
     const product = await this.productModel.create(productData.toCreate());
     const ingredients = product.ingredients.map((id) => id.toString());
@@ -199,26 +203,24 @@ export class ProductRepository {
 
   async allProductsExists(
     productsIds: string[],
-  ): Promise<ProductEntity<string, string[], string>[]> {
+  ): Promise<ProductType<string, string>[]> {
     const allProductsExists = await this.productModel.find({
       _id: { $in: productsIds },
     });
     if (!allProductsExists) {
       throw new NotFoundException('Um ou mais produtos não existe');
     }
-    return allProductsExists.map((p) =>
-      ProductEntity.toEntity({
-        _id: p.id,
-        category: p.category.toString(),
-        description: p.description,
-        discount: p.discount,
-        ingredients: p.ingredients.map((id) => id.toString()),
-        imageUrl: p.imageUrl,
-        name: p.name,
-        price: p.price,
-        priceInDiscount: p.priceInDiscount,
-      }),
-    );
+    return allProductsExists.map((p) => ({
+      _id: p.id,
+      category: p.category.toString(),
+      description: p.description,
+      discount: p.discount,
+      ingredients: p.ingredients.map((id) => id.toString()),
+      imageUrl: p.imageUrl,
+      name: p.name,
+      price: p.price,
+      priceInDiscount: p.priceInDiscount,
+    }));
   }
 
   async categoryIsBeingUsed(

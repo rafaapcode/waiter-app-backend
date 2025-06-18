@@ -48,7 +48,8 @@ export class ProductEntity<
     return new ProductEntity(
       data.name,
       data.description,
-      data.imageUrl,
+      data.imageUrl ||
+        'https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg',
       data.price,
       data.ingredients,
       data.category,

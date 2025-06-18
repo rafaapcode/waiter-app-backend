@@ -23,6 +23,7 @@ import {
   OutPutListProductDto,
   OutPutMessageDto,
 } from './dto/OutPut.dto';
+import { ProductEntity } from './entity/Product.entity';
 import { ProductService } from './services/product.service';
 
 @Controller('product')
@@ -76,7 +77,8 @@ export class ProductController {
   async createProduct(
     @Body() productData: CreateProductDto,
   ): Promise<OutPutCreateProductDto> {
-    return await this.productService.createProduct(productData);
+    const product = ProductEntity.newProduct(productData);
+    return await this.productService.createProduct(product);
   }
 
   @Get('categorie/:orgId/:categoryId')
@@ -133,11 +135,14 @@ export class ProductController {
     @Body() updateProduct: UpdateProductDto,
   ): Promise<OutPutMessageDto> {
     const { orgId, productId } = params;
+
+    const dataToUpdate = ProductEntity.toUpdate(updateProduct);
+
     await this.productService.updateProduct(
       user.id,
       orgId,
       productId,
-      updateProduct,
+      dataToUpdate,
     );
     return {
       message: 'Produto atualizado com sucesso !',
