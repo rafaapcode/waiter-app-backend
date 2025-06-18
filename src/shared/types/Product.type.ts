@@ -1,13 +1,14 @@
+import { ProductEntity } from '@core/http/product/entity/Product.entity';
 import { Document, Schema } from 'mongoose';
 import { Category } from './Category.type';
 import { Org } from './Org.type';
 
-type CategoriePropertie =
+export type CategoriePropertie =
   | Schema.Types.ObjectId
   | Category
   | { _id: Schema.Types.ObjectId; name: string; icon: string };
-type OrgPropertie = Schema.Types.ObjectId | Org;
-type IngredientsProperties =
+export type OrgPropertie = Schema.Types.ObjectId | Org;
+export type IngredientsProperties =
   | Schema.Types.ObjectId[]
   | { _id: Schema.Types.ObjectId; name: string; icon: string }[];
 
@@ -42,7 +43,7 @@ export type ProductType<
   priceInDiscount: number;
 };
 
-export type ListProductsType = ProductType<
+export type ListProductEntityType = ProductEntity<
   {
     _id: string;
     name: string;
@@ -52,5 +53,6 @@ export type ListProductsType = ProductType<
     _id: string;
     name: string;
     icon: string;
-  }
+  }[],
+  OrgPropertie
 >;
