@@ -94,9 +94,8 @@ export class CategoryRepository {
   ): Promise<boolean> {
     const category = await this.categoryModel.findOne({
       _id: categoryId,
-      orgid,
+      org: orgid,
     });
-
     if (!category) {
       return false;
     }

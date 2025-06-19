@@ -104,7 +104,6 @@ export class ProductService {
       orgId,
       categoryId,
     );
-
     if (products.length === 0) {
       throw new HttpException(null, 204);
     }

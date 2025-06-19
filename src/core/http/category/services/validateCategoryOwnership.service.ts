@@ -3,10 +3,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class VerifyCategoryOwnershipService {
-  constructor(private readonly category: CategoryRepository) {}
+  constructor(private readonly categoryRepo: CategoryRepository) {}
 
   async verify(orgId: string, categoryId: string) {
-    const isOwner = await this.category.verifyCategoryOwnership(
+    const isOwner = await this.categoryRepo.verifyCategoryOwnership(
       orgId,
       categoryId,
     );
