@@ -4,12 +4,20 @@ import { Org } from '@shared/types/Org.type';
 import {
   CategoriePropertie,
   IngredientsProperties,
+  ListProductEntityType,
   OrgPropertie,
   Product,
   ProductType,
 } from '@shared/types/Product.type';
 import { Document, Schema } from 'mongoose';
 import { CreateProductDto, UpdateProductDto } from '../dto/Input.dto';
+import {
+  OutPutCreateProductDto,
+  OutPutDiscountProductDto,
+  OutPutGetProductDto,
+  OutPutListProductByCategorieDto,
+  OutPutListProductDto,
+} from '../dto/OutPut.dto';
 
 type ProductMongoType = Document<
   unknown,
@@ -23,6 +31,18 @@ type ProductMongoType = Document<
   }> & {
     __v: number;
   };
+
+type IngredientType = {
+  _id: string;
+  name: string;
+  icon: string;
+};
+
+type CategoryType = {
+  _id: string;
+  name: string;
+  icon: string;
+};
 
 export class ProductEntity<
   TCat = Schema.Types.ObjectId | Category,
@@ -142,6 +162,88 @@ export class ProductEntity<
       name: this.name,
       org: this.org as string,
       price: this.price,
+    };
+  }
+
+  static httpListProductsResponse(
+    products: ListProductEntityType[],
+  ): OutPutListProductDto {
+    return {
+      products: products.map((p) => ({
+        _id: p._id,
+        name: p.name,
+        description: p.description,
+        imageUrl: p.imageUrl,
+        price: p.price,
+        category: p.category,
+        discount: p.discount,
+        priceInDiscount: p.priceInDiscount,
+        ingredients: p.ingredients,
+      })),
+    };
+  }
+
+  httpGetProductsResponse(): OutPutGetProductDto {
+    return {
+      _id: this._id,
+      category: this.category as CategoryType,
+      description: this.description,
+      discount: this.discount,
+      imageUrl: this.imageUrl,
+      ingredients: this.ingredients as IngredientType[],
+      name: this.name,
+      price: this.price,
+      priceInDiscount: this.priceInDiscount,
+    };
+  }
+
+  httpCreateProductsResponse(): OutPutCreateProductDto {
+    return {
+      _id: this._id,
+      category: this.category as string,
+      description: this.description,
+      discount: this.discount,
+      imageUrl: this.imageUrl,
+      ingredients: this.ingredients as string[],
+      name: this.name,
+      price: this.price,
+      priceInDiscount: this.priceInDiscount,
+    };
+  }
+
+  static httpListProductsByCategorieResponse(
+    products: ProductEntity<string, string[], string>[],
+  ): OutPutListProductByCategorieDto {
+    return {
+      products: products.map((product) => ({
+        _id: product._id,
+        category: product.category as string,
+        description: product.description,
+        discount: product.discount,
+        imageUrl: product.imageUrl,
+        ingredients: product.ingredients as string[],
+        name: product.name,
+        price: product.price,
+        priceInDiscount: product.priceInDiscount,
+      })),
+    };
+  }
+
+  static httpGetDiscountProductsResponse(
+    products: ProductEntity<string, string[], string>[],
+  ): OutPutDiscountProductDto {
+    return {
+      products: products.map((product) => ({
+        _id: product._id,
+        category: product.category as string,
+        description: product.description,
+        discount: product.discount,
+        imageUrl: product.imageUrl,
+        ingredients: product.ingredients as string[],
+        name: product.name,
+        price: product.price,
+        priceInDiscount: product.priceInDiscount,
+      })),
     };
   }
 }

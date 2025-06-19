@@ -39,21 +39,7 @@ export class ProductController {
     @Param('orgId') orgId: string,
   ): Promise<OutPutListProductDto> {
     const products = await this.productService.listProduct(user.id, orgId);
-    return {
-      products: products.map((product) => {
-        return {
-          _id: product._id,
-          name: product.name,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: product.price,
-          category: product.category,
-          discount: product.discount,
-          priceInDiscount: product.priceInDiscount,
-          ingredients: product.ingredients,
-        };
-      }),
-    };
+    return ProductEntity.httpListProductsResponse(products);
   }
 
   @Get('search/:orgId/:productId')
@@ -68,7 +54,7 @@ export class ProductController {
       orgId,
       productId,
     );
-    return product;
+    return product.httpGetProductsResponse();
   }
 
   @Post('')
@@ -78,7 +64,8 @@ export class ProductController {
     @Body() productData: CreateProductDto,
   ): Promise<OutPutCreateProductDto> {
     const product = ProductEntity.newProduct(productData);
-    return await this.productService.createProduct(product);
+    const productCreated = await this.productService.createProduct(product);
+    return productCreated.httpCreateProductsResponse();
   }
 
   @Get('categorie/:orgId/:categoryId')
@@ -95,21 +82,7 @@ export class ProductController {
       orgId,
       categoryId,
     );
-    return {
-      products: products.map((product) => {
-        return {
-          _id: product._id,
-          name: product.name,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: product.price,
-          category: product.category,
-          discount: product.discount,
-          priceInDiscount: product.priceInDiscount,
-          ingredients: product.ingredients,
-        };
-      }),
-    };
+    return ProductEntity.httpListProductsByCategorieResponse(products);
   }
 
   @Delete(':orgId/:productId')
@@ -199,20 +172,6 @@ export class ProductController {
       user.id,
       orgId,
     );
-    return {
-      products: products.map((product) => {
-        return {
-          _id: product._id,
-          name: product.name,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: product.price,
-          category: product.category,
-          discount: product.discount,
-          priceInDiscount: product.priceInDiscount,
-          ingredients: product.ingredients,
-        };
-      }),
-    };
+    return ProductEntity.httpGetDiscountProductsResponse(products);
   }
 }
