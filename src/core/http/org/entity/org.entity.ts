@@ -195,6 +195,7 @@ export class OrgEntity {
       return {
         _id: o._id,
         name: o.name,
+        imageUrl: o.imageUrl,
       };
     });
   }

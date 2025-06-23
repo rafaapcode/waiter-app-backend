@@ -101,6 +101,9 @@ class orgDto {
   @IsString({ message: 'name deve ser uma string' })
   @IsNotEmpty({ message: 'name é obrigatório' })
   name: string;
+
+  @IsOptional()
+  imageUrl?: string;
 }
 
 export class OutPutCreateOrgDto extends orgInfoDto {}
