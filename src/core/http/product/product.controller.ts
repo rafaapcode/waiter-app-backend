@@ -42,7 +42,7 @@ export class ProductController {
     return ProductEntity.httpListProductsResponse(products);
   }
 
-  @Get('search/:orgId/:productId')
+  @Get(':orgId/:productId')
   @UseInterceptors(new ResponseInterceptor(OutPutGetProductDto))
   async getProduct(
     @CurrentUser() user: JwtPayload,

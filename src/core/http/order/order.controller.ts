@@ -32,7 +32,7 @@ import { OrderService } from './services/order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Get('history/:page/:orgId')
+  @Get('history/:orgId/:page')
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrders(
@@ -52,7 +52,7 @@ export class OrderController {
     };
   }
 
-  @Get('history/filter/:page/:orgId')
+  @Get('history/filter/:orgId/:page')
   @Roles(Role.ADMIN, Role.WAITER)
   @UseInterceptors(new ResponseInterceptor(OutPutHistoryOrderDto))
   async historyOfOrdersFiltered(
