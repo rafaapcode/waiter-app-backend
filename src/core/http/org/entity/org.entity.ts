@@ -3,6 +3,7 @@ import { CreateOrgDTO, UpdateOrgDTO } from '../dto/Input.dto';
 import {
   OutPutCreateOrgDto,
   OutPutGetOrgDto,
+  OutPutListOrgsInfoOfUser,
   OutPutListOrgsOfUser,
   OutPutUpdateOrgDto,
 } from '../dto/OutPut.dto';
@@ -165,9 +166,9 @@ export class OrgEntity {
     };
   }
 
-  static httpGetAllOrgsResponse(
+  static httpGetAllOrgsInfoResponse(
     orgs: OrgEntity[],
-  ): OutPutListOrgsOfUser['orgs'] {
+  ): OutPutListOrgsInfoOfUser['orgs'] {
     return orgs.map((o) => {
       return {
         _id: o._id,
@@ -183,6 +184,17 @@ export class OrgEntity {
         street: o.street,
         user: o.user,
         location: o.location,
+      };
+    });
+  }
+
+  static httpListAllOrgsResponse(
+    orgs: OrgEntity[],
+  ): OutPutListOrgsOfUser['orgs'] {
+    return orgs.map((o) => {
+      return {
+        _id: o._id,
+        name: o.name,
       };
     });
   }

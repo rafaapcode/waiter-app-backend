@@ -19,6 +19,7 @@ import { CreateOrgDTO, UpdateOrgDTO } from './dto/Input.dto';
 import {
   OutPutCreateOrgDto,
   OutPutGetOrgDto,
+  OutPutListOrgsInfoOfUser,
   OutPutListOrgsOfUser,
   OutPutMessageDto,
   OutPutUpdateOrgDto,
@@ -75,15 +76,29 @@ export class OrgController {
     return org.httpCreateResponse();
   }
 
+  @Get('user/info')
+  @Roles(Role.ADMIN)
+  @UseInterceptors(
+    new ResponseInterceptorArray(OutPutListOrgsInfoOfUser, 'orgs'),
+  )
+  async getOrgInfoOfUser(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<OutPutListOrgsInfoOfUser> {
+    const orgs = await this.orgService.getAllOrgsOfUser(user.id);
+    return {
+      orgs: OrgEntity.httpGetAllOrgsInfoResponse(orgs),
+    };
+  }
+
   @Get('user')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptorArray(OutPutListOrgsOfUser, 'orgs'))
-  async getOrgOfUser(
+  async listOrgOfUser(
     @CurrentUser() user: JwtPayload,
   ): Promise<OutPutListOrgsOfUser> {
     const orgs = await this.orgService.getAllOrgsOfUser(user.id);
     return {
-      orgs: OrgEntity.httpGetAllOrgsResponse(orgs),
+      orgs: OrgEntity.httpListAllOrgsResponse(orgs),
     };
   }
 

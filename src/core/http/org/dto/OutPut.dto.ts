@@ -31,7 +31,7 @@ class location {
   coordinates?: [number, number];
 }
 
-class orgDto {
+class orgInfoDto {
   @IsString({ message: '_id deve ser uma string' })
   @IsOptional()
   @IsMongoId()
@@ -92,9 +92,27 @@ class orgDto {
   user: string;
 }
 
-export class OutPutCreateOrgDto extends orgDto {}
-export class OutPutUpdateOrgDto extends PartialType(orgDto) {}
-export class OutPutGetOrgDto extends orgDto {}
+class orgDto {
+  @IsString({ message: '_id deve ser uma string' })
+  @IsOptional()
+  @IsMongoId()
+  _id?: string;
+
+  @IsString({ message: 'name deve ser uma string' })
+  @IsNotEmpty({ message: 'name é obrigatório' })
+  name: string;
+}
+
+export class OutPutCreateOrgDto extends orgInfoDto {}
+export class OutPutUpdateOrgDto extends PartialType(orgInfoDto) {}
+export class OutPutGetOrgDto extends orgInfoDto {}
+
+export class OutPutListOrgsInfoOfUser {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => orgInfoDto)
+  orgs: orgInfoDto[];
+}
 
 export class OutPutListOrgsOfUser {
   @IsArray()
