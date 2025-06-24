@@ -22,7 +22,7 @@ export class CreateOrgDTO {
     require_protocol: true,
   })
   @IsOptional()
-  imageUrl: string;
+  imageUrl?: string;
 
   @IsString()
   @IsNotEmpty()
