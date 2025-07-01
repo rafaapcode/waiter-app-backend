@@ -43,7 +43,10 @@ export class OrgEntity {
       data.user,
       {
         type: 'Point',
-        coordinates: [data.location[0], data.location[1]],
+        coordinates: [
+          data.location ? data.location[0] : 0,
+          data.location ? data.location[1] : 0,
+        ],
       },
     );
   }
