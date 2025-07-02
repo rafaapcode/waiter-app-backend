@@ -5,8 +5,8 @@ import {
   Get,
   InternalServerErrorException,
   Param,
+  Patch,
   Post,
-  Put,
   UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from '@shared/decorators/getCurrentUser.decorator';
@@ -47,7 +47,7 @@ export class OrgController {
     return { message: 'Organização deletada !' };
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutUpdateOrgDto))
   async updateOrg(
