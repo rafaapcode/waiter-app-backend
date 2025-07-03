@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -38,6 +39,9 @@ export class ProductController {
     @CurrentUser() user: JwtPayload,
     @Param('orgId') orgId: string,
   ): Promise<OutPutListProductDto> {
+    if (!orgId) {
+      throw new BadRequestException('OrgID é obrigatório.');
+    }
     const products = await this.productService.listProduct(user.id, orgId);
     return ProductEntity.httpListProductsResponse(products);
   }
