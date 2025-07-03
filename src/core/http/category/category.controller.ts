@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -34,6 +35,11 @@ export class CategoryController {
   async listCategories(
     @Param('orgId') orgId: string,
   ): Promise<OutPutListCategoryDto> {
+    console.log('categoryId - orgid', orgId);
+    if (!orgId) {
+      throw new BadRequestException('OrgId é obrigatório');
+    }
+
     const categories = await this.categoryService.listCategory(orgId);
 
     return {
