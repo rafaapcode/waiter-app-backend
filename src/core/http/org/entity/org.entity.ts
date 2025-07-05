@@ -14,6 +14,7 @@ export class OrgEntity {
     public readonly email: string,
     public readonly imageUrl: string,
     public readonly description: string,
+    public readonly locationCode: string,
     public readonly openHour: string,
     public readonly closeHour: string,
     public readonly cep: string,
@@ -41,6 +42,7 @@ export class OrgEntity {
       data.neighborhood,
       data.street,
       data.user,
+      data.locationCode,
       {
         type: 'Point',
         coordinates: [
@@ -57,6 +59,7 @@ export class OrgEntity {
       data.email,
       data.imageUrl,
       data.description,
+      data.locationCode,
       data.openHour,
       data.closeHour,
       data.cep,
@@ -74,6 +77,7 @@ export class OrgEntity {
       ...(data.name && { name: data.name }),
       ...(data.email && { email: data.email }),
       ...(data.imageUrl && { imageUrl: data.imageUrl }),
+      ...(data.locationCode && { location: data.locationCode }),
       ...(data.description && { description: data.description }),
       ...(data.openHour && { openHour: data.openHour }),
       ...(data.closeHour && { closeHour: data.closeHour }),
@@ -87,6 +91,7 @@ export class OrgEntity {
 
   toCreate(): CreateOrgDTO & { user: string } {
     return {
+      locationCode: this.locationCode,
       cep: this.cep,
       city: this.city,
       closeHour: this.closeHour,
@@ -109,6 +114,7 @@ export class OrgEntity {
       city: this.city,
       closeHour: this.closeHour,
       description: this.description,
+      locationCode: this.locationCode,
       email: this.email,
       imageUrl: this.imageUrl,
       name: this.name,
@@ -159,6 +165,7 @@ export class OrgEntity {
       neighborhood: this.neighborhood,
       openHour: this.openHour,
       street: this.street,
+      locationCode: this.locationCode,
       user: this.user,
       location: {
         type: 'Point',
@@ -187,6 +194,7 @@ export class OrgEntity {
         street: o.street,
         user: o.user,
         location: o.location,
+        locationCode: o.locationCode,
       };
     });
   }

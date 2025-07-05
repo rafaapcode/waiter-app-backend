@@ -22,6 +22,7 @@ export class OrgRepository {
       },
     });
     return OrgEntity.toEntity({
+      locationCode: newOrg.locationCode,
       description: newOrg.description,
       email: newOrg.email,
       imageUrl: newOrg.imageUrl,
@@ -50,6 +51,7 @@ export class OrgRepository {
     }
 
     return OrgEntity.toEntity({
+      locationCode: newOrg.locationCode,
       description: newOrg.description,
       email: newOrg.email,
       imageUrl: newOrg.imageUrl,
@@ -73,6 +75,7 @@ export class OrgRepository {
       throw new NotFoundException('Organização não encontrada');
     }
     return OrgEntity.toEntity({
+      locationCode: orgById.locationCode,
       description: orgById.description,
       email: orgById.email,
       imageUrl: orgById.imageUrl,
@@ -106,6 +109,7 @@ export class OrgRepository {
     });
     return allOrgs.map((org) => {
       return OrgEntity.toEntity({
+        locationCode: org.locationCode,
         description: org.description,
         email: org.email,
         imageUrl: org.imageUrl,

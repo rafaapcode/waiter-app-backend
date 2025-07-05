@@ -3,6 +3,7 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
+  IsNumberString,
   IsOptional,
   IsString,
   IsUrl,
@@ -55,6 +56,13 @@ export class CreateOrgDTO {
     message: 'O horário de fechamento deve ter no máximo 6 caracteres',
   })
   closeHour: string;
+
+  @IsString({
+    message: 'O número do estabelecimento deve ter no mínimo 4 caracteres',
+  })
+  @IsNumberString()
+  @IsNotEmpty()
+  locationCode: string;
 
   @IsString()
   @IsNotEmpty()

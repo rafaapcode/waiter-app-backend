@@ -6,6 +6,7 @@ import {
   IsEmail,
   IsMongoId,
   IsNotEmpty,
+  IsNumberString,
   IsOptional,
   IsString,
   IsUrl,
@@ -62,6 +63,11 @@ class orgInfoDto {
   @IsString({ message: 'openHour deve ser uma string' })
   @IsNotEmpty({ message: 'openHour é obrigatório' })
   openHour: string;
+
+  @IsString()
+  @IsNumberString()
+  @IsNotEmpty({ message: 'o número do estabelecimento é obrigatório' })
+  locationCode: string;
 
   @IsString({ message: 'closeHour deve ser uma string' })
   @IsNotEmpty({ message: 'closeHour é obrigatório' })

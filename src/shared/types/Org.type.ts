@@ -8,6 +8,7 @@ export interface Org<TUser = UserPropertie> extends Document {
   readonly imageUrl: string;
   readonly email: string;
   readonly description: string;
+  readonly locationCode: string;
   readonly openHour: string;
   readonly closeHour: string;
   readonly cep: string;
@@ -28,6 +29,7 @@ export type OrgType<TUser = string> = {
   imageUrl: string;
   description: string;
   openHour: string;
+  locationCode: string;
   closeHour: string;
   cep: string;
   city: string;

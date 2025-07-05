@@ -81,6 +81,16 @@ export const OrgSchema = new mongoose.Schema({
       required: false,
     },
   },
+  locationCode: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (value: string) {
+        return /^[0-9]+$/.test(value);
+      },
+      message: 'O número do estabelecimento de ser composto de números',
+    },
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
