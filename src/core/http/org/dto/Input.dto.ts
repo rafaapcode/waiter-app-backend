@@ -57,9 +57,7 @@ export class CreateOrgDTO {
   })
   closeHour: string;
 
-  @IsString({
-    message: 'O número do estabelecimento deve ter no mínimo 4 caracteres',
-  })
+  @IsString()
   @IsNumberString()
   @IsNotEmpty()
   locationCode: string;

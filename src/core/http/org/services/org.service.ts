@@ -27,11 +27,9 @@ export class OrgService {
       orgData.name,
       orgData.user,
     );
-
     if (orgExists) {
       throw new BadRequestException('Organização já existe');
     }
-
     const org = await this.orgRepository.createOrg(orgData);
 
     return org;

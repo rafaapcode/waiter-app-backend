@@ -35,6 +35,7 @@ export class OrgEntity {
       data.email,
       data.imageUrl,
       data.description,
+      data.locationCode,
       data.openHour,
       data.closeHour,
       data.cep,
@@ -42,7 +43,6 @@ export class OrgEntity {
       data.neighborhood,
       data.street,
       data.user,
-      data.locationCode,
       {
         type: 'Point',
         coordinates: [
