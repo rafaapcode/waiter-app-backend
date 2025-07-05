@@ -85,13 +85,25 @@ export class ProductRepository {
     return true;
   }
 
-  async deleteProduct(productId: string): Promise<boolean> {
+  async deleteProduct(
+    productId: string,
+  ): Promise<ProductEntity<string, string[], string> | null> {
     const productDeleted = await this.productModel.findByIdAndDelete(productId);
-
     if (!productDeleted) {
-      return false;
+      return null;
     }
-    return true;
+    const ingredients = productDeleted.ingredients.map((id) => id.toString());
+    return ProductEntity.toEntity({
+      _id: productDeleted.id,
+      category: productDeleted.category.toString(),
+      description: productDeleted.description,
+      discount: productDeleted.discount,
+      ingredients,
+      imageUrl: productDeleted.imageUrl,
+      name: productDeleted.name,
+      price: productDeleted.price,
+      priceInDiscount: productDeleted.priceInDiscount,
+    });
   }
 
   async updateProduct(

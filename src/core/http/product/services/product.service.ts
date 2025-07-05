@@ -11,6 +11,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { env } from '@shared/config/env';
 import { ListProductEntityType } from '@shared/types/Product.type';
 import { VerifyOrgOwnershipService } from '../../org/services/verifyOrgOwnership.service';
 import { UpdateProductDto } from '../dto/Input.dto';
@@ -139,6 +140,15 @@ export class ProductService {
     if (!productDeleted) {
       throw new NotFoundException('Produto não encontrado !');
     }
+
+    const pathKey = new URL(productDeleted.imageUrl).pathname.slice(1);
+
+    fetch(`${env.IMAGE_URL}?key_path=${pathKey}`, { method: 'DELETE' }).catch(
+      (err) => {
+        console.error(err);
+        console.log('Erro ao deletar a imagem do produto', productId);
+      },
+    );
 
     return true;
   }
