@@ -252,6 +252,8 @@ export class ProductRepository {
   }
 
   async deleteAllProductsOfOrg(orgId: string): Promise<boolean> {
+    // const getProductsId = await this.productModel.
+
     await this.productModel.deleteMany({
       org: orgId,
     });
