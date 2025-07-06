@@ -7,6 +7,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { env } from '@shared/config/env';
 import mongoose from 'mongoose';
 import { UpdateOrgDTO } from '../dto/Input.dto';
 import { OrgEntity } from '../entity/org.entity';
@@ -62,6 +63,8 @@ export class OrgService {
     }
     const session = await mongoose.startSession();
     try {
+      let productUrlsToDelete = [];
+      let orgKeyPath = '';
       await session.withTransaction(async () => {
         const deleteCategory =
           this.categoryRepository.deleteAllCategoryOfOrg(orgId);
@@ -69,10 +72,35 @@ export class OrgService {
         const deleteProduct =
           this.productRepository.deleteAllProductsOfOrg(orgId);
 
-        await Promise.all([deleteCategory, deleteOrder, deleteProduct]);
+        const [, , productUrls] = await Promise.all([
+          deleteCategory,
+          deleteOrder,
+          deleteProduct,
+        ]);
+        productUrlsToDelete = productUrls.map((url) =>
+          new URL(url).pathname.slice(1),
+        );
         await this.orgRepository.deleteOrgById(orgId);
+        orgKeyPath = '';
       });
       await session.commitTransaction();
+
+      fetch(`${env.IMAGE_URL}/delete/batch`, {
+        method: 'POST',
+        body: JSON.stringify({ keys: productUrlsToDelete }),
+      }).catch((err) => {
+        console.error(err);
+        console.log('Erro ao deletar as imagems dos produtos');
+      });
+
+      fetch(`${env.IMAGE_URL}?key_path=${orgKeyPath}`, {
+        method: 'POST',
+        body: JSON.stringify({ keys: productUrlsToDelete }),
+      }).catch((err) => {
+        console.error(err);
+        console.log('Erro ao deletar as imagems dos produtos');
+      });
+
       return true;
     } catch (error) {
       console.log(error);

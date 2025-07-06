@@ -251,14 +251,13 @@ export class ProductRepository {
     return false;
   }
 
-  async deleteAllProductsOfOrg(orgId: string): Promise<boolean> {
-    // const getProductsId = await this.productModel.
-
+  async deleteAllProductsOfOrg(orgId: string): Promise<string[]> {
+    const getProductsId = await this.productModel.find({ org: orgId });
     await this.productModel.deleteMany({
       org: orgId,
     });
 
-    return true;
+    return getProductsId.map((p) => p.imageUrl);
   }
 
   async verifyProductOwnership(
