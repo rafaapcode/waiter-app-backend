@@ -78,16 +78,24 @@ export class OrgService {
           deleteOrder,
           deleteProduct,
         ]);
-        productUrlsToDelete = productUrls.map((url) =>
-          new URL(url).pathname.slice(1),
-        );
+        if (productUrls.length > 0) {
+          productUrlsToDelete = productUrls.map((url) =>
+            new URL(url).pathname.slice(1),
+          );
+        }
         const orgImageUrl = await this.orgRepository.deleteOrgById(orgId);
-        orgKeyPath = new URL(orgImageUrl).pathname.slice(1);
+        if (orgImageUrl) {
+          orgKeyPath = new URL(orgImageUrl).pathname.slice(1);
+        }
       });
       await session.commitTransaction();
 
-      this.deleteBatchImages(productUrlsToDelete);
-      this.deleteImage(orgKeyPath);
+      if (productUrlsToDelete.length > 0) {
+        this.deleteBatchImages(productUrlsToDelete);
+      }
+      if (orgKeyPath) {
+        this.deleteImage(orgKeyPath);
+      }
 
       return true;
     } catch (error) {
