@@ -114,7 +114,46 @@ class orgDto {
 
 export class OutPutCreateOrgDto extends orgInfoDto {}
 export class OutPutUpdateOrgDto extends PartialType(orgInfoDto) {}
-export class OutPutGetOrgDto extends orgInfoDto {}
+export class OutPutGetOrgDto {
+  @IsString({ message: 'name deve ser uma string' })
+  @IsNotEmpty({ message: 'name é obrigatório' })
+  name: string;
+
+  @IsEmail({}, { message: 'email deve ser um email válido' })
+  @IsNotEmpty({ message: 'email é obrigatório' })
+  email: string;
+
+  @IsUrl(
+    {
+      protocols: ['http', 'https'],
+      require_protocol: true,
+    },
+    { message: 'imageUrl deve ser uma URL válida' },
+  )
+  @IsOptional()
+  imageUrl?: string;
+
+  @IsString({ message: 'description deve ser uma string' })
+  @IsNotEmpty({ message: 'description é obrigatório' })
+  description: string;
+
+  @IsString({ message: 'openHour deve ser uma string' })
+  @IsNotEmpty({ message: 'openHour é obrigatório' })
+  openHour: string;
+
+  @IsString()
+  @IsNumberString()
+  @IsNotEmpty({ message: 'o número do estabelecimento é obrigatório' })
+  locationCode: string;
+
+  @IsString({ message: 'closeHour deve ser uma string' })
+  @IsNotEmpty({ message: 'closeHour é obrigatório' })
+  closeHour: string;
+
+  @IsString({ message: 'cep deve ser uma string' })
+  @IsNotEmpty({ message: 'cep é obrigatório' })
+  cep: string;
+}
 
 export class OutPutListOrgsInfoOfUser {
   @IsArray()

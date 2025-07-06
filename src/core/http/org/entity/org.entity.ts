@@ -2,7 +2,6 @@ import { OrgType } from '@shared/types/Org.type';
 import { CreateOrgDTO, UpdateOrgDTO } from '../dto/Input.dto';
 import {
   OutPutCreateOrgDto,
-  OutPutGetOrgDto,
   OutPutListOrgsInfoOfUser,
   OutPutListOrgsOfUser,
   OutPutUpdateOrgDto,
@@ -143,29 +142,6 @@ export class OrgEntity {
       neighborhood: this.neighborhood,
       openHour: this.openHour,
       street: this.street,
-      user: this.user,
-      location: {
-        type: 'Point',
-        ...(this.location.coordinates && {
-          coordinates: this.location.coordinates,
-        }),
-      },
-    };
-  }
-
-  httpGetOrgResponse(): OutPutGetOrgDto {
-    return {
-      cep: this.cep,
-      city: this.city,
-      closeHour: this.closeHour,
-      description: this.description,
-      email: this.email,
-      imageUrl: this.imageUrl,
-      name: this.name,
-      neighborhood: this.neighborhood,
-      openHour: this.openHour,
-      street: this.street,
-      locationCode: this.locationCode,
       user: this.user,
       location: {
         type: 'Point',

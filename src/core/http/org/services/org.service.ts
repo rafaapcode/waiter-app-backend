@@ -1,6 +1,7 @@
 import { CategoryRepository } from '@infra/repository/category/category.repository';
 import { OrderRepository } from '@infra/repository/order/order.repository';
 import { OrgRepository } from '@infra/repository/org/org.repository';
+import { GetPartialDataOfOrgByIdOutPut } from '@infra/repository/org/type';
 import { ProductRepository } from '@infra/repository/product/product.repository';
 import {
   BadRequestException,
@@ -105,9 +106,12 @@ export class OrgService {
     }
   }
 
-  async getOrgId(userid: string, orgId: string): Promise<OrgEntity> {
+  async getOrgId(
+    userid: string,
+    orgId: string,
+  ): Promise<GetPartialDataOfOrgByIdOutPut> {
     await this.verifyOwnershipService.verify(userid, orgId);
-    return await this.orgRepository.getOrgById(orgId);
+    return await this.orgRepository.getPartialDataOfOrgById(orgId);
   }
 
   async getAllOrgsOfUser(userid: string): Promise<OrgEntity[]> {

@@ -4,6 +4,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Org } from '@shared/types/Org.type';
 import { Model } from 'mongoose';
 import { CONSTANTS } from '../../../constants';
+import { GetPartialDataOfOrgByIdOutPut } from './type';
 
 @Injectable()
 export class OrgRepository {
@@ -90,6 +91,30 @@ export class OrgRepository {
       user: orgById.user.toString(),
       _id: orgById.id,
     });
+  }
+
+  async getPartialDataOfOrgById(
+    orgId: string,
+  ): Promise<GetPartialDataOfOrgByIdOutPut> {
+    const orgById = await this.orgModel
+      .findById(orgId)
+      .select(
+        'locationCode name email description imageUrl cep closeHour openHour',
+      );
+
+    if (!orgById) {
+      throw new NotFoundException('Organização não encontrada');
+    }
+    return {
+      cep: orgById.cep,
+      closeHour: orgById.closeHour,
+      description: orgById.description,
+      email: orgById.email,
+      locationCode: orgById.locationCode,
+      name: orgById.name,
+      openHour: orgById.openHour,
+      imageUrl: orgById.imageUrl,
+    };
   }
 
   async getOrgByName(orgName: string, userid: string): Promise<boolean> {

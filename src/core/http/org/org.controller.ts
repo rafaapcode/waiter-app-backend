@@ -1,3 +1,4 @@
+import { GetPartialDataOfOrgByIdOutPut } from '@infra/repository/org/type';
 import {
   Body,
   Controller,
@@ -108,8 +109,8 @@ export class OrgController {
   async getOrg(
     @CurrentUser() user: JwtPayload,
     @Param('orgid') orgid: string,
-  ): Promise<OutPutGetOrgDto> {
+  ): Promise<GetPartialDataOfOrgByIdOutPut> {
     const org = await this.orgService.getOrgId(user.id, orgid);
-    return org.httpGetOrgResponse();
+    return org;
   }
 }
