@@ -127,12 +127,14 @@ export class OrgRepository {
     });
   }
 
-  async deleteOrgById(orgId: string): Promise<boolean> {
-    await this.orgModel.deleteOne({
-      _id: orgId,
-    });
+  async deleteOrgById(orgId: string): Promise<string> {
+    const org = await this.orgModel
+      .findByIdAndDelete({
+        _id: orgId,
+      })
+      .select('imageUrl');
 
-    return true;
+    return org.imageUrl;
   }
 
   async orgExists(orgId: string): Promise<void> {

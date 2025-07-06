@@ -134,21 +134,16 @@ export class ProductService {
       );
     }
 
-    const productDeleted =
+    const productDeletedImageUrl =
       await this.productRepository.deleteProduct(productId);
 
-    if (!productDeleted) {
+    if (!productDeletedImageUrl) {
       throw new NotFoundException('Produto não encontrado !');
     }
 
-    const pathKey = new URL(productDeleted.imageUrl).pathname.slice(1);
+    const pathKey = new URL(productDeletedImageUrl).pathname.slice(1);
 
-    fetch(`${env.IMAGE_URL}?key_path=${pathKey}`, { method: 'DELETE' }).catch(
-      (err) => {
-        console.error(err);
-        console.log('Erro ao deletar a imagem do produto', productId);
-      },
-    );
+    this.deleteImage(pathKey, productId);
 
     return true;
   }
@@ -165,7 +160,7 @@ export class ProductService {
       productId,
     });
 
-    await this.productRepository.getProduct(productId);
+    const oldProduct = await this.productRepository.getProduct(productId);
 
     if (data.ingredients) {
       const ingredientExists =
@@ -192,6 +187,11 @@ export class ProductService {
       productId,
       data,
     );
+
+    if (oldProduct.imageUrl) {
+      const imgPathKey = new URL(oldProduct.imageUrl).pathname.slice(1);
+      this.deleteImage(imgPathKey, productId);
+    }
 
     return updatedProduct;
   }
@@ -297,5 +297,14 @@ export class ProductService {
       categoryId &&
         this.categoryVerifyOwnershipService.verify(orgId, categoryId),
     ]);
+  }
+
+  private deleteImage(pathKey: string, productId: string): void {
+    fetch(`${env.IMAGE_URL}?key_path=${pathKey}`, { method: 'DELETE' }).catch(
+      (err) => {
+        console.error(err);
+        console.log('Erro ao deletar a imagem do produto', productId);
+      },
+    );
   }
 }

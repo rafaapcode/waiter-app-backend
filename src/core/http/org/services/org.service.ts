@@ -45,11 +45,12 @@ export class OrgService {
 
     const orgExists = await this.orgRepository.getOrgById(orgId);
 
-    if (!orgExists) {
-      throw new NotFoundException('Organização não encontrada');
-    }
-
     const org = await this.orgRepository.updateOrg(orgId, orgData);
+
+    if (orgExists.imageUrl) {
+      const imgPathKey = new URL(orgExists.imageUrl).pathname.slice(1);
+      this.deleteImage(imgPathKey);
+    }
 
     return org;
   }
@@ -80,26 +81,13 @@ export class OrgService {
         productUrlsToDelete = productUrls.map((url) =>
           new URL(url).pathname.slice(1),
         );
-        await this.orgRepository.deleteOrgById(orgId);
-        orgKeyPath = '';
+        const orgImageUrl = await this.orgRepository.deleteOrgById(orgId);
+        orgKeyPath = new URL(orgImageUrl).pathname.slice(1);
       });
       await session.commitTransaction();
 
-      fetch(`${env.IMAGE_URL}/delete/batch`, {
-        method: 'POST',
-        body: JSON.stringify({ keys: productUrlsToDelete }),
-      }).catch((err) => {
-        console.error(err);
-        console.log('Erro ao deletar as imagems dos produtos');
-      });
-
-      fetch(`${env.IMAGE_URL}?key_path=${orgKeyPath}`, {
-        method: 'POST',
-        body: JSON.stringify({ keys: productUrlsToDelete }),
-      }).catch((err) => {
-        console.error(err);
-        console.log('Erro ao deletar as imagems dos produtos');
-      });
+      this.deleteBatchImages(productUrlsToDelete);
+      this.deleteImage(orgKeyPath);
 
       return true;
     } catch (error) {
@@ -116,5 +104,24 @@ export class OrgService {
 
   async getAllOrgsOfUser(userid: string): Promise<OrgEntity[]> {
     return await this.orgRepository.getAllOrgsOfUser(userid);
+  }
+
+  private deleteBatchImages(productUrlsToDelete: string[]): void {
+    fetch(`${env.IMAGE_URL}/delete/batch`, {
+      method: 'POST',
+      body: JSON.stringify({ keys: productUrlsToDelete }),
+    }).catch((err) => {
+      console.error(err);
+      console.log('Erro ao deletar as imagems dos produtos');
+    });
+  }
+
+  private deleteImage(keyPath: string): void {
+    fetch(`${env.IMAGE_URL}?key_path=${keyPath}`, {
+      method: 'DELETE',
+    }).catch((err) => {
+      console.error(err);
+      console.log('Erro ao deletar as imagems dos produtos');
+    });
   }
 }

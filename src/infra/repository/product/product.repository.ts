@@ -85,25 +85,15 @@ export class ProductRepository {
     return true;
   }
 
-  async deleteProduct(
-    productId: string,
-  ): Promise<ProductEntity<string, string[], string> | null> {
-    const productDeleted = await this.productModel.findByIdAndDelete(productId);
+  async deleteProduct(productId: string): Promise<string | null> {
+    const productDeleted = await this.productModel
+      .findByIdAndDelete(productId)
+      .select('imageUrl');
     if (!productDeleted) {
       return null;
     }
-    const ingredients = productDeleted.ingredients.map((id) => id.toString());
-    return ProductEntity.toEntity({
-      _id: productDeleted.id,
-      category: productDeleted.category.toString(),
-      description: productDeleted.description,
-      discount: productDeleted.discount,
-      ingredients,
-      imageUrl: productDeleted.imageUrl,
-      name: productDeleted.name,
-      price: productDeleted.price,
-      priceInDiscount: productDeleted.priceInDiscount,
-    });
+
+    return productDeleted.imageUrl;
   }
 
   async updateProduct(
@@ -252,7 +242,10 @@ export class ProductRepository {
   }
 
   async deleteAllProductsOfOrg(orgId: string): Promise<string[]> {
-    const getProductsId = await this.productModel.find({ org: orgId });
+    const getProductsId = await this.productModel
+      .find({ org: orgId })
+      .select('imageUrl');
+
     await this.productModel.deleteMany({
       org: orgId,
     });
