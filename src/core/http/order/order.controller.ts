@@ -102,6 +102,20 @@ export class OrderController {
     return orderCreated.httpCreateResponse();
   }
 
+  @Patch('restart/:orgId')
+  @HttpCode(200)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
+  async restartDay(
+    @CurrentUser() user: JwtPayload,
+    @Param('orgId') orgId: string,
+  ): Promise<OutPutMessageDto> {
+    await this.orderService.restartDay(user.id, orgId);
+    return {
+      message: 'Dia reiniciado com sucesso !',
+    };
+  }
+
   @Patch('/:orgId/:orderId')
   @Roles(Role.ADMIN)
   @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
@@ -147,20 +161,6 @@ export class OrderController {
     await this.orderService.deleteHistoryOrder(user.id, orgId, orderId);
     return {
       message: 'Registro deletado com sucesso !',
-    };
-  }
-
-  @Patch('/restart/:orgId')
-  @HttpCode(200)
-  @Roles(Role.ADMIN)
-  @UseInterceptors(new ResponseInterceptor(OutPutMessageDto))
-  async restartDay(
-    @CurrentUser() user: JwtPayload,
-    @Param('orgId') orgId: string,
-  ): Promise<OutPutMessageDto> {
-    await this.orderService.restartDay(user.id, orgId);
-    return {
-      message: 'Dia reiniciado com sucesso !',
     };
   }
 }
