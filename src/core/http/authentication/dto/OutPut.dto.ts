@@ -1,5 +1,6 @@
 import { UserRoles } from '@shared/types/User.type';
 import {
+  IsEmail,
   IsEnum,
   IsJWT,
   IsMongoId,
@@ -21,6 +22,15 @@ export class OutputUserDto {
   @IsNotEmpty()
   @IsEnum(UserRoles)
   role: UserRoles;
+
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  email: string;
 
   @IsString()
   @IsNotEmpty()

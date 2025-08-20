@@ -22,6 +22,8 @@ export class AuthenticationService {
     access_token: string;
     refresh_token: string;
     role: UserRoles;
+    name: string;
+    email: string;
     id: string;
   }> {
     const user = await this.userRepo.userExists(email);
@@ -47,6 +49,8 @@ export class AuthenticationService {
       access_token: token,
       refresh_token: refreshToken,
       role: user.role,
+      name: user.name,
+      email: user.email,
       id: user._id,
     };
   }
