@@ -1,11 +1,12 @@
-# Waiter App Back End
+# Waitery App Back End
 
-## O que é o projeto
-- WAITERAPP é basicamente um aplicativo para ajudar restaurantes a gerenciar os pedidos de cada mesa, oferecendo uma interface administrativa para os cozinheiros e administradores e uma interface para os garçons e clientes conseguirem ver o cardápio e realiarem pedidos.
 
-- Esse repositório é onde está o código do BACK END desse projeto que ainda não está finalizado , porém está em andamento.
+### Project Overview
+- WAITERYAPP is basically an application to help restaurants manage orders for each table, offering an administrative interface for cooks and administrators and an interface for waiters and customers to view the menu and place orders.
+- This repository is where the BACK END code for this project is located, which is not yet finished but is in progress.
 
-## Tecnologias
+
+### Technologies
 - NodeJs ( NestJs )
 - Websockets
 - Mongoose
